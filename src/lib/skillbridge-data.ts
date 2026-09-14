@@ -260,7 +260,7 @@ export const CAREER_PATHS: CareerPath[] = [
 ];
 
 export function getPath(id: CareerPathId): CareerPath {
-  return CAREER_PATHS.find((p) => p.id === id) ?? CAREER_PATHS[0];
+  return CAREER_PATHS.find((p) => p.id === id) ?? CAREER_PATHS[0]!;
 }
 
 export const CANDIDATES = [
