@@ -363,12 +363,27 @@ function StudentDashboard({
   const [customJobs, setCustomJobs] = useState<LiveJob[]>([]);
 
   useEffect(() => {
-    setCustomJobs(getCustomJobs());
-    const handler = () => setCustomJobs(getCustomJobs());
-    window.addEventListener("storage_job_update", handler);
-    return () => window.removeEventListener("storage_job_update", handler);
-  }, []);
+    const updateJobs = () => {
+      setCustomJobs(getCustomJobs());
+    };
 
+  
+    updateJobs();
+
+    window.addEventListener("storage_job_update", updateJobs);
+    
+    
+    window.addEventListener("storage", updateJobs);
+    
+  
+    window.addEventListener("focus", updateJobs);
+
+    return () => {
+      window.removeEventListener("storage_job_update", updateJobs);
+      window.removeEventListener("storage", updateJobs);
+      window.removeEventListener("focus", updateJobs);
+    };
+  }, []);
   const allInternships = [...customJobs, ...path.internships];
 
   return (
