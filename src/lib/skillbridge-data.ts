@@ -588,3 +588,31 @@ export const SKILL_TAGS = [
   "React", "Node.js", "SQL", "Python", "Docker", "AWS", "Kubernetes",
   "FastAPI", "PowerBI", "Transformers", "TypeScript", "CI/CD",
 ];
+
+// --- Dynamic Recruiter Job Sync Helpers ---
+export type LiveJob = {
+  company: string;
+  role: string;
+  location: string;
+  stipend: string;
+  fit: number;
+  isCustom?: boolean;
+};
+
+export function getCustomJobs(): LiveJob[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = localStorage.getItem("skillbridge_custom_jobs");
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addCustomJob(job: Omit<LiveJob, "isCustom" | "fit">) {
+  if (typeof window === "undefined") return;
+  const existing = getCustomJobs();
+  const newJob: LiveJob = { ...job, fit: 95, isCustom: true };
+  localStorage.setItem("skillbridge_custom_jobs", JSON.stringify([newJob, ...existing]));
+  window.dispatchEvent(new Event("storage_job_update"));
+}

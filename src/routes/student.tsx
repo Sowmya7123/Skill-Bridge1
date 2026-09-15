@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -15,6 +15,7 @@ import {
   Target,
   TrendingUp,
   TriangleAlert,
+  Sparkles,
 } from "lucide-react";
 import { TopBar, KpiCard } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,13 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { CAREER_PATHS, getPath, type CareerPathId } from "@/lib/skillbridge-data";
+import {
+  CAREER_PATHS,
+  getPath,
+  getCustomJobs,
+  type CareerPathId,
+  type LiveJob,
+} from "@/lib/skillbridge-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/student")({
@@ -41,12 +48,14 @@ export const Route = createFileRoute("/student")({
       { title: "Student Skill Journey — SkillBridge" },
       {
         name: "description",
-        content: "Pick a career path, take an AI skill assessment and get a personalized roadmap to placement.",
+        content:
+          "Pick a career path, take an AI skill assessment and get a personalized roadmap to placement.",
       },
       { property: "og:title", content: "Student Skill Journey — SkillBridge" },
       {
         property: "og:description",
-        content: "AI skill gap analysis, learning roadmap and matched internships for students.",
+        content:
+          "AI skill gap analysis, learning roadmap and matched internships for students.",
       },
     ],
   }),
@@ -96,7 +105,9 @@ function StudentFlow() {
             answers={answers}
             onAnswer={(id, i) => setAnswers((a) => ({ ...a, [id]: i }))}
             onPrev={() => setQIndex((i) => Math.max(0, i - 1))}
-            onNext={() => setQIndex((i) => Math.min(path.questions.length - 1, i + 1))}
+            onNext={() =>
+              setQIndex((i) => Math.min(path.questions.length - 1, i + 1))
+            }
             onSubmit={submit}
             onBack={() => setStage("path")}
           />
@@ -105,17 +116,32 @@ function StudentFlow() {
         {stage === "analyzing" && <Analyzing />}
 
         {stage === "dashboard" && path && (
-          <StudentDashboard path={path} correct={correct} onRetake={startQuiz} onChangePath={() => setStage("path")} />
+          <StudentDashboard
+            path={path}
+            correct={correct}
+            onRetake={startQuiz}
+            onChangePath={() => setStage("path")}
+          />
         )}
       </main>
     </div>
   );
 }
 
-function StepHeader({ step, title, sub }: { step: string; title: string; sub: string }) {
+function StepHeader({
+  step,
+  title,
+  sub,
+}: {
+  step: string;
+  title: string;
+  sub: string;
+}) {
   return (
     <div className="mb-7">
-      <p className="text-xs font-semibold uppercase tracking-widest text-primary">{step}</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+        {step}
+      </p>
       <h1 className="mt-2 text-2xl font-bold sm:text-3xl">{title}</h1>
       <p className="mt-1.5 text-sm text-muted-foreground">{sub}</p>
     </div>
@@ -148,18 +174,24 @@ function PathStep({
               onClick={() => onSelect(p.id)}
               className={cn(
                 "rounded-2xl border bg-card p-6 text-left shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift",
-                active ? "border-primary ring-2 ring-primary/25" : "border-border",
+                active
+                  ? "border-primary ring-2 ring-primary/25"
+                  : "border-border",
               )}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-base font-semibold">{p.title}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{p.blurb}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {p.blurb}
+                  </p>
                 </div>
                 <span
                   className={cn(
                     "flex size-5 shrink-0 items-center justify-center rounded-full border",
-                    active ? "border-primary bg-primary text-primary-foreground" : "border-border",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border",
                   )}
                 >
                   {active && <CheckCircle2 className="size-4" />}
@@ -181,7 +213,11 @@ function PathStep({
           Continue to Skill Assessment
           <ArrowRight className="size-4" />
         </Button>
-        {!selected && <p className="text-sm text-muted-foreground">Select a path to continue.</p>}
+        {!selected && (
+          <p className="text-sm text-muted-foreground">
+            Select a path to continue.
+          </p>
+        )}
       </div>
     </div>
   );
@@ -249,7 +285,9 @@ function QuizStep({
                 <span
                   className={cn(
                     "flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
-                    active ? "border-primary bg-primary text-primary-foreground" : "border-border",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border",
                   )}
                 >
                   {String.fromCharCode(65 + i)}
@@ -291,10 +329,12 @@ function Analyzing() {
       <span className="flex size-16 items-center justify-center rounded-2xl bg-primary-soft text-primary">
         <Loader2 className="size-7 animate-spin" />
       </span>
-      <h2 className="mt-6 text-xl font-semibold">Running Sentence-Transformers & Skill Gap Mapping…</h2>
+      <h2 className="mt-6 text-xl font-semibold">
+        Running Sentence-Transformers & Skill Gap Mapping…
+      </h2>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        Embedding your responses, comparing them against live job descriptions and building your
-        personalized roadmap.
+        Embedding your responses, comparing them against live job descriptions
+        and building your personalized roadmap.
       </p>
       <div className="mt-6 h-1.5 w-64 overflow-hidden rounded-full bg-muted">
         <div className="h-full w-1/2 animate-pulse rounded-full bg-primary" />
@@ -320,6 +360,17 @@ function StudentDashboard({
   const matchIndex = Math.min(97, readiness + 16);
   const [done, setDone] = useState<Record<number, boolean>>({});
 
+  const [customJobs, setCustomJobs] = useState<LiveJob[]>([]);
+
+  useEffect(() => {
+    setCustomJobs(getCustomJobs());
+    const handler = () => setCustomJobs(getCustomJobs());
+    window.addEventListener("storage_job_update", handler);
+    return () => window.removeEventListener("storage_job_update", handler);
+  }, []);
+
+  const allInternships = [...customJobs, ...path.internships];
+
   return (
     <div>
       <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
@@ -328,7 +379,9 @@ function StudentDashboard({
             <Target className="size-3.5" />
             Target: {path.title}
           </Badge>
-          <h1 className="mt-3 text-2xl font-bold sm:text-3xl">Your skill readiness</h1>
+          <h1 className="mt-3 text-2xl font-bold sm:text-3xl">
+            Your skill readiness
+          </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Scored {correct} of {total} correct · analysis refreshed just now
           </p>
@@ -345,7 +398,12 @@ function StudentDashboard({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <KpiCard label="Skill Readiness Score" value={`${readiness}%`} hint="vs 71% cohort average" icon={Gauge} />
+        <KpiCard
+          label="Skill Readiness Score"
+          value={`${readiness}%`}
+          hint="vs 71% cohort average"
+          icon={Gauge}
+        />
         <KpiCard
           label="Gaps Identified"
           value={`${gapsCritical} critical`}
@@ -353,13 +411,20 @@ function StudentDashboard({
           icon={TriangleAlert}
           tone="warning"
         />
-        <KpiCard label="Match Index" value={`${matchIndex}%`} hint="Against open partner roles" icon={TrendingUp} tone="success" />
+        <KpiCard
+          label="Match Index"
+          value={`${matchIndex}%`}
+          hint="Against open partner roles"
+          icon={TrendingUp}
+          tone="success"
+        />
       </div>
 
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
         <h2 className="text-lg font-semibold">AI Skill Gap Analysis</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Your verified strengths compared against what {path.title} postings actually require.
+          Your verified strengths compared against what {path.title} postings
+          actually require.
         </p>
         <div className="mt-5 grid gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-border bg-success/6 p-5">
@@ -375,7 +440,10 @@ function StudentDashboard({
                     <span className="text-muted-foreground">{s.level}%</span>
                   </div>
                   <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full rounded-full bg-success" style={{ width: `${s.level}%` }} />
+                    <div
+                      className="h-full rounded-full bg-success"
+                      style={{ width: `${s.level}%` }}
+                    />
                   </div>
                 </div>
               ))}
@@ -405,7 +473,9 @@ function StudentDashboard({
                     <div
                       className={cn(
                         "h-full rounded-full",
-                        s.severity === "critical" ? "bg-destructive" : "bg-warning",
+                        s.severity === "critical"
+                          ? "bg-destructive"
+                          : "bg-warning",
                       )}
                       style={{ width: `${s.level}%` }}
                     />
@@ -422,7 +492,8 @@ function StudentDashboard({
           <div>
             <h2 className="text-lg font-semibold">Personalized Learning Roadmap</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {Object.values(done).filter(Boolean).length} of {path.roadmap.length} milestones complete ·{" "}
+              {Object.values(done).filter(Boolean).length} of{" "}
+              {path.roadmap.length} milestones complete ·{" "}
               {path.roadmap.reduce((a, r) => a + r.hours, 0)} hrs estimated
             </p>
           </div>
@@ -439,7 +510,9 @@ function StudentDashboard({
                   onClick={() => setDone((d) => ({ ...d, [i]: !d[i] }))}
                   className={cn(
                     "flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors",
-                    isDone ? "border-success/40 bg-success/6" : "border-border hover:bg-muted",
+                    isDone
+                      ? "border-success/40 bg-success/6"
+                      : "border-border hover:bg-muted",
                   )}
                 >
                   <span className="mt-0.5 shrink-0">
@@ -450,10 +523,17 @@ function StudentDashboard({
                     )}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className={cn("block text-sm font-semibold", isDone && "line-through opacity-70")}>
+                    <span
+                      className={cn(
+                        "block text-sm font-semibold",
+                        isDone && "line-through opacity-70",
+                      )}
+                    >
                       {i + 1}. {step.title}
                     </span>
-                    <span className="mt-0.5 block text-sm text-muted-foreground">{step.detail}</span>
+                    <span className="mt-0.5 block text-sm text-muted-foreground">
+                      {step.detail}
+                    </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
                     <Clock className="size-3.5" />
@@ -468,16 +548,41 @@ function StudentDashboard({
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
-          <h2 className="text-lg font-semibold">Recommended Internships</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Ranked by verified skill fit against your profile.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Recommended Internships</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Ranked by verified skill fit against your profile.
+              </p>
+            </div>
+            {customJobs.length > 0 && (
+              <Badge className="bg-primary-soft text-primary">
+                <Sparkles className="mr-1 size-3" />
+                {customJobs.length} Live Recruiter Post{customJobs.length > 1 ? "s" : ""}
+              </Badge>
+            )}
+          </div>
+
           <div className="mt-5 space-y-3">
-            {path.internships.map((job) => (
+            {allInternships.map((job, idx) => (
               <div
-                key={job.company}
-                className="flex flex-wrap items-center gap-4 rounded-xl border border-border p-4"
+                key={`${job.company}-${idx}`}
+                className={cn(
+                  "flex flex-wrap items-center gap-4 rounded-xl border p-4 transition-all",
+                  (job as any).isCustom
+                    ? "border-primary/50 bg-primary-soft/20 shadow-sm"
+                    : "border-border",
+                )}
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold">{job.role}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold">{job.role}</p>
+                    {(job as any).isCustom && (
+                      <Badge variant="outline" className="border-primary text-primary text-[10px] py-0 px-1.5">
+                        New Post
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground">{job.company}</p>
                   <p className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
@@ -487,8 +592,14 @@ function StudentDashboard({
                     <span>{job.stipend}</span>
                   </p>
                 </div>
-                <Badge className="bg-success/12 text-success hover:bg-success/12">{job.fit}% Fit</Badge>
-                <ApplyDialog role={job.role} company={job.company} fit={job.fit} />
+                <Badge className="bg-success/12 text-success hover:bg-success/12">
+                  {job.fit}% Fit
+                </Badge>
+                <ApplyDialog
+                  role={job.role}
+                  company={job.company}
+                  fit={job.fit}
+                />
               </div>
             ))}
           </div>
@@ -496,13 +607,21 @@ function StudentDashboard({
 
         <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
           <h2 className="text-lg font-semibold">Recommended Mentors</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Industry practitioners on your target path.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Industry practitioners on your target path.
+          </p>
           <div className="mt-5 space-y-3">
             {path.mentors.map((m) => (
-              <div key={m.name} className="flex items-center gap-3 rounded-xl border border-border p-4">
+              <div
+                key={m.name}
+                className="flex items-center gap-3 rounded-xl border border-border p-4"
+              >
                 <Avatar className="size-10">
                   <AvatarFallback className="bg-primary-soft text-xs font-semibold text-accent-foreground">
-                    {m.name.split(" ").map((n) => n[0]).join("")}
+                    {m.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
@@ -516,7 +635,9 @@ function StudentDashboard({
                   <Button
                     variant="link"
                     className="h-auto p-0 text-xs"
-                    onClick={() => toast.success(`Mentorship request sent to ${m.name}`)}
+                    onClick={() =>
+                      toast.success(`Mentorship request sent to ${m.name}`)
+                    }
                   >
                     Request
                   </Button>
@@ -530,7 +651,15 @@ function StudentDashboard({
   );
 }
 
-function ApplyDialog({ role, company, fit }: { role: string; company: string; fit: number }) {
+function ApplyDialog({
+  role,
+  company,
+  fit,
+}: {
+  role: string;
+  company: string;
+  fit: number;
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -556,7 +685,9 @@ function ApplyDialog({ role, company, fit }: { role: string; company: string; fi
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button onClick={() => toast.success(`Application sent to ${company}`)}>
+            <Button
+              onClick={() => toast.success(`Application sent to ${company}`)}
+            >
               Confirm application
             </Button>
           </DialogClose>
