@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Blocks,
   GraduationCap,
@@ -13,6 +13,9 @@ import {
   Mail,
   Lock,
   CheckCircle2,
+  MoreVertical,
+  Globe,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +85,81 @@ const ROLES: {
   },
 ];
 
+// Three Dots Language Dropdown Component
+function LanguageMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState("en");
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+    if (match && match[1]) {
+      setCurrentLang(match[1]);
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLanguageSelect = (langCode: string) => {
+    document.cookie = `googtrans=/en/${langCode}; path=/;`;
+    document.cookie = `googtrans=/en/${langCode}; domain=.${window.location.hostname}; path=/;`;
+    setCurrentLang(langCode);
+    setIsOpen(false);
+    window.location.reload();
+  };
+
+  const languages = [
+    { code: "en", label: "English", native: "English" },
+    { code: "te", label: "Telugu", native: "తెలుగు" },
+    { code: "hi", label: "Hindi", native: "हिंदी" },
+  ];
+
+  return (
+    <div className="relative inline-block text-left" ref={menuRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex size-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition hover:bg-accent hover:text-foreground"
+        title="Change Language"
+      >
+        <MoreVertical className="size-4" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-44 rounded-2xl border border-border bg-popover p-1.5 shadow-xl z-50">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground border-b border-border mb-1">
+            <Globe className="size-3.5" />
+            Language
+          </div>
+
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => handleLanguageSelect(lang.code)}
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-popover-foreground transition hover:bg-accent"
+            >
+              <div className="flex flex-col text-left">
+                <span className="font-medium leading-none">{lang.native}</span>
+                <span className="text-[11px] text-muted-foreground">{lang.label}</span>
+              </div>
+              {currentLang === lang.code && (
+                <Check className="size-4 text-primary" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Welcome() {
   const navigate = useNavigate();
   const { email, signIn, completeRegistration } = useAppState();
@@ -93,6 +171,27 @@ function Welcome() {
 
   const step: 1 | 2 = email ? 2 : 1;
   const active = ROLES.find((r) => r.id === role);
+
+  // Auto-inject Google Translate script into page
+  useEffect(() => {
+    if (!document.getElementById("google-translate-script")) {
+      const script = document.createElement("script");
+      script.id = "google-translate-script";
+      script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      document.body.appendChild(script);
+
+      (window as any).googleTranslateElementInit = () => {
+        new (window as any).google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "en,te,hi",
+            autoDisplay: false,
+          },
+          "google_translate_element"
+        );
+      };
+    }
+  }, []);
 
   function handleContinue() {
     const value = emailInput.trim() || "demo@skillbridge.io";
@@ -108,7 +207,15 @@ function Welcome() {
   }
 
   return (
-    <div className="surface-grid min-h-screen bg-background">
+    <div className="surface-grid relative min-h-screen bg-background">
+      {/* Hidden Translate Anchor */}
+      <div id="google_translate_element" style={{ display: "none" }} />
+
+      {/* Top Right Three Dots Language Button */}
+      <div className="absolute right-4 top-4 z-50 sm:right-8 sm:top-6">
+        <LanguageMenu />
+      </div>
+
       <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-center px-4 py-16 sm:px-6">
         <div className="flex items-center gap-2.5">
           <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
