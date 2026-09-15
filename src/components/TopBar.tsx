@@ -1,17 +1,37 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { Blocks, GraduationCap, Briefcase, School, Compass } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Blocks, GraduationCap, Briefcase, School, Compass, ChevronDown, LogOut, Repeat } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAppState, ROLE_LABELS, type RoleId } from "@/lib/app-state";
 import { cn } from "@/lib/utils";
 
 const ROLES = [
-  { to: "/student", label: "Student", icon: GraduationCap },
-  { to: "/recruiter", label: "Recruiter", icon: Briefcase },
-  { to: "/academician", label: "Academician", icon: School },
-  { to: "/mentor", label: "Mentor", icon: Compass },
+  { to: "/student", id: "student", label: "Student", icon: GraduationCap },
+  { to: "/recruiter", id: "recruiter", label: "Recruiter", icon: Briefcase },
+  { to: "/academician", id: "academician", label: "Academician", icon: School },
+  { to: "/mentor", id: "mentor", label: "Mentor", icon: Compass },
 ] as const;
 
 export function TopBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const { session, switchRole, signOut } = useAppState();
+
+  const initials = (session?.email ?? "SB").slice(0, 2).toUpperCase();
+
+  function goToRole(role: RoleId) {
+    switchRole(role);
+    navigate({ to: `/${role}` });
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card/85 backdrop-blur">
@@ -27,9 +47,10 @@ export function TopBar() {
           {ROLES.map((r) => {
             const active = pathname.startsWith(r.to);
             return (
-              <Link
+              <button
                 key={r.to}
-                to={r.to}
+                type="button"
+                onClick={() => goToRole(r.id)}
                 className={cn(
                   "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
                   active
@@ -39,21 +60,66 @@ export function TopBar() {
               >
                 <r.icon className="size-4" />
                 {r.label}
-              </Link>
+              </button>
             );
           })}
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
-          <div className="hidden text-right sm:block">
-            <p className="text-sm font-medium leading-tight">Sowmya K.</p>
-            <p className="text-xs text-muted-foreground leading-tight">Pre-final year</p>
-          </div>
-          <Avatar className="size-9 border border-border">
-            <AvatarFallback className="bg-primary-soft text-sm font-semibold text-accent-foreground">
-              SK
-            </AvatarFallback>
-          </Avatar>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-auto gap-2 px-2 py-1.5">
+                <Avatar className="size-9 border border-border">
+                  <AvatarFallback className="bg-primary-soft text-sm font-semibold text-accent-foreground">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden text-left sm:block">
+                  <span className="block max-w-[180px] truncate text-sm font-medium leading-tight">
+                    {session?.email ?? "Guest"}
+                  </span>
+                  <span className="mt-0.5 flex items-center gap-1.5">
+                    <Badge variant="secondary" className="px-1.5 py-0 text-[10px] font-semibold">
+                      {session ? ROLE_LABELS[session.role] : "Not registered"}
+                    </Badge>
+                  </span>
+                </span>
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuLabel>
+                <p className="truncate text-sm">{session?.email ?? "Guest"}</p>
+                {session?.org ? (
+                  <p className="truncate text-xs font-normal text-muted-foreground">{session.org}</p>
+                ) : null}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Repeat className="size-3.5" />
+                  Switch role
+                </span>
+              </DropdownMenuLabel>
+              {ROLES.map((r) => (
+                <DropdownMenuItem key={r.id} onSelect={() => goToRole(r.id)}>
+                  <r.icon className="size-4" />
+                  {r.label}
+                  {session?.role === r.id && <span className="ml-auto text-xs text-primary">current</span>}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={() => {
+                  signOut();
+                  navigate({ to: "/" });
+                }}
+              >
+                <LogOut className="size-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -61,16 +127,17 @@ export function TopBar() {
         {ROLES.map((r) => {
           const active = pathname.startsWith(r.to);
           return (
-            <Link
+            <button
               key={r.to}
-              to={r.to}
+              type="button"
+              onClick={() => goToRole(r.id)}
               className={cn(
                 "whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium",
                 active ? "bg-primary-soft text-accent-foreground" : "text-muted-foreground",
               )}
             >
               {r.label}
-            </Link>
+            </button>
           );
         })}
       </nav>
