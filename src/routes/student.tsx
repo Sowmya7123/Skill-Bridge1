@@ -124,6 +124,7 @@ function StudentFlow() {
           <StudentDashboard
             path={path}
             correct={correct}
+            answers={answers}
             onRetake={startQuiz}
             onChangePath={() => setStage("path")}
           />
@@ -351,21 +352,46 @@ function Analyzing() {
 function StudentDashboard({
   path,
   correct,
+  answers,
   onRetake,
   onChangePath,
 }: {
   path: ReturnType<typeof getPath>;
   correct: number;
+  answers: Record<string, number>;
   onRetake: () => void;
   onChangePath: () => void;
 }) {
   const total = path.questions.length;
-  const readiness = Math.round(40 + (correct / total) * 55);
-  const gapsCritical = path.gaps.filter((g) => g.severity === "critical").length;
-  const matchIndex = Math.min(97, readiness + 16);
-  const [selectedModule, setSelectedModule] = useState<(typeof studyPlan)[0] | null>(null);
-
+  // నిజమైన పర్సంటేజ్ స్కోర్ (ఉదా: 6/10 = 60%)
+  const readiness = total > 0 ? Math.round((correct / total) * 100) : 0;
+  const matchIndex = Math.min(98, Math.max(50, readiness + 12));
+  const [done, setDone] = useState<Record<number, boolean>>({});
   const [customJobs, setCustomJobs] = useState<LiveJob[]>([]);
+
+  // డైనమిక్ Mastered Skills (కరెక్ట్ గా రాసిన టాపిక్స్)
+  const masteredSkills = useMemo(() => {
+    const correctQ = path.questions.filter((q) => answers[q.id] === q.answer);
+    const topics = Array.from(new Set(correctQ.map((q) => q.topic)));
+    if (topics.length === 0) return [{ skill: "Basic Fundamentals", level: 65 }];
+    return topics.map((t) => ({ skill: t, level: 85 }));
+  }, [path, answers]);
+
+  // డైనమిక్ Missing Gaps (తప్పు రాసిన టాపిక్స్)
+  const gapSkills = useMemo(() => {
+    const wrongQ = path.questions.filter((q) => answers[q.id] !== q.answer);
+    const topics = Array.from(new Set(wrongQ.map((q) => q.topic)));
+    if (topics.length === 0) {
+      return [{ skill: "Advanced Architecture", level: 50, severity: "moderate" as const }];
+    }
+    return topics.map((t, idx) => ({
+      skill: t,
+      level: Math.max(20, 45 - idx * 5),
+      severity: (idx < 2 ? "critical" : "moderate") as "critical" | "moderate",
+    }));
+  }, [path, answers]);
+
+  const gapsCritical = gapSkills.filter((g) => g.severity === "critical").length;
 
   useEffect(() => {
     const updateJobs = () => setCustomJobs(getCustomJobs());
@@ -382,56 +408,58 @@ function StudentDashboard({
 
   const allInternships = [...customJobs, ...path.internships];
 
-  // Dynamic Personalized Study Plan generated from assessment gaps with Prototype details
+  // Dynamic Personalized Study Plan generated from assessment gaps
   const studyPlan = useMemo(() => {
-    const gapSkills = path.gaps.map((g) => g.skill);
+    const identifiedGaps = gapSkills.map((g) => g.skill);
     return [
       {
         week: "Week 1",
-        focus: gapSkills[0] || path.badges[0] || "Core Fundamentals",
+        focus: identifiedGaps[0] || path.badges[0] || "Core Architecture",
         hours: "10 hrs",
-        videoTitle: `Mastering ${gapSkills[0] || "Core Fundamentals"} from Scratch`,
+        videoTitle: `Foundations of ${identifiedGaps[0] || path.badges[0]}`,
         project: {
-          title: "Mini-Project: Syntax & Basics",
-          desc: `Write foundational code implementing ${gapSkills[0] || "core concepts"}.`,
+          title: "Hands-on Practice Sandbox",
+          desc: `Fix architectural flaws and build fundamentals in ${identifiedGaps[0] || "core modules"}.`,
         },
         mentor: { name: "Ananya Rao", initials: "AR" },
       },
       {
         week: "Week 2",
-        focus: gapSkills[1] || path.badges[1] || "System Integration",
+        focus: identifiedGaps[1] || path.badges[1] || "System Integration",
         hours: "14 hrs",
-        videoTitle: `Advanced ${gapSkills[1] || "System Integration"} & APIs`,
+        videoTitle: `Applied ${identifiedGaps[1] || "Integration & APIs"}`,
         project: {
-          title: "Integration Assignment",
-          desc: "Connect your basic logic to a live API or Database.",
+          title: "API & Data Pipeline Integration",
+          desc: "Integrate backend services and resolve asynchronous data state.",
         },
         mentor: { name: "Dev Menon", initials: "DM" },
       },
       {
         week: "Week 3",
-        focus: gapSkills[2] || "Performance & Testing",
+        focus: identifiedGaps[2] || "Performance & Optimization",
         hours: "12 hrs",
-        videoTitle: "Debugging & Writing Tests",
+        videoTitle: "Production Debugging & Automated Testing",
         project: {
-          title: "Code Review & Optimization",
-          desc: "Optimize the existing codebase and achieve 80% test coverage.",
+          title: "Benchmark Profiling & Unit Testing",
+          desc: "Improve system execution time and eliminate memory leaks.",
         },
         mentor: { name: "Priya Nair", initials: "PN" },
       },
       {
         week: "Week 4",
-        focus: `${path.title} Capstone`,
+        focus: `${path.title} Industry Capstone`,
         hours: "20 hrs",
-        videoTitle: "Deploying Production-Ready Apps",
+        videoTitle: "Packaging & Zero-Downtime Deployment",
         project: {
-          title: "Industry Capstone Project",
-          desc: "Build an end-to-end application and submit it for recruiter matching.",
+          title: "Full Capstone Deployment",
+          desc: "Deploy an end-to-end industry verified application with CI/CD.",
         },
         mentor: { name: "Rahul Bose", initials: "RB" },
       },
     ];
-  }, [path]);
+  }, [path, gapSkills]);
+
+  const [selectedModule, setSelectedModule] = useState<(typeof studyPlan)[0] | null>(null);
 
   return (
     <div>
@@ -463,13 +491,13 @@ function StudentDashboard({
         <KpiCard
           label="Skill Readiness Score"
           value={`${readiness}%`}
-          hint="vs 71% cohort average"
+          hint={readiness >= 70 ? "Above benchmark" : "Needs milestone review"}
           icon={Gauge}
         />
         <KpiCard
           label="Gaps Identified"
           value={`${gapsCritical} critical`}
-          hint={`${path.gaps.length} total skill gaps`}
+          hint={`${gapSkills.length} total skill gaps`}
           icon={TriangleAlert}
           tone="warning"
         />
@@ -486,8 +514,7 @@ function StudentDashboard({
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
         <h2 className="text-lg font-semibold">AI Skill Gap Analysis</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Your verified strengths compared against what {path.title} postings
-          require.
+          Your verified strengths compared against what {path.title} postings require.
         </p>
         <div className="mt-5 grid gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-border bg-success/6 p-5">
@@ -496,7 +523,7 @@ function StudentDashboard({
               Mastered Skills
             </h3>
             <div className="mt-4 space-y-4">
-              {path.mastered.map((s) => (
+              {masteredSkills.map((s) => (
                 <div key={s.skill}>
                   <div className="flex justify-between text-sm">
                     <span className="font-medium">{s.skill}</span>
@@ -519,7 +546,7 @@ function StudentDashboard({
               Missing / Gap Skills
             </h3>
             <div className="mt-4 space-y-4">
-              {path.gaps.map((s) => (
+              {gapSkills.map((s) => (
                 <div key={s.skill}>
                   <div className="flex justify-between text-sm">
                     <span className="font-medium">
@@ -550,8 +577,7 @@ function StudentDashboard({
         </div>
       </section>
 
-      {/* Structured 4-Week Study Plan with Prototype Modals */}
-      {/* Interactive Learning Hub with State-based Modal */}
+      {/* Interactive Learning Hub */}
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
         <div className="flex items-center justify-between">
           <div>
