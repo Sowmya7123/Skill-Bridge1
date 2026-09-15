@@ -17,6 +17,10 @@ import {
   TriangleAlert,
   Sparkles,
   BookOpen,
+  PlayCircle,
+  Code2,
+  UserCheck,
+  Trophy,
 } from "lucide-react";
 import { TopBar, KpiCard } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
@@ -378,45 +382,53 @@ function StudentDashboard({
 
   const allInternships = [...customJobs, ...path.internships];
 
-  // Dynamic Personalized Study Plan generated from assessment gaps
+  // Dynamic Personalized Study Plan generated from assessment gaps with Prototype details
   const studyPlan = useMemo(() => {
     const gapSkills = path.gaps.map((g) => g.skill);
     return [
       {
-        week: "Week 1: Foundations & Core Deficiencies",
+        week: "Week 1",
         focus: gapSkills[0] || path.badges[0] || "Core Fundamentals",
         hours: "10 hrs",
-        modules: [
-          "Module 1.1: Syntax, Core Architecture & Key Concepts",
-          "Module 1.2: Official Documentation Walkthrough & 5 Practice Drills",
-        ],
+        videoTitle: `Mastering ${gapSkills[0] || "Core Fundamentals"} from Scratch`,
+        project: {
+          title: "Mini-Project: Syntax & Basics",
+          desc: `Write foundational code implementing ${gapSkills[0] || "core concepts"}.`,
+        },
+        mentor: { name: "Ananya Rao", initials: "AR" },
       },
       {
-        week: "Week 2: Applied Tooling & Architecture",
+        week: "Week 2",
         focus: gapSkills[1] || path.badges[1] || "System Integration",
         hours: "14 hrs",
-        modules: [
-          "Module 2.1: Hands-on implementation targeting assessment gaps",
-          "Module 2.2: Middleware, API endpoints & Configuration testing",
-        ],
+        videoTitle: `Advanced ${gapSkills[1] || "System Integration"} & APIs`,
+        project: {
+          title: "Integration Assignment",
+          desc: "Connect your basic logic to a live API or Database.",
+        },
+        mentor: { name: "Dev Menon", initials: "DM" },
       },
       {
-        week: "Week 3: Advanced Optimization & Debugging",
+        week: "Week 3",
         focus: gapSkills[2] || "Performance & Testing",
         hours: "12 hrs",
-        modules: [
-          "Module 3.1: Performance bottlenecks, profiling & memory management",
-          "Module 3.2: Mentor-guided code review session",
-        ],
+        videoTitle: "Debugging & Writing Tests",
+        project: {
+          title: "Code Review & Optimization",
+          desc: "Optimize the existing codebase and achieve 80% test coverage.",
+        },
+        mentor: { name: "Priya Nair", initials: "PN" },
       },
       {
-        week: "Week 4: Capstone Industry Project",
-        focus: `${path.title} Showcase Project`,
+        week: "Week 4",
+        focus: `${path.title} Capstone`,
         hours: "20 hrs",
-        modules: [
-          "Module 4.1: Production-grade repository deployment with CI/CD",
-          "Module 4.2: Automated portfolio submission for recruiter matching",
-        ],
+        videoTitle: "Deploying Production-Ready Apps",
+        project: {
+          title: "Industry Capstone Project",
+          desc: "Build an end-to-end application and submit it for recruiter matching.",
+        },
+        mentor: { name: "Rahul Bose", initials: "RB" },
       },
     ];
   }, [path]);
@@ -538,76 +550,16 @@ function StudentDashboard({
         </div>
       </section>
 
-      {/* Personalized Learning Roadmap Milestones */}
-      <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold">Personalized Learning Roadmap</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {Object.values(done).filter(Boolean).length} of{" "}
-              {path.roadmap.length} milestones complete ·{" "}
-              {path.roadmap.reduce((a, r) => a + r.hours, 0)} hrs estimated
-            </p>
-          </div>
-          <Badge variant="outline">Auto-generated from your gaps</Badge>
-        </div>
-
-        <ol className="mt-5 space-y-3">
-          {path.roadmap.map((step, i) => {
-            const isDone = !!done[i];
-            return (
-              <li key={step.title}>
-                <button
-                  type="button"
-                  onClick={() => setDone((d) => ({ ...d, [i]: !d[i] }))}
-                  className={cn(
-                    "flex w-full items-start gap-4 rounded-xl border p-4 text-left transition-colors",
-                    isDone
-                      ? "border-success/40 bg-success/6"
-                      : "border-border hover:bg-muted",
-                  )}
-                >
-                  <span className="mt-0.5 shrink-0">
-                    {isDone ? (
-                      <CheckCircle2 className="size-5 text-success" />
-                    ) : (
-                      <CircleDashed className="size-5 text-muted-foreground" />
-                    )}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span
-                      className={cn(
-                        "block text-sm font-semibold",
-                        isDone && "line-through opacity-70",
-                      )}
-                    >
-                      {i + 1}. {step.title}
-                    </span>
-                    <span className="mt-0.5 block text-sm text-muted-foreground">
-                      {step.detail}
-                    </span>
-                  </span>
-                  <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                    <Clock className="size-3.5" />
-                    {step.hours} hrs
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
-
-      {/* Structured 4-Week Study Plan */}
+      {/* Structured 4-Week Study Plan with Prototype Modals */}
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <BookOpen className="size-5 text-primary" />
-              Tailored 4-Week Study Plan
+              Interactive Learning Hub
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              A structured week-by-week plan designed specifically to close your assessment gaps.
+              Click on a module to learn, build a project, and get mentor verified.
             </p>
           </div>
           <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
@@ -618,26 +570,101 @@ function StudentDashboard({
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {studyPlan.map((s, idx) => (
-            <div
-              key={idx}
-              className="rounded-xl border border-border bg-background/50 p-4 transition-all hover:border-primary/40 hover:bg-muted/30"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                  {s.week.split(":")[0]}
-                </span>
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="size-3.5" />
-                  {s.hours}
-                </span>
-              </div>
-              <h3 className="mt-1 text-sm font-semibold">{s.focus}</h3>
-              <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground list-disc list-inside">
-                {s.modules.map((m, mIdx) => (
-                  <li key={mIdx}>{m}</li>
-                ))}
-              </ul>
-            </div>
+            <Dialog key={idx}>
+              <DialogTrigger asChild>
+                <div className="group cursor-pointer rounded-xl border border-border bg-background/50 p-4 transition-all hover:border-primary/50 hover:bg-primary-soft/20 hover:shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                      {s.week}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="size-3.5" />
+                      {s.hours}
+                    </span>
+                  </div>
+                  <h3 className="mt-2 text-sm font-semibold">{s.focus}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                    Learn through video, build a micro-project, and get it reviewed by {s.mentor.name}.
+                  </p>
+                  <div className="mt-4 flex items-center text-xs font-semibold text-primary opacity-80 group-hover:opacity-100">
+                    Start Learning <ArrowRight className="ml-1 size-3 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl">
+                    {s.week}: {s.focus}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Complete the learning materials and submit your project to update your skill profile.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-6 py-4">
+                  {/* Step 1: Learn */}
+                  <div className="space-y-3">
+                    <h4 className="flex items-center gap-2 text-sm font-semibold">
+                      <PlayCircle className="size-4 text-primary" /> 
+                      Step 1: Learn the Concepts
+                    </h4>
+                    <div className="flex aspect-video w-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 text-muted-foreground transition-colors hover:bg-muted">
+                      <PlayCircle className="mb-2 size-10 opacity-50" />
+                      <p className="text-sm font-medium">Interactive Video: {s.videoTitle}</p>
+                      <p className="text-xs">Duration: 45 mins</p>
+                    </div>
+                  </div>
+
+                  {/* Step 2: Build Project */}
+                  <div className="space-y-3">
+                    <h4 className="flex items-center gap-2 text-sm font-semibold">
+                      <Code2 className="size-4 text-primary" /> 
+                      Step 2: Build & Apply
+                    </h4>
+                    <div className="rounded-xl border border-border bg-muted/30 p-4">
+                      <p className="text-sm font-semibold text-foreground">{s.project.title}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{s.project.desc}</p>
+                      <Button variant="outline" size="sm" className="mt-3">
+                        <Code2 className="mr-2 size-3.5" />
+                        Open Cloud IDE
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Step 3: Mentor Assigned */}
+                  <div className="space-y-3">
+                    <h4 className="flex items-center gap-2 text-sm font-semibold">
+                      <UserCheck className="size-4 text-primary" /> 
+                      Step 3: Mentor Review
+                    </h4>
+                    <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4">
+                      <Avatar className="size-10">
+                        <AvatarFallback className="bg-primary-soft text-primary font-semibold">{s.mentor.initials}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">Assigned to: {s.mentor.name}</p>
+                        <p className="text-xs text-muted-foreground">Will review your code and approve your skill profile update.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter className="sm:justify-between">
+                  <DialogClose asChild>
+                    <Button variant="ghost">Close</Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button 
+                      onClick={() => toast.success(`Skill Verified! +20 points added to your ${s.focus} profile.`)}
+                      className="bg-success text-success-foreground hover:bg-success/90"
+                    >
+                      <Trophy className="mr-2 size-4" />
+                      Complete & Update Profile
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           ))}
         </div>
       </section>
