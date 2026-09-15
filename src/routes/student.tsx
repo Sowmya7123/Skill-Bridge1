@@ -363,7 +363,7 @@ function StudentDashboard({
   const readiness = Math.round(40 + (correct / total) * 55);
   const gapsCritical = path.gaps.filter((g) => g.severity === "critical").length;
   const matchIndex = Math.min(97, readiness + 16);
-  const [done, setDone] = useState<Record<number, boolean>>({});
+  const [selectedModule, setSelectedModule] = useState<(typeof studyPlan)[0] | null>(null);
 
   const [customJobs, setCustomJobs] = useState<LiveJob[]>([]);
 
@@ -551,6 +551,7 @@ function StudentDashboard({
       </section>
 
       {/* Structured 4-Week Study Plan with Prototype Modals */}
+      {/* Interactive Learning Hub with State-based Modal */}
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
         <div className="flex items-center justify-between">
           <div>
@@ -559,7 +560,7 @@ function StudentDashboard({
               Interactive Learning Hub
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Click on a module to learn, build a project, and get mentor verified.
+              Click on any module below to start learning, work on your project, and get mentor verified.
             </p>
           </div>
           <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
@@ -570,104 +571,121 @@ function StudentDashboard({
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {studyPlan.map((s, idx) => (
-            <Dialog key={idx}>
-              <DialogTrigger asChild>
-                <div className="group cursor-pointer rounded-xl border border-border bg-background/50 p-4 transition-all hover:border-primary/50 hover:bg-primary-soft/20 hover:shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                      {s.week}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="size-3.5" />
-                      {s.hours}
-                    </span>
-                  </div>
-                  <h3 className="mt-2 text-sm font-semibold">{s.focus}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                    Learn through video, build a micro-project, and get it reviewed by {s.mentor.name}.
-                  </p>
-                  <div className="mt-4 flex items-center text-xs font-semibold text-primary opacity-80 group-hover:opacity-100">
-                    Start Learning <ArrowRight className="ml-1 size-3 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-xl">
-                    {s.week}: {s.focus}
-                  </DialogTitle>
-                  <DialogDescription>
-                    Complete the learning materials and submit your project to update your skill profile.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="space-y-6 py-4">
-                  {/* Step 1: Learn */}
-                  <div className="space-y-3">
-                    <h4 className="flex items-center gap-2 text-sm font-semibold">
-                      <PlayCircle className="size-4 text-primary" /> 
-                      Step 1: Learn the Concepts
-                    </h4>
-                    <div className="flex aspect-video w-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 text-muted-foreground transition-colors hover:bg-muted">
-                      <PlayCircle className="mb-2 size-10 opacity-50" />
-                      <p className="text-sm font-medium">Interactive Video: {s.videoTitle}</p>
-                      <p className="text-xs">Duration: 45 mins</p>
-                    </div>
-                  </div>
-
-                  {/* Step 2: Build Project */}
-                  <div className="space-y-3">
-                    <h4 className="flex items-center gap-2 text-sm font-semibold">
-                      <Code2 className="size-4 text-primary" /> 
-                      Step 2: Build & Apply
-                    </h4>
-                    <div className="rounded-xl border border-border bg-muted/30 p-4">
-                      <p className="text-sm font-semibold text-foreground">{s.project.title}</p>
-                      <p className="mt-1 text-sm text-muted-foreground">{s.project.desc}</p>
-                      <Button variant="outline" size="sm" className="mt-3">
-                        <Code2 className="mr-2 size-3.5" />
-                        Open Cloud IDE
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Step 3: Mentor Assigned */}
-                  <div className="space-y-3">
-                    <h4 className="flex items-center gap-2 text-sm font-semibold">
-                      <UserCheck className="size-4 text-primary" /> 
-                      Step 3: Mentor Review
-                    </h4>
-                    <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4">
-                      <Avatar className="size-10">
-                        <AvatarFallback className="bg-primary-soft text-primary font-semibold">{s.mentor.initials}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">Assigned to: {s.mentor.name}</p>
-                        <p className="text-xs text-muted-foreground">Will review your code and approve your skill profile update.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <DialogFooter className="sm:justify-between">
-                  <DialogClose asChild>
-                    <Button variant="ghost">Close</Button>
-                  </DialogClose>
-                  <DialogClose asChild>
-                    <Button 
-                      onClick={() => toast.success(`Skill Verified! +20 points added to your ${s.focus} profile.`)}
-                      className="bg-success text-success-foreground hover:bg-success/90"
-                    >
-                      <Trophy className="mr-2 size-4" />
-                      Complete & Update Profile
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setSelectedModule(s)}
+              className="group flex flex-col text-left rounded-xl border border-border bg-background/50 p-4 transition-all hover:border-primary/50 hover:bg-primary-soft/20 hover:shadow-sm"
+            >
+              <div className="flex w-full items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                  {s.week}
+                </span>
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="size-3.5" />
+                  {s.hours}
+                </span>
+              </div>
+              <h3 className="mt-2 text-sm font-semibold text-foreground">{s.focus}</h3>
+              <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                Learn concepts through interactive sessions, complete hands-on assignments, and get reviewed by {s.mentor.name}.
+              </p>
+              <div className="mt-4 flex items-center text-xs font-semibold text-primary opacity-80 group-hover:opacity-100">
+                Start Learning <ArrowRight className="ml-1 size-3 transition-transform group-hover:translate-x-1" />
+              </div>
+            </button>
           ))}
         </div>
       </section>
+
+      {/* Global Learning Modal */}
+      <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedModule && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl">
+                  {selectedModule.week}: {selectedModule.focus}
+                </DialogTitle>
+                <DialogDescription>
+                  Complete your learning modules, submit your hands-on project, and get mentor-verified to level up.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-6 py-4">
+                {/* Step 1: Learn */}
+                <div className="space-y-3">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold">
+                    <PlayCircle className="size-4 text-primary" /> 
+                    Step 1: Learn the Concepts
+                  </h4>
+                  <div className="flex aspect-video w-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 text-muted-foreground transition-colors hover:bg-muted">
+                    <PlayCircle className="mb-2 size-10 opacity-60 text-primary" />
+                    <p className="text-sm font-medium text-foreground">Interactive Lecture: {selectedModule.videoTitle}</p>
+                    <p className="text-xs text-muted-foreground">Duration: 45 mins · Interactive Sandboxes included</p>
+                  </div>
+                </div>
+
+                {/* Step 2: Build Project */}
+                <div className="space-y-3">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold">
+                    <Code2 className="size-4 text-primary" /> 
+                    Step 2: Hands-on Project Assignment
+                  </h4>
+                  <div className="rounded-xl border border-border bg-muted/30 p-4">
+                    <p className="text-sm font-semibold text-foreground">{selectedModule.project.title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{selectedModule.project.desc}</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-3"
+                      onClick={() => toast.info("Cloud Workspace spinning up...")}
+                    >
+                      <Code2 className="mr-2 size-3.5" />
+                      Open Cloud IDE
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Step 3: Mentor Assigned */}
+                <div className="space-y-3">
+                  <h4 className="flex items-center gap-2 text-sm font-semibold">
+                    <UserCheck className="size-4 text-primary" /> 
+                    Step 3: Mentor Verification
+                  </h4>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4">
+                    <Avatar className="size-10">
+                      <AvatarFallback className="bg-primary-soft text-primary font-semibold">
+                        {selectedModule.mentor.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">Assigned Mentor: {selectedModule.mentor.name}</p>
+                      <p className="text-xs text-muted-foreground">Will review your code repository and approve your skill profile update.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="sm:justify-between gap-2">
+                <Button variant="ghost" onClick={() => setSelectedModule(null)}>
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    toast.success(`Skill Verified! +20 points added to your ${selectedModule.focus} profile.`);
+                    setSelectedModule(null);
+                  }}
+                  className="bg-emerald-600 text-white hover:bg-emerald-700"
+                >
+                  <Trophy className="mr-2 size-4" />
+                  Complete & Update Profile
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Internships & Mentors */}
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
