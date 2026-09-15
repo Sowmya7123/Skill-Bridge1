@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -16,6 +16,7 @@ import {
   TrendingUp,
   TriangleAlert,
   Sparkles,
+  BookOpen,
 } from "lucide-react";
 import { TopBar, KpiCard } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
@@ -333,8 +334,8 @@ function Analyzing() {
         Running Sentence-Transformers & Skill Gap Mapping…
       </h2>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        Embedding your responses, comparing them against live job descriptions
-        and building your personalized roadmap.
+        Embedding your responses, comparing them against live industry benchmarks
+        and generating your personalized study plan.
       </p>
       <div className="mt-6 h-1.5 w-64 overflow-hidden rounded-full bg-muted">
         <div className="h-full w-1/2 animate-pulse rounded-full bg-primary" />
@@ -363,28 +364,62 @@ function StudentDashboard({
   const [customJobs, setCustomJobs] = useState<LiveJob[]>([]);
 
   useEffect(() => {
-    const updateJobs = () => {
-      setCustomJobs(getCustomJobs());
-    };
-
-  
+    const updateJobs = () => setCustomJobs(getCustomJobs());
     updateJobs();
-
     window.addEventListener("storage_job_update", updateJobs);
-    
-    
     window.addEventListener("storage", updateJobs);
-    
-  
     window.addEventListener("focus", updateJobs);
-
     return () => {
       window.removeEventListener("storage_job_update", updateJobs);
       window.removeEventListener("storage", updateJobs);
       window.removeEventListener("focus", updateJobs);
     };
   }, []);
+
   const allInternships = [...customJobs, ...path.internships];
+
+  // Dynamic Personalized Study Plan generated from assessment gaps
+  const studyPlan = useMemo(() => {
+    const gapSkills = path.gaps.map((g) => g.skill);
+    return [
+      {
+        week: "Week 1: Foundations & Core Deficiencies",
+        focus: gapSkills[0] || path.badges[0] || "Core Fundamentals",
+        hours: "10 hrs",
+        modules: [
+          "Module 1.1: Syntax, Core Architecture & Key Concepts",
+          "Module 1.2: Official Documentation Walkthrough & 5 Practice Drills",
+        ],
+      },
+      {
+        week: "Week 2: Applied Tooling & Architecture",
+        focus: gapSkills[1] || path.badges[1] || "System Integration",
+        hours: "14 hrs",
+        modules: [
+          "Module 2.1: Hands-on implementation targeting assessment gaps",
+          "Module 2.2: Middleware, API endpoints & Configuration testing",
+        ],
+      },
+      {
+        week: "Week 3: Advanced Optimization & Debugging",
+        focus: gapSkills[2] || "Performance & Testing",
+        hours: "12 hrs",
+        modules: [
+          "Module 3.1: Performance bottlenecks, profiling & memory management",
+          "Module 3.2: Mentor-guided code review session",
+        ],
+      },
+      {
+        week: "Week 4: Capstone Industry Project",
+        focus: `${path.title} Showcase Project`,
+        hours: "20 hrs",
+        modules: [
+          "Module 4.1: Production-grade repository deployment with CI/CD",
+          "Module 4.2: Automated portfolio submission for recruiter matching",
+        ],
+      },
+    ];
+  }, [path]);
 
   return (
     <div>
@@ -395,15 +430,15 @@ function StudentDashboard({
             Target: {path.title}
           </Badge>
           <h1 className="mt-3 text-2xl font-bold sm:text-3xl">
-            Your skill readiness
+            Your Skill Readiness
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Scored {correct} of {total} correct · analysis refreshed just now
+            Scored {correct} of {total} correct · Analysis refreshed just now
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onChangePath}>
-            Change path
+            Change Path
           </Button>
           <Button variant="outline" onClick={onRetake}>
             <RotateCcw className="size-4" />
@@ -435,11 +470,12 @@ function StudentDashboard({
         />
       </div>
 
+      {/* AI Skill Gap Analysis */}
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
         <h2 className="text-lg font-semibold">AI Skill Gap Analysis</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Your verified strengths compared against what {path.title} postings
-          actually require.
+          require.
         </p>
         <div className="mt-5 grid gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-border bg-success/6 p-5">
@@ -502,6 +538,7 @@ function StudentDashboard({
         </div>
       </section>
 
+      {/* Personalized Learning Roadmap Milestones */}
       <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -561,6 +598,51 @@ function StudentDashboard({
         </ol>
       </section>
 
+      {/* Structured 4-Week Study Plan */}
+      <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <BookOpen className="size-5 text-primary" />
+              Tailored 4-Week Study Plan
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              A structured week-by-week plan designed specifically to close your assessment gaps.
+            </p>
+          </div>
+          <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
+            <Sparkles className="mr-1 size-3" />
+            AI Tailored
+          </Badge>
+        </div>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {studyPlan.map((s, idx) => (
+            <div
+              key={idx}
+              className="rounded-xl border border-border bg-background/50 p-4 transition-all hover:border-primary/40 hover:bg-muted/30"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                  {s.week.split(":")[0]}
+                </span>
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="size-3.5" />
+                  {s.hours}
+                </span>
+              </div>
+              <h3 className="mt-1 text-sm font-semibold">{s.focus}</h3>
+              <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground list-disc list-inside">
+                {s.modules.map((m, mIdx) => (
+                  <li key={mIdx}>{m}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Internships & Mentors */}
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
           <div className="flex items-center justify-between">
