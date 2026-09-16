@@ -64,14 +64,15 @@ interface StakeholderTheme {
 
 const STAKEHOLDERS: StakeholderTheme[] = [
   {
+    {
     id: "student",
     badge: "Student Portal",
     title: "Student",
     tagline: "Benchmark your skills & secure verified campus job placements.",
     description: "Industry-aligned skill tests, verified project portfolios, and direct hiring tracks.",
     icon: GraduationCap,
-    imageUrl:
-      "https://images.theconversation.com/files/546059/original/file-20230906-25-tvi2bv.jpg?ixlib=rb-1.1.0&rect=0%2C0%2C5760%2C3840&q=45&auto=format&w=926&fit=clip",
+    // Mee exact student photo from public folder
+    imageUrl: "/student-hero.jpg",
     pillBg: "bg-blue-50 border-blue-200 text-blue-700",
     iconBg: "bg-blue-100/70 border-blue-200",
     iconColor: "text-blue-600",
@@ -97,8 +98,8 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Hire pre-screened talent with audited skill scores.",
     description: "Discover candidates with verified competencies and campus academic audit trails.",
     icon: Briefcase,
-    imageUrl:
-      "https://images.theconversation.com/files/552943/original/file-20231011-19-w6m18z.jpg?ixlib=rb-1.1.0&rect=0%2C0%2C5976%2C3984&q=45&auto=format&w=926&fit=clip",
+    // Mee exact recruiter photo from public folder
+    imageUrl: "/recruiter-hero.webp",
     pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
     iconBg: "bg-emerald-100/70 border-emerald-200",
     iconColor: "text-emerald-700",
