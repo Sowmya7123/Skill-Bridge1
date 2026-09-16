@@ -89,14 +89,15 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     orgLabel: "College / University Name",
     orgPlaceholder: "VIT Vellore",
   },
-  {
+ {
     id: "recruiter",
     badge: "Recruitment Suite",
     title: "Recruiter",
     tagline: "Hire pre-screened talent with audited skill scores.",
     description: "Discover candidates with verified competencies and campus academic audit trails.",
     icon: Briefcase,
-    imageUrl: "https://www.betterup.com/blog/hiring-manager-vs-recruiter",
+    // Clear professional recruiter portrait at office desk with laptop
+    imageUrl: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
     pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
     iconBg: "bg-emerald-100/70 border-emerald-200",
     iconColor: "text-emerald-700",
