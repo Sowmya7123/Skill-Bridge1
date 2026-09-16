@@ -72,7 +72,7 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     icon: GraduationCap,
     imageUrl: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80",
     pillBg: "bg-blue-50 border-blue-200 text-blue-700",
-    iconBg: "bg-blue-100/70 border-blue-200",
+    iconBg: "bg-blue-100/80 border-blue-200",
     iconColor: "text-blue-600",
     buttonClass: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-200",
     statNumber: "88.4%",
@@ -89,17 +89,16 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     orgLabel: "College / University Name",
     orgPlaceholder: "VIT Vellore",
   },
- {
+  {
     id: "recruiter",
     badge: "Recruitment Suite",
     title: "Recruiter",
     tagline: "Hire pre-screened talent with audited skill scores.",
     description: "Discover candidates with verified competencies and campus academic audit trails.",
     icon: Briefcase,
-    // Clear professional recruiter portrait at office desk with laptop
     imageUrl: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
     pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
-    iconBg: "bg-emerald-100/70 border-emerald-200",
+    iconBg: "bg-emerald-100/80 border-emerald-200",
     iconColor: "text-emerald-700",
     buttonClass: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-200",
     statNumber: "3.2x",
@@ -125,7 +124,7 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     icon: School,
     imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
     pillBg: "bg-amber-50 border-amber-200 text-amber-800",
-    iconBg: "bg-amber-100/70 border-amber-200",
+    iconBg: "bg-amber-100/80 border-amber-200",
     iconColor: "text-amber-700",
     buttonClass: "bg-amber-600 hover:bg-amber-700 text-white shadow-sm shadow-amber-200",
     statNumber: "94%",
@@ -151,7 +150,7 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     icon: Compass,
     imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
     pillBg: "bg-cyan-50 border-cyan-200 text-cyan-800",
-    iconBg: "bg-cyan-100/70 border-cyan-200",
+    iconBg: "bg-cyan-100/80 border-cyan-200",
     iconColor: "text-cyan-700",
     buttonClass: "bg-cyan-700 hover:bg-cyan-800 text-white shadow-sm shadow-cyan-200",
     statNumber: "4.9/5",
@@ -210,14 +209,14 @@ function LanguageMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-xs hover:bg-slate-50 transition"
+        className="flex size-9 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white backdrop-blur-md hover:bg-white/20 transition"
         title="Language"
       >
         <MoreVertical className="size-4" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg z-50">
+        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
           <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
             <Globe className="size-3.5" />
             Language
@@ -280,7 +279,7 @@ function Welcome() {
             );
           }
         } catch {
-          // ignore init error
+          // ignore
         }
       };
     }
@@ -306,32 +305,43 @@ function Welcome() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans relative">
+    <div className="min-h-screen relative flex flex-col font-sans text-slate-900 overflow-x-hidden">
       <div id="google_translate_element" style={{ display: "none" }} />
 
-      {/* NAVBAR */}
-      <header className="border-b border-slate-200 bg-white/95 backdrop-blur-sm px-6 py-3.5 flex items-center justify-between sticky top-0 z-40">
+      {/* HIGH-END ARCHITECTURAL / INFRASTRUCTURE BACKGROUND AS PER REFERENCE */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <img
+          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2200&q=85"
+          alt="Modern Architectural Infrastructure"
+          className="w-full h-full object-cover object-center"
+        />
+        {/* Deep blue to slate gradient overlay matching SkyStructure reference */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0B1E3B]/85 via-[#0D2447]/80 to-[#F8FAFC]" />
+      </div>
+
+      {/* ENTERPRISE GLASS NAVBAR */}
+      <header className="relative z-40 border-b border-white/10 bg-[#0B1E3B]/60 backdrop-blur-md px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm shadow-xs">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-base shadow-sm">
             SB
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-base font-bold text-slate-900 tracking-tight">SkillBridge</span>
-              <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+              <span className="text-base sm:text-lg font-bold text-white tracking-tight">SkillBridge</span>
+              <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-blue-400/30 bg-blue-500/20 px-2 py-0.5 text-[10px] font-semibold text-blue-200 backdrop-blur-sm">
                 <BadgeCheck className="size-3" />
                 Institutional Network
               </span>
             </div>
-            <p className="hidden sm:block text-[11px] text-slate-500">
+            <p className="hidden sm:block text-[11px] text-blue-200/70">
               National Talent & Higher Education Portal
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="hidden md:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-            <ShieldCheck className="size-3.5 text-emerald-600" />
+        <div className="flex items-center gap-4">
+          <span className="hidden md:flex items-center gap-1.5 text-xs text-blue-200/80 font-medium">
+            <ShieldCheck className="size-3.5 text-emerald-400" />
             Verified Environment
           </span>
           <LanguageMenu />
@@ -339,23 +349,25 @@ function Welcome() {
       </header>
 
       {/* MAIN VIEW */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
         {!selectedRole ? (
-          /* 4 ROLE CARDS */
-          <div className="w-full max-w-6xl py-4 sm:py-6">
-            <div className="text-center max-w-2xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-2xs text-xs font-semibold text-slate-600 mb-3">
-                <Sparkles className="size-3.5 text-blue-500" />
-                Stakeholder Exchange Portals
+          /* STEP 1: HERO HEADER & 4 ELEVATED STAKEHOLDER CARDS */
+          <div className="w-full max-w-6xl py-6 sm:py-10">
+            {/* Architectural Hero Header */}
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-xs text-xs font-semibold text-blue-100 mb-4">
+                <Sparkles className="size-3.5 text-blue-300" />
+                Next-Gen Academic & Corporate Exchange
               </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
-                Welcome to SkillBridge Portal
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white drop-shadow-sm">
+                Elevating Campus Talent & Industry Readiness
               </h1>
-              <p className="mt-2 text-sm text-slate-500">
-                Choose your stakeholder role to enter your customized institutional dashboard.
+              <p className="mt-3 text-sm sm:text-base text-blue-100/85 max-w-xl mx-auto leading-relaxed">
+                Connect students, corporate recruiters, deans, and certified industry mentors on a single verified platform.
               </p>
             </div>
 
+            {/* 4 CARDS (ELEVATED & CRISP CONTRAST) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               {STAKEHOLDERS.map((item) => {
                 const IconComponent = item.icon;
@@ -364,27 +376,27 @@ function Welcome() {
                     key={item.id}
                     type="button"
                     onClick={() => setSelectedRole(item.id)}
-                    className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white overflow-hidden text-left shadow-xs hover:shadow-md hover:border-slate-300 transition duration-200"
+                    className="group flex flex-col justify-between rounded-2xl border border-white/20 bg-white/95 backdrop-blur-md overflow-hidden text-left shadow-xl hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300"
                   >
-                    {/* Image Header with centered framing */}
-                    <div className="relative h-40 w-full overflow-hidden bg-slate-100">
+                    {/* Visual Header */}
+                    <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                       <img
                         src={item.imageUrl}
                         alt={item.title}
-                        className="h-full w-full object-cover object-center group-hover:scale-105 transition duration-300"
+                        className="h-full w-full object-cover object-center group-hover:scale-105 transition duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-900/20 to-transparent" />
 
-                      <div className={cn("absolute bottom-3 left-3 size-10 rounded-xl flex items-center justify-center border shadow-sm backdrop-blur-md bg-white/95", item.iconColor)}>
+                      <div className={cn("absolute bottom-3 left-3 size-10 rounded-xl flex items-center justify-center border shadow-md backdrop-blur-md bg-white/95", item.iconColor)}>
                         <IconComponent className="size-5" />
                       </div>
 
-                      <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shadow-2xs backdrop-blur-sm bg-white/90", item.pillBg)}>
+                      <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border shadow-xs backdrop-blur-sm bg-white/90", item.pillBg)}>
                         {item.badge}
                       </span>
                     </div>
 
-                    <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div className="p-5 flex-1 flex flex-col justify-between bg-white">
                       <div>
                         <h2 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                           {item.title}
@@ -394,9 +406,9 @@ function Welcome() {
                         </p>
                       </div>
 
-                      <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-900">
+                      <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-900">
                         <span>Enter Workspace</span>
-                        <ArrowRight className="size-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition" />
+                        <ArrowRight className="size-3.5 text-blue-600 group-hover:translate-x-1 transition" />
                       </div>
                     </div>
                   </button>
@@ -405,11 +417,11 @@ function Welcome() {
             </div>
           </div>
         ) : (
-          /* SPLIT AUTH MODAL */
-          <div className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+          /* STEP 2: SPLIT AUTH DIALOG WITH ELEVATED GLASS */
+          <div className="w-full max-w-4xl rounded-2xl border border-white/20 bg-white/95 backdrop-blur-xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-6">
             
             {/* Left Hero Panel */}
-            <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-slate-900 text-white min-h-[340px]">
+            <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-slate-900 text-white min-h-[360px]">
               <img
                 src={currentStakeholder?.imageUrl}
                 alt={currentStakeholder?.title}
@@ -417,17 +429,17 @@ function Welcome() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
 
-              <div className="relative z-10 p-6 sm:p-7">
+              <div className="relative z-10 p-6 sm:p-8">
                 <button
                   type="button"
                   onClick={() => setSelectedRole(null)}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white mb-6 transition"
                 >
                   <ArrowLeft className="size-3.5" />
-                  Back to Roles
+                  Back to Portals
                 </button>
 
-                <span className={cn("inline-block text-[10px] font-bold uppercase px-2.5 py-1 rounded-md border backdrop-blur-md bg-white/15 text-white border-white/20 mb-3")}>
+                <span className="inline-block text-[10px] font-bold uppercase px-2.5 py-1 rounded-md border backdrop-blur-md bg-white/15 text-white border-white/20 mb-3">
                   {currentStakeholder?.badge}
                 </span>
 
@@ -438,7 +450,8 @@ function Welcome() {
                   {currentStakeholder?.description}
                 </p>
 
-                <div className="mt-5 p-3.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
+                {/* Stat Box */}
+                <div className="mt-6 p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
                   <div className="text-2xl font-black text-white">{currentStakeholder?.statNumber}</div>
                   <div className="text-[11px] text-white/75 mt-0.5">{currentStakeholder?.statLabel}</div>
                 </div>
@@ -454,7 +467,7 @@ function Welcome() {
               </div>
 
               <div className="relative z-10 p-6 pt-0 text-[11px] text-white/60">
-                Institutional SSO & Verification Active
+                Institutional Identity & Verification Active
               </div>
             </div>
 
@@ -465,7 +478,7 @@ function Welcome() {
                   <h3 className="text-base font-bold text-slate-900">
                     {authMode === "signin" ? "Authorized Login" : "New Registration"}
                   </h3>
-                  <p className="text-xs text-slate-500">Fill in your official credentials</p>
+                  <p className="text-xs text-slate-500">Fill in your official institutional credentials</p>
                 </div>
 
                 <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs">
@@ -474,7 +487,7 @@ function Welcome() {
                     onClick={() => setAuthMode("signin")}
                     className={cn(
                       "px-3 py-1 rounded-md font-semibold transition",
-                      authMode === "signin" ? "bg-white shadow-2xs text-slate-900" : "text-slate-500"
+                      authMode === "signin" ? "bg-white shadow-xs text-slate-900" : "text-slate-500"
                     )}
                   >
                     Sign In
@@ -484,7 +497,7 @@ function Welcome() {
                     onClick={() => setAuthMode("signup")}
                     className={cn(
                       "px-3 py-1 rounded-md font-semibold transition",
-                      authMode === "signup" ? "bg-white shadow-2xs text-slate-900" : "text-slate-500"
+                      authMode === "signup" ? "bg-white shadow-xs text-slate-900" : "text-slate-500"
                     )}
                   >
                     Register
@@ -581,8 +594,8 @@ function Welcome() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-slate-200 bg-white py-3.5 px-6 text-center text-xs text-slate-400">
-        SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Frameworks.
+      <footer className="relative z-10 border-t border-slate-200/80 bg-white/80 backdrop-blur-md py-4 px-6 text-center text-xs text-slate-500">
+        SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Infrastructure Frameworks.
       </footer>
     </div>
   );
