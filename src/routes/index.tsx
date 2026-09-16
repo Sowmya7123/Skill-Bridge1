@@ -70,7 +70,8 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Benchmark your skills & secure verified campus job placements.",
     description: "Industry-aligned skill tests, verified project portfolios, and direct hiring tracks.",
     icon: GraduationCap,
-    imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.theconversation.com/files/546059/original/file-20230906-25-tvi2bv.jpg?ixlib=rb-1.1.0&rect=0%2C0%2C5760%2C3840&q=45&auto=format&w=926&fit=clip",
     pillBg: "bg-blue-50 border-blue-200 text-blue-700",
     iconBg: "bg-blue-100/70 border-blue-200",
     iconColor: "text-blue-600",
@@ -96,7 +97,8 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Hire pre-screened talent with audited skill scores.",
     description: "Discover candidates with verified competencies and campus academic audit trails.",
     icon: Briefcase,
-    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.theconversation.com/files/552943/original/file-20231011-19-w6m18z.jpg?ixlib=rb-1.1.0&rect=0%2C0%2C5976%2C3984&q=45&auto=format&w=926&fit=clip",
     pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
     iconBg: "bg-emerald-100/70 border-emerald-200",
     iconColor: "text-emerald-700",
@@ -122,7 +124,8 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Track batch competencies and align syllabus to market trends.",
     description: "Monitor real-time cohort readiness metrics and export verified documentation.",
     icon: School,
-    imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
     pillBg: "bg-amber-50 border-amber-200 text-amber-800",
     iconBg: "bg-amber-100/70 border-amber-200",
     iconColor: "text-amber-700",
@@ -148,7 +151,8 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Review capstone projects and mentor future engineers.",
     description: "Guide student final-year capstones and endorse high-potential portfolios.",
     icon: Compass,
-    imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
     pillBg: "bg-cyan-50 border-cyan-200 text-cyan-800",
     iconBg: "bg-cyan-100/70 border-cyan-200",
     iconColor: "text-cyan-700",
@@ -340,7 +344,7 @@ function Welcome() {
       {/* MAIN VIEW */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
         {!selectedRole ? (
-          /* STEP 1: 4 ROLE CARDS WITH PICTURES & PASTEL ICONS */
+          /* STEP 1: 4 ROLE CARDS */
           <div className="w-full max-w-6xl py-4 sm:py-6">
             <div className="text-center max-w-2xl mx-auto mb-10">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-2xs text-xs font-semibold text-slate-600 mb-3">
@@ -366,20 +370,30 @@ function Welcome() {
                     className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white overflow-hidden text-left shadow-xs hover:shadow-md hover:border-slate-300 transition duration-200"
                   >
                     {/* Role Image Header */}
-                    <div className="relative h-36 w-full overflow-hidden bg-slate-100">
+                    <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                       <img
                         src={item.imageUrl}
                         alt={item.title}
                         className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                      
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+
                       {/* Floating Icon inside image */}
-                      <div className={cn("absolute bottom-3 left-3 size-10 rounded-xl flex items-center justify-center border shadow-sm backdrop-blur-md bg-white/95", item.iconColor)}>
+                      <div
+                        className={cn(
+                          "absolute bottom-3 left-3 size-10 rounded-xl flex items-center justify-center border shadow-sm backdrop-blur-md bg-white/95",
+                          item.iconColor
+                        )}
+                      >
                         <IconComponent className="size-5" />
                       </div>
 
-                      <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shadow-2xs backdrop-blur-sm bg-white/90", item.pillBg)}>
+                      <span
+                        className={cn(
+                          "absolute top-3 right-3 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shadow-2xs backdrop-blur-sm bg-white/90",
+                          item.pillBg
+                        )}
+                      >
                         {item.badge}
                       </span>
                     </div>
@@ -405,16 +419,14 @@ function Welcome() {
             </div>
           </div>
         ) : (
-          /* STEP 2: SPLIT LOGIN WITH HERO IMAGE & METRICS */
+          /* STEP 2: SPLIT LOGIN */
           <div className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-            
             {/* Left Hero Image + Stats Panel */}
             <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-slate-900 text-white min-h-[340px]">
-              {/* Stakeholder Background Image */}
               <img
                 src={currentStakeholder?.imageUrl}
                 alt={currentStakeholder?.title}
-                className="absolute inset-0 h-full w-full object-cover opacity-35"
+                className="absolute inset-0 h-full w-full object-cover opacity-40"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
 
@@ -428,7 +440,7 @@ function Welcome() {
                   Back to Roles
                 </button>
 
-                <span className={cn("inline-block text-[10px] font-bold uppercase px-2.5 py-1 rounded-md border backdrop-blur-md bg-white/15 text-white border-white/20 mb-3")}>
+                <span className="inline-block text-[10px] font-bold uppercase px-2.5 py-1 rounded-md border backdrop-blur-md bg-white/15 text-white border-white/20 mb-3">
                   {currentStakeholder?.badge}
                 </span>
 
