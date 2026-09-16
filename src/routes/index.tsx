@@ -12,7 +12,8 @@ import {
   Sparkles,
   Mail,
   Lock,
-  CheckCircle2,
+  IdCard,
+  Building,
   MoreVertical,
   Globe,
   Check,
@@ -33,55 +34,72 @@ export const Route = createFileRoute("/")({
         content:
           "Smart automation portal connecting students, academia, and industry for personalized skill mapping and placement.",
       },
-      { property: "og:title", content: "SkillBridge — Connecting Academia, Industry & Talent" },
-      {
-        property: "og:description",
-        content: "AI skill gap mapping, guided learning roadmaps and verified talent matching in one portal.",
-      },
     ],
   }),
   component: Welcome,
 });
 
-const ROLES: {
+interface RoleConfig {
   id: RoleId;
   icon: typeof GraduationCap;
   title: string;
   desc: string;
-  field: string;
-  placeholder: string;
-}[] = [
+  idLabel: string;
+  idPlaceholder: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  orgLabel?: string;
+  orgPlaceholder?: string;
+}
+
+const ROLES: RoleConfig[] = [
   {
     id: "student",
     icon: GraduationCap,
     title: "Student",
     desc: "Assess skills, bridge gaps & get placed",
-    field: "College / University Name",
-    placeholder: "e.g. VIT Vellore",
+    idLabel: "College Registration / Student ID",
+    idPlaceholder: "e.g. 21BCE1042",
+    emailLabel: "Student Email",
+    emailPlaceholder: "student@college.edu",
+    orgLabel: "College / University Name",
+    orgPlaceholder: "e.g. VIT Vellore",
   },
   {
     id: "recruiter",
     icon: Briefcase,
     title: "Recruiter",
     desc: "Post roles & hire verified talent",
-    field: "Company Name",
-    placeholder: "e.g. Northwind Labs",
+    idLabel: "Company / Employee ID",
+    idPlaceholder: "e.g. EMP-90421",
+    emailLabel: "Work Email",
+    emailPlaceholder: "hr@company.com",
+    orgLabel: "Company Name",
+    orgPlaceholder: "e.g. Microsoft, Google",
   },
   {
     id: "academician",
     icon: School,
     title: "Academician",
     desc: "Track cohort readiness & update curriculum",
-    field: "College / University Name",
-    placeholder: "e.g. NIT Trichy",
+    idLabel: "Faculty / College ID",
+    idPlaceholder: "e.g. FAC-5512",
+    emailLabel: "Institutional Email",
+    emailPlaceholder: "faculty@university.edu",
+    orgLabel: "College / University Name",
+    orgPlaceholder: "e.g. NIT Trichy",
   },
   {
     id: "mentor",
     icon: Compass,
     title: "Mentor",
     desc: "Guide students & review industry projects",
-    field: "Domain Expertise",
-    placeholder: "e.g. Cloud & Platform Engineering",
+    idLabel: "Mentor / Expert ID",
+    idPlaceholder: "e.g. MNT-7701",
+    emailLabel: "Contact Email",
+    emailPlaceholder: "mentor@domain.com",
+    orgLabel: "Domain Expertise",
+    orgPlaceholder: "e.g. Cloud & AI Architecture",
   },
 ];
 
@@ -162,15 +180,18 @@ function LanguageMenu() {
 
 function Welcome() {
   const navigate = useNavigate();
-  const { email, signIn, completeRegistration } = useAppState();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const { signIn, completeRegistration } = useAppState();
+
+  const [selectedRole, setSelectedRole] = useState<RoleId | null>(null);
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+
+  // Form states
+  const [stakeholderId, setStakeholderId] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<RoleId | null>(null);
-  const [org, setOrg] = useState("");
+  const [orgInput, setOrgInput] = useState("");
 
-  const step: 1 | 2 = email ? 2 : 1;
-  const active = ROLES.find((r) => r.id === role);
+  const activeRoleConfig = ROLES.find((r) => r.id === selectedRole);
 
   // Auto-inject Google Translate script into page
   useEffect(() => {
@@ -193,30 +214,34 @@ function Welcome() {
     }
   }, []);
 
-  function handleContinue() {
-    const value = emailInput.trim() || "demo@skillbridge.io";
-    signIn(value);
-    toast.success(mode === "signin" ? "Signed in" : "Account created");
-  }
+  function handleAuthSubmit() {
+    if (!selectedRole) return;
 
-  function handleRegister() {
-    if (!role) return;
-    completeRegistration(role, org.trim());
-    toast.success(`Profile registered as ${active?.title}`);
-    navigate({ to: `/${role}` });
+    const emailValue = emailInput.trim() || `${selectedRole}.demo@skillbridge.io`;
+    signIn(emailValue);
+    completeRegistration(selectedRole, orgInput.trim() || activeRoleConfig?.orgPlaceholder || "");
+
+    toast.success(
+      authMode === "signin"
+        ? `Logged in as ${activeRoleConfig?.title}`
+        : `Registered successfully as ${activeRoleConfig?.title}`
+    );
+
+    navigate({ to: `/${selectedRole}` });
   }
 
   return (
     <div className="surface-grid relative min-h-screen bg-background">
-      {/* Hidden Translate Anchor */}
+      {/* Hidden Translate Element */}
       <div id="google_translate_element" style={{ display: "none" }} />
 
-      {/* Top Right Three Dots Language Button */}
+      {/* Top Right Three Dots Language Menu */}
       <div className="absolute right-4 top-4 z-50 sm:right-8 sm:top-6">
         <LanguageMenu />
       </div>
 
       <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-center px-4 py-16 sm:px-6">
+        {/* Brand */}
         <div className="flex items-center gap-2.5">
           <span className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Blocks className="size-5" />
@@ -224,44 +249,125 @@ function Welcome() {
           <span className="font-display text-xl font-bold tracking-tight">SkillBridge</span>
         </div>
 
-        <span className="mt-8 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
+        <span className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground">
           <Sparkles className="size-3.5 text-primary" />
           Connecting Academia, Industry & Talent
         </span>
 
-        <h1 className="mt-5 text-center text-4xl font-bold sm:text-5xl">Welcome to SkillBridge</h1>
-        <p className="mt-4 max-w-2xl text-center text-base leading-relaxed text-muted-foreground">
-          Smart automation portal connecting students, academia, and industry for personalized skill
-          mapping and placement.
+        <h1 className="mt-4 text-center text-3xl font-bold sm:text-4xl">
+          {selectedRole
+            ? `${activeRoleConfig?.title} Portal`
+            : "Select Your Stakeholder Role"}
+        </h1>
+        <p className="mt-2 max-w-xl text-center text-sm text-muted-foreground">
+          {selectedRole
+            ? `Please authenticate using your verified ${activeRoleConfig?.idLabel.toLowerCase()}`
+            : "Choose your role to access dedicated dashboards, tools, and verification portals."}
         </p>
 
-        <div className="mt-8 flex items-center gap-3 text-xs font-medium">
-          <StepDot n={1} label="Sign in" done={step > 1} active={step === 1} />
-          <span className="h-px w-8 bg-border" />
-          <StepDot n={2} label="Role setup" done={false} active={step === 2} />
-        </div>
+        {/* STEP 1: SELECT STAKEHOLDER ROLE */}
+        {!selectedRole ? (
+          <div className="mt-8 grid w-full max-w-3xl gap-4 sm:grid-cols-2">
+            {ROLES.map((r) => {
+              const Icon = r.icon;
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setSelectedRole(r.id)}
+                  className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 text-left transition-all hover:-translate-y-1 hover:border-primary hover:shadow-lg"
+                >
+                  <div>
+                    <span className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                      <Icon className="size-6" />
+                    </span>
+                    <h2 className="mt-4 text-lg font-semibold">{r.title}</h2>
+                    <p className="mt-1 text-xs text-muted-foreground">{r.desc}</p>
+                  </div>
+                  <div className="mt-5 flex items-center gap-1 text-xs font-medium text-primary">
+                    <span>Access Portal</span>
+                    <ArrowRight className="size-3.5 transition group-hover:translate-x-1" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          /* STEP 2: DEDICATED LOGIN / REGISTER FORM FOR SELECTED ROLE */
+          <div className="mt-8 w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-card sm:p-7">
+            {/* Back Button */}
+            <button
+              type="button"
+              onClick={() => setSelectedRole(null)}
+              className="mb-4 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="size-3.5" />
+              Switch Stakeholder Role
+            </button>
 
-        {step === 1 ? (
-          <div className="mt-6 w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-card sm:p-7">
+            {/* Toggle Sign In / Register */}
             <div className="grid grid-cols-2 gap-1 rounded-full bg-muted p-1">
               {(["signin", "signup"] as const).map((m) => (
                 <button
                   key={m}
                   type="button"
-                  onClick={() => setMode(m)}
+                  onClick={() => setAuthMode(m)}
                   className={cn(
-                    "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                    mode === m ? "bg-card text-primary shadow-sm" : "text-muted-foreground",
+                    "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                    authMode === m
+                      ? "bg-card text-primary shadow-sm"
+                      : "text-muted-foreground"
                   )}
                 >
-                  {m === "signin" ? "Sign In" : "Create Account"}
+                  {m === "signin"
+                    ? `${activeRoleConfig?.title} Sign In`
+                    : `Register New`}
                 </button>
               ))}
             </div>
 
             <div className="mt-5 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              {/* Stakeholder Specific ID (Student ID / Company ID / Faculty ID) */}
+              <div className="space-y-1.5">
+                <Label htmlFor="stakeholder-id" className="text-xs">
+                  {activeRoleConfig?.idLabel}
+                </Label>
+                <div className="relative">
+                  <IdCard className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="stakeholder-id"
+                    value={stakeholderId}
+                    onChange={(e) => setStakeholderId(e.target.value)}
+                    placeholder={activeRoleConfig?.idPlaceholder}
+                    className="pl-9 text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Institution / Company Name (Visible during Register) */}
+              {authMode === "signup" && activeRoleConfig?.orgLabel && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="org-name" className="text-xs">
+                    {activeRoleConfig.orgLabel}
+                  </Label>
+                  <div className="relative">
+                    <Building className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="org-name"
+                      value={orgInput}
+                      onChange={(e) => setOrgInput(e.target.value)}
+                      placeholder={activeRoleConfig.orgPlaceholder}
+                      className="pl-9 text-xs"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Email */}
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-xs">
+                  {activeRoleConfig?.emailLabel}
+                </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -269,13 +375,17 @@ function Welcome() {
                     type="email"
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="you@college.edu"
-                    className="pl-9"
+                    placeholder={activeRoleConfig?.emailPlaceholder}
+                    className="pl-9 text-xs"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-xs">
+                  Password
+                </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -284,103 +394,31 @@ function Welcome() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="pl-9"
+                    className="pl-9 text-xs"
                   />
                 </div>
               </div>
-              <Button className="w-full" size="lg" onClick={handleContinue}>
-                Continue
-                <ArrowRight className="size-4" />
+
+              {/* Submit */}
+              <Button className="w-full mt-2" size="lg" onClick={handleAuthSubmit}>
+                {authMode === "signin"
+                  ? `Enter as ${activeRoleConfig?.title}`
+                  : `Complete Registration`}
+                <ArrowRight className="size-4 ml-1.5" />
               </Button>
-              <p className="text-center text-xs text-muted-foreground">
-                Demo mode — any email and password is accepted.
+
+              <p className="text-center text-[11px] text-muted-foreground">
+                Demo mode — custom stakeholder validation active.
               </p>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-6 w-full max-w-3xl rounded-2xl border border-border bg-card p-6 shadow-card sm:p-7">
-            <p className="text-sm font-semibold">Select your role to complete profile registration</p>
-            <p className="mt-1 text-sm text-muted-foreground">Signed in as {email}</p>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {ROLES.map((r) => {
-                const on = role === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRole(r.id)}
-                    className={cn(
-                      "rounded-2xl border p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lift",
-                      on ? "border-primary ring-2 ring-primary/25" : "border-border",
-                    )}
-                  >
-                    <div className="flex items-start gap-4">
-                      <span
-                        className={cn(
-                          "flex size-11 shrink-0 items-center justify-center rounded-xl",
-                          on ? "bg-primary text-primary-foreground" : "bg-primary-soft text-primary",
-                        )}
-                      >
-                        <r.icon className="size-5" />
-                      </span>
-                      <div className="min-w-0">
-                        <h2 className="text-base font-semibold">{r.title}</h2>
-                        <p className="mt-1 text-sm text-muted-foreground">{r.desc}</p>
-                      </div>
-                      {on && <CheckCircle2 className="ml-auto size-5 shrink-0 text-primary" />}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {active && (
-              <div className="mt-5 space-y-2">
-                <Label htmlFor="org">{active.field}</Label>
-                <Input
-                  id="org"
-                  value={org}
-                  onChange={(e) => setOrg(e.target.value)}
-                  placeholder={active.placeholder}
-                />
-              </div>
-            )}
-
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <Button size="lg" disabled={!role} onClick={handleRegister}>
-                Complete Registration
-                <ArrowRight className="size-4" />
-              </Button>
-              <Button variant="ghost" onClick={() => setRole(null)}>
-                <ArrowLeft className="size-4" />
-                Clear selection
-              </Button>
             </div>
           </div>
         )}
 
         <p className="mt-8 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <ShieldCheck className="size-3.5 text-success" />
-          Skill scores are verified through assessments and mentor-reviewed projects.
+          <ShieldCheck className="size-3.5 text-emerald-500" />
+          Verified stakeholder role authentication with institutional ID matching.
         </p>
       </div>
     </div>
-  );
-}
-
-function StepDot({ n, label, done, active }: { n: number; label: string; done: boolean; active: boolean }) {
-  return (
-    <span className={cn("flex items-center gap-2", active || done ? "text-primary" : "text-muted-foreground")}>
-      <span
-        className={cn(
-          "flex size-6 items-center justify-center rounded-full border text-[11px] font-semibold",
-          done || active ? "border-primary bg-primary text-primary-foreground" : "border-border",
-        )}
-      >
-        {done ? <CheckCircle2 className="size-3.5" /> : n}
-      </span>
-      {label}
-    </span>
   );
 }
