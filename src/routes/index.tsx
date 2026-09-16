@@ -17,6 +17,7 @@ import {
   Check,
   Sparkles,
   CheckCircle2,
+  BadgeCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,11 @@ interface StakeholderTheme {
   tagline: string;
   description: string;
   icon: typeof GraduationCap;
+  imageUrl: string;
+  pillBg: string;
+  iconBg: string;
+  iconColor: string;
+  buttonClass: string;
   statNumber: string;
   statLabel: string;
   features: string[];
@@ -61,11 +67,16 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     id: "student",
     badge: "Student Portal",
     title: "Student",
-    tagline: "Assess industry readiness and unlock verified campus interviews.",
-    description: "Benchmark your skills with standardized diagnostics and showcase verified project rubrics.",
+    tagline: "Benchmark your skills & secure verified campus job placements.",
+    description: "Industry-aligned skill tests, verified project portfolios, and direct hiring tracks.",
     icon: GraduationCap,
+    imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80",
+    pillBg: "bg-blue-50 border-blue-200 text-blue-700",
+    iconBg: "bg-blue-100/70 border-blue-200",
+    iconColor: "text-blue-600",
+    buttonClass: "bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-200",
     statNumber: "88.4%",
-    statLabel: "Skill-to-Role Fitment",
+    statLabel: "Skill-to-Role Fitment Score",
     features: [
       "Industry benchmarked skill diagnostic tests",
       "Mentor-evaluated capstone portfolios",
@@ -82,9 +93,14 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     id: "recruiter",
     badge: "Recruitment Suite",
     title: "Recruiter",
-    tagline: "Hire verified talent based on audited assessment outcomes.",
-    description: "Connect with job-ready candidates with transparent performance audit trails.",
+    tagline: "Hire pre-screened talent with audited skill scores.",
+    description: "Discover candidates with verified competencies and campus academic audit trails.",
     icon: Briefcase,
+    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
+    pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
+    iconBg: "bg-emerald-100/70 border-emerald-200",
+    iconColor: "text-emerald-700",
+    buttonClass: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-200",
     statNumber: "3.2x",
     statLabel: "Faster Candidate Filtering",
     features: [
@@ -92,10 +108,10 @@ const STAKEHOLDERS: StakeholderTheme[] = [
       "Granular filters by university and branch",
       "Proctored assessment audit verification",
     ],
-    idFieldLabel: "Corporate Employee ID",
+    idFieldLabel: "Corporate Employee ID / Work ID",
     idPlaceholder: "e.g. CORP-REC-4821",
     emailLabel: "Work Email Address",
-    emailPlaceholder: "talent@company.com",
+    emailPlaceholder: "talent@microsoft.com",
     orgLabel: "Company Name",
     orgPlaceholder: "Northwind Labs",
   },
@@ -103,9 +119,14 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     id: "academician",
     badge: "Faculty Portal",
     title: "Academician",
-    tagline: "Analyze cohort skill gaps and adapt curriculum to market trends.",
+    tagline: "Track batch competencies and align syllabus to market trends.",
     description: "Monitor real-time cohort readiness metrics and export verified documentation.",
     icon: School,
+    imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80",
+    pillBg: "bg-amber-50 border-amber-200 text-amber-800",
+    iconBg: "bg-amber-100/70 border-amber-200",
+    iconColor: "text-amber-700",
+    buttonClass: "bg-amber-600 hover:bg-amber-700 text-white shadow-sm shadow-amber-200",
     statNumber: "94%",
     statLabel: "Curriculum Alignment Index",
     features: [
@@ -124,9 +145,14 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     id: "mentor",
     badge: "Mentor Desk",
     title: "Mentor",
-    tagline: "Evaluate project rigor and coach future engineering cohorts.",
+    tagline: "Review capstone projects and mentor future engineers.",
     description: "Guide student final-year capstones and endorse high-potential portfolios.",
     icon: Compass,
+    imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80",
+    pillBg: "bg-cyan-50 border-cyan-200 text-cyan-800",
+    iconBg: "bg-cyan-100/70 border-cyan-200",
+    iconColor: "text-cyan-700",
+    buttonClass: "bg-cyan-700 hover:bg-cyan-800 text-white shadow-sm shadow-cyan-200",
     statNumber: "4.9/5",
     statLabel: "Average Mentor Engagement",
     features: [
@@ -183,16 +209,16 @@ function LanguageMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex size-8 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition"
+        className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-xs hover:bg-slate-50 transition"
         title="Language"
       >
         <MoreVertical className="size-4" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-200 bg-white p-1 shadow-md z-50">
-          <div className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-100 mb-1">
-            <Globe className="size-3" />
+        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg z-50">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+            <Globe className="size-3.5" />
             Language
           </div>
           {languages.map((lang) => (
@@ -200,11 +226,11 @@ function LanguageMenu() {
               key={lang.code}
               type="button"
               onClick={() => handleLanguageSelect(lang.code)}
-              className="flex w-full items-center justify-between rounded px-2.5 py-1.5 text-xs font-normal text-gray-600 hover:bg-gray-50 transition"
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
             >
               <div className="flex flex-col text-left">
                 <span>{lang.native}</span>
-                <span className="text-[9px] text-gray-400">{lang.label}</span>
+                <span className="text-[10px] text-slate-400">{lang.label}</span>
               </div>
               {currentLang === lang.code && <Check className="size-3.5 text-blue-600" />}
             </button>
@@ -279,24 +305,32 @@ function Welcome() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-gray-700 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans relative">
       <div id="google_translate_element" style={{ display: "none" }} />
 
-      {/* LIGHT MINIMAL NAVBAR */}
-      <header className="border-b border-gray-100 bg-white px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="flex size-7 items-center justify-center rounded border border-gray-200 bg-gray-50 text-gray-700 font-semibold text-xs">
+      {/* CLEAN NAVBAR */}
+      <header className="border-b border-slate-200 bg-white/95 backdrop-blur-sm px-6 py-3.5 flex items-center justify-between sticky top-0 z-40">
+        <div className="flex items-center gap-3">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-sm shadow-xs">
             SB
           </div>
-          <span className="text-sm font-semibold tracking-tight text-gray-800">SkillBridge</span>
-          <span className="hidden sm:inline-block text-[11px] text-gray-400 pl-2 border-l border-gray-200">
-            Higher Education & Industry Portal
-          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold text-slate-900 tracking-tight">SkillBridge</span>
+              <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+                <BadgeCheck className="size-3" />
+                Institutional Network
+              </span>
+            </div>
+            <p className="hidden sm:block text-[11px] text-slate-500">
+              National Talent & Higher Education Portal
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="hidden md:flex items-center gap-1 text-xs text-gray-400">
-            <ShieldCheck className="size-3.5 text-gray-400" />
+          <span className="hidden md:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+            <ShieldCheck className="size-3.5 text-emerald-600" />
             Verified Environment
           </span>
           <LanguageMenu />
@@ -304,24 +338,24 @@ function Welcome() {
       </header>
 
       {/* MAIN VIEW */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 bg-[#FAFAFA]">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
         {!selectedRole ? (
-          /* STEP 1: ROLE SELECTION CARDS */
-          <div className="w-full max-w-4xl py-6">
-            <div className="text-center max-w-lg mx-auto mb-8">
-              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white border border-gray-200 text-[11px] text-gray-500 mb-2">
-                <Sparkles className="size-3 text-gray-400" />
-                Select Gateway
+          /* STEP 1: 4 ROLE CARDS WITH PICTURES & PASTEL ICONS */
+          <div className="w-full max-w-6xl py-4 sm:py-6">
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-2xs text-xs font-semibold text-slate-600 mb-3">
+                <Sparkles className="size-3.5 text-blue-500" />
+                Stakeholder Exchange Portals
               </div>
-              <h1 className="text-2xl font-semibold tracking-tight text-gray-800">
-                Welcome to SkillBridge
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">
+                Welcome to SkillBridge Portal
               </h1>
-              <p className="mt-1 text-xs text-gray-500">
-                Select your stakeholder category to continue to your dashboard.
+              <p className="mt-2 text-sm text-slate-500">
+                Choose your stakeholder role to enter your customized institutional dashboard.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               {STAKEHOLDERS.map((item) => {
                 const IconComponent = item.icon;
                 return (
@@ -329,29 +363,41 @@ function Welcome() {
                     key={item.id}
                     type="button"
                     onClick={() => setSelectedRole(item.id)}
-                    className="flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-4 text-left hover:border-gray-300 hover:shadow-xs transition"
+                    className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white overflow-hidden text-left shadow-xs hover:shadow-md hover:border-slate-300 transition duration-200"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="size-8 rounded border border-gray-100 bg-gray-50 flex items-center justify-center text-gray-600">
-                          <IconComponent className="size-4" />
-                        </div>
-                        <span className="text-[10px] text-gray-400 font-medium">
-                          {item.badge}
-                        </span>
+                    {/* Role Image Header */}
+                    <div className="relative h-36 w-full overflow-hidden bg-slate-100">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      
+                      {/* Floating Icon inside image */}
+                      <div className={cn("absolute bottom-3 left-3 size-10 rounded-xl flex items-center justify-center border shadow-sm backdrop-blur-md bg-white/95", item.iconColor)}>
+                        <IconComponent className="size-5" />
                       </div>
 
-                      <h2 className="text-sm font-semibold text-gray-800">
-                        {item.title}
-                      </h2>
-                      <p className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-relaxed">
-                        {item.tagline}
-                      </p>
+                      <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border shadow-2xs backdrop-blur-sm bg-white/90", item.pillBg)}>
+                        {item.badge}
+                      </span>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between pt-2.5 border-t border-gray-50 text-[11px] font-medium text-gray-600 w-full">
-                      <span>Access Portal</span>
-                      <ArrowRight className="size-3 text-gray-400" />
+                    <div className="p-5 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h2 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                          {item.title}
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
+                          {item.tagline}
+                        </p>
+                      </div>
+
+                      <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-900">
+                        <span>Enter Workspace</span>
+                        <ArrowRight className="size-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition" />
+                      </div>
                     </div>
                   </button>
                 );
@@ -359,68 +405,78 @@ function Welcome() {
             </div>
           </div>
         ) : (
-          /* STEP 2: SPLIT LOGIN FORM */
-          <div className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-12">
-            {/* Left Info Panel */}
-            <div className="md:col-span-5 p-5 bg-gray-50/50 border-r border-gray-100 flex flex-col justify-between">
-              <div>
+          /* STEP 2: SPLIT LOGIN WITH HERO IMAGE & METRICS */
+          <div className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+            
+            {/* Left Hero Image + Stats Panel */}
+            <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-slate-900 text-white min-h-[340px]">
+              {/* Stakeholder Background Image */}
+              <img
+                src={currentStakeholder?.imageUrl}
+                alt={currentStakeholder?.title}
+                className="absolute inset-0 h-full w-full object-cover opacity-35"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
+
+              <div className="relative z-10 p-6 sm:p-7">
                 <button
                   type="button"
                   onClick={() => setSelectedRole(null)}
-                  className="inline-flex items-center gap-1 text-[11px] text-gray-500 hover:text-gray-700 mb-4 transition"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white mb-6 transition"
                 >
-                  <ArrowLeft className="size-3" />
-                  Switch Role
+                  <ArrowLeft className="size-3.5" />
+                  Back to Roles
                 </button>
 
-                <div className="text-[10px] font-medium uppercase tracking-wider text-gray-400 mb-1">
+                <span className={cn("inline-block text-[10px] font-bold uppercase px-2.5 py-1 rounded-md border backdrop-blur-md bg-white/15 text-white border-white/20 mb-3")}>
                   {currentStakeholder?.badge}
-                </div>
+                </span>
 
-                <h2 className="text-base font-semibold text-gray-800">
+                <h2 className="text-2xl font-black tracking-tight text-white">
                   {currentStakeholder?.title} Portal
                 </h2>
-                <p className="mt-1 text-[11px] text-gray-500 leading-relaxed">
+                <p className="mt-2 text-xs text-white/80 leading-relaxed">
                   {currentStakeholder?.description}
                 </p>
 
-                <div className="mt-4 p-2.5 rounded border border-gray-100 bg-white">
-                  <div className="text-lg font-semibold text-gray-800">{currentStakeholder?.statNumber}</div>
-                  <div className="text-[10px] text-gray-400">{currentStakeholder?.statLabel}</div>
+                {/* Metric Card */}
+                <div className="mt-5 p-3.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
+                  <div className="text-2xl font-black text-white">{currentStakeholder?.statNumber}</div>
+                  <div className="text-[11px] text-white/75 mt-0.5">{currentStakeholder?.statLabel}</div>
                 </div>
 
-                <div className="mt-4 space-y-1.5">
+                <div className="mt-5 space-y-2">
                   {currentStakeholder?.features.map((f, i) => (
-                    <div key={i} className="flex items-start gap-1.5 text-[11px] text-gray-600">
-                      <CheckCircle2 className="size-3 mt-0.5 text-gray-400 shrink-0" />
+                    <div key={i} className="flex items-start gap-2 text-xs text-white/90">
+                      <CheckCircle2 className="size-3.5 mt-0.5 text-emerald-400 shrink-0" />
                       <span>{f}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-4 pt-2 border-t border-gray-100 text-[10px] text-gray-400">
-                Single Sign-On Active
+              <div className="relative z-10 p-6 pt-0 text-[11px] text-white/60">
+                Institutional SSO & Verification Active
               </div>
             </div>
 
             {/* Right Form Panel */}
-            <div className="md:col-span-7 p-5 sm:p-6 flex flex-col justify-center bg-white">
-              <div className="flex items-center justify-between mb-4">
+            <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-center bg-white">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-800">
-                    {authMode === "signin" ? "Login" : "Register"}
+                  <h3 className="text-base font-bold text-slate-900">
+                    {authMode === "signin" ? "Authorized Login" : "New Registration"}
                   </h3>
-                  <p className="text-[10px] text-gray-400">Enter your credentials</p>
+                  <p className="text-xs text-slate-500">Fill in your official credentials</p>
                 </div>
 
-                <div className="flex rounded bg-gray-100 p-0.5 text-[11px]">
+                <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs">
                   <button
                     type="button"
                     onClick={() => setAuthMode("signin")}
                     className={cn(
-                      "px-2 py-0.5 rounded transition",
-                      authMode === "signin" ? "bg-white text-gray-800 font-medium shadow-2xs" : "text-gray-500"
+                      "px-3 py-1 rounded-md font-semibold transition",
+                      authMode === "signin" ? "bg-white shadow-2xs text-slate-900" : "text-slate-500"
                     )}
                   >
                     Sign In
@@ -429,8 +485,8 @@ function Welcome() {
                     type="button"
                     onClick={() => setAuthMode("signup")}
                     className={cn(
-                      "px-2 py-0.5 rounded transition",
-                      authMode === "signup" ? "bg-white text-gray-800 font-medium shadow-2xs" : "text-gray-500"
+                      "px-3 py-1 rounded-md font-semibold transition",
+                      authMode === "signup" ? "bg-white shadow-2xs text-slate-900" : "text-slate-500"
                     )}
                   >
                     Register
@@ -438,87 +494,87 @@ function Welcome() {
                 </div>
               </div>
 
-              <form onSubmit={handleAuthSubmit} className="space-y-2.5">
-                <div className="space-y-0.5">
-                  <Label htmlFor="id-input" className="text-[11px] font-medium text-gray-600">
-                    {currentStakeholder?.idFieldLabel}
+              <form onSubmit={handleAuthSubmit} className="space-y-3.5">
+                <div className="space-y-1">
+                  <Label htmlFor="id-input" className="text-xs font-semibold text-slate-700">
+                    {currentStakeholder?.idFieldLabel} <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
-                    <IdCard className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
+                    <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <Input
                       id="id-input"
                       value={stakeholderId}
                       onChange={(e) => setStakeholderId(e.target.value)}
                       placeholder={currentStakeholder?.idPlaceholder}
-                      className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
+                      className="pl-9 h-10 text-xs border-slate-200 bg-white"
                     />
                   </div>
                 </div>
 
                 {authMode === "signup" && (
-                  <div className="space-y-0.5">
-                    <Label htmlFor="org-input" className="text-[11px] font-medium text-gray-600">
-                      {currentStakeholder?.orgLabel}
+                  <div className="space-y-1">
+                    <Label htmlFor="org-input" className="text-xs font-semibold text-slate-700">
+                      {currentStakeholder?.orgLabel} <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative">
-                      <Building2 className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
+                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
                         id="org-input"
                         value={orgInput}
                         onChange={(e) => setOrgInput(e.target.value)}
                         placeholder={currentStakeholder?.orgPlaceholder}
-                        className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
+                        className="pl-9 h-10 text-xs border-slate-200 bg-white"
                       />
                     </div>
                   </div>
                 )}
 
-                <div className="space-y-0.5">
-                  <Label htmlFor="email-input" className="text-[11px] font-medium text-gray-600">
-                    {currentStakeholder?.emailLabel}
+                <div className="space-y-1">
+                  <Label htmlFor="email-input" className="text-xs font-semibold text-slate-700">
+                    {currentStakeholder?.emailLabel} <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <Input
                       id="email-input"
                       type="email"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
                       placeholder={currentStakeholder?.emailPlaceholder}
-                      className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
+                      className="pl-9 h-10 text-xs border-slate-200 bg-white"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-0.5">
-                  <Label htmlFor="pwd-input" className="text-[11px] font-medium text-gray-600">
-                    Password
+                <div className="space-y-1">
+                  <Label htmlFor="pwd-input" className="text-xs font-semibold text-slate-700">
+                    Password <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <Input
                       id="pwd-input"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
+                      className="pl-9 h-10 text-xs border-slate-200 bg-white"
                     />
                   </div>
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full h-8 text-xs font-medium transition mt-2 bg-blue-600 hover:bg-blue-700 text-white shadow-none"
+                  className={cn("w-full h-10 text-xs font-bold transition mt-2", currentStakeholder?.buttonClass)}
                 >
                   {authMode === "signin"
-                    ? `Continue as ${currentStakeholder?.title}`
-                    : `Register`}
-                  <ArrowRight className="size-3 ml-1" />
+                    ? `Enter as ${currentStakeholder?.title}`
+                    : `Complete Registration`}
+                  <ArrowRight className="size-4 ml-1.5" />
                 </Button>
 
-                <p className="text-center text-[10px] text-gray-400 pt-0.5">
-                  Demo mode active. Any credentials accepted.
+                <p className="text-center text-[10px] text-slate-400 pt-1">
+                  Single-sign-on active. Instant test verification enabled for preview.
                 </p>
               </form>
             </div>
@@ -526,8 +582,8 @@ function Welcome() {
         )}
       </main>
 
-      <footer className="border-t border-gray-100 bg-white py-2.5 px-6 text-center text-[10px] text-gray-400">
-        SkillBridge &copy; 2026. Higher Education & Industry Frameworks.
+      <footer className="border-t border-slate-200 bg-white py-3.5 px-6 text-center text-xs text-slate-400">
+        SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Frameworks.
       </footer>
     </div>
   );
