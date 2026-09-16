@@ -17,7 +17,6 @@ import {
   Check,
   Sparkles,
   CheckCircle2,
-  BadgeCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,10 +45,6 @@ interface StakeholderTheme {
   tagline: string;
   description: string;
   icon: typeof GraduationCap;
-  pillBg: string;
-  iconBg: string;
-  iconColor: string;
-  buttonClass: string;
   statNumber: string;
   statLabel: string;
   features: string[];
@@ -69,12 +64,8 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Assess industry readiness and unlock verified campus interviews.",
     description: "Benchmark your skills with standardized diagnostics and showcase verified project rubrics.",
     icon: GraduationCap,
-    pillBg: "bg-slate-100 border-slate-200 text-slate-700",
-    iconBg: "bg-slate-100 border-slate-200",
-    iconColor: "text-slate-700",
-    buttonClass: "bg-slate-900 hover:bg-slate-800 text-white shadow-sm",
     statNumber: "88.4%",
-    statLabel: "Skill-to-Role Fitment Score",
+    statLabel: "Skill-to-Role Fitment",
     features: [
       "Industry benchmarked skill diagnostic tests",
       "Mentor-evaluated capstone portfolios",
@@ -94,10 +85,6 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Hire verified talent based on audited assessment outcomes.",
     description: "Connect with job-ready candidates with transparent performance audit trails.",
     icon: Briefcase,
-    pillBg: "bg-stone-100 border-stone-200 text-stone-700",
-    iconBg: "bg-stone-100 border-stone-200",
-    iconColor: "text-stone-700",
-    buttonClass: "bg-stone-800 hover:bg-stone-700 text-white shadow-sm",
     statNumber: "3.2x",
     statLabel: "Faster Candidate Filtering",
     features: [
@@ -108,7 +95,7 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     idFieldLabel: "Corporate Employee ID",
     idPlaceholder: "e.g. CORP-REC-4821",
     emailLabel: "Work Email Address",
-    emailPlaceholder: "talent@microsoft.com",
+    emailPlaceholder: "talent@company.com",
     orgLabel: "Company Name",
     orgPlaceholder: "Northwind Labs",
   },
@@ -119,10 +106,6 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Analyze cohort skill gaps and adapt curriculum to market trends.",
     description: "Monitor real-time cohort readiness metrics and export verified documentation.",
     icon: School,
-    pillBg: "bg-zinc-100 border-zinc-200 text-zinc-700",
-    iconBg: "bg-zinc-100 border-zinc-200",
-    iconColor: "text-zinc-700",
-    buttonClass: "bg-zinc-800 hover:bg-zinc-700 text-white shadow-sm",
     statNumber: "94%",
     statLabel: "Curriculum Alignment Index",
     features: [
@@ -144,10 +127,6 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Evaluate project rigor and coach future engineering cohorts.",
     description: "Guide student final-year capstones and endorse high-potential portfolios.",
     icon: Compass,
-    pillBg: "bg-neutral-100 border-neutral-200 text-neutral-700",
-    iconBg: "bg-neutral-100 border-neutral-200",
-    iconColor: "text-neutral-700",
-    buttonClass: "bg-neutral-800 hover:bg-neutral-700 text-white shadow-sm",
     statNumber: "4.9/5",
     statLabel: "Average Mentor Engagement",
     features: [
@@ -204,16 +183,16 @@ function LanguageMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex size-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm hover:bg-slate-50 hover:text-slate-700 transition"
+        className="flex size-8 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition"
         title="Language"
       >
         <MoreVertical className="size-4" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg z-50">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
-            <Globe className="size-3.5" />
+        <div className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-200 bg-white p-1 shadow-md z-50">
+          <div className="flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-100 mb-1">
+            <Globe className="size-3" />
             Language
           </div>
           {languages.map((lang) => (
@@ -221,13 +200,13 @@ function LanguageMenu() {
               key={lang.code}
               type="button"
               onClick={() => handleLanguageSelect(lang.code)}
-              className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
+              className="flex w-full items-center justify-between rounded px-2.5 py-1.5 text-xs font-normal text-gray-600 hover:bg-gray-50 transition"
             >
               <div className="flex flex-col text-left">
                 <span>{lang.native}</span>
-                <span className="text-[10px] text-slate-400">{lang.label}</span>
+                <span className="text-[9px] text-gray-400">{lang.label}</span>
               </div>
-              {currentLang === lang.code && <Check className="size-3.5 text-slate-900" />}
+              {currentLang === lang.code && <Check className="size-3.5 text-blue-600" />}
             </button>
           ))}
         </div>
@@ -274,7 +253,7 @@ function Welcome() {
             );
           }
         } catch {
-          // ignore init error
+          // ignore
         }
       };
     }
@@ -300,57 +279,49 @@ function Welcome() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBFC] text-slate-800 flex flex-col font-sans relative">
+    <div className="min-h-screen bg-white text-gray-700 flex flex-col font-sans">
       <div id="google_translate_element" style={{ display: "none" }} />
 
-      {/* HEADER */}
-      <header className="border-b border-slate-200/80 bg-white px-6 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-lg bg-slate-900 text-white font-semibold text-xs tracking-wider">
+      {/* LIGHT MINIMAL NAVBAR */}
+      <header className="border-b border-gray-100 bg-white px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="flex size-7 items-center justify-center rounded border border-gray-200 bg-gray-50 text-gray-700 font-semibold text-xs">
             SB
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold tracking-tight text-slate-900">SkillBridge</span>
-              <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600">
-                <BadgeCheck className="size-3 text-slate-500" />
-                Verified Framework
-              </span>
-            </div>
-            <p className="hidden sm:block text-[11px] text-slate-400">
-              National Talent & Higher Education Portal
-            </p>
-          </div>
+          <span className="text-sm font-semibold tracking-tight text-gray-800">SkillBridge</span>
+          <span className="hidden sm:inline-block text-[11px] text-gray-400 pl-2 border-l border-gray-200">
+            Higher Education & Industry Portal
+          </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="hidden md:flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-            <ShieldCheck className="size-3.5 text-slate-400" />
-            Institutional Identity Protected
+          <span className="hidden md:flex items-center gap-1 text-xs text-gray-400">
+            <ShieldCheck className="size-3.5 text-gray-400" />
+            Verified Environment
           </span>
           <LanguageMenu />
         </div>
       </header>
 
-      {/* CONTENT */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+      {/* MAIN VIEW */}
+      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 bg-[#FAFAFA]">
         {!selectedRole ? (
-          /* ROLE SELECTION */
-          <div className="w-full max-w-5xl py-4">
-            <div className="text-center max-w-xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-xs text-xs font-medium text-slate-600 mb-3">
-                <Sparkles className="size-3 text-slate-400" />
-                Institutional Stakeholder Gateway
+          /* STEP 1: ROLE SELECTION CARDS */
+          <div className="w-full max-w-4xl py-6">
+            <div className="text-center max-w-lg mx-auto mb-8">
+              <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white border border-gray-200 text-[11px] text-gray-500 mb-2">
+                <Sparkles className="size-3 text-gray-400" />
+                Select Gateway
               </div>
-              <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+              <h1 className="text-2xl font-semibold tracking-tight text-gray-800">
                 Welcome to SkillBridge
               </h1>
-              <p className="mt-2 text-xs sm:text-sm text-slate-500">
-                Select your stakeholder category to access your dedicated workspace.
+              <p className="mt-1 text-xs text-gray-500">
+                Select your stakeholder category to continue to your dashboard.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
               {STAKEHOLDERS.map((item) => {
                 const IconComponent = item.icon;
                 return (
@@ -358,29 +329,29 @@ function Welcome() {
                     key={item.id}
                     type="button"
                     onClick={() => setSelectedRole(item.id)}
-                    className="flex flex-col justify-between rounded-xl border border-slate-200/90 bg-white p-5 text-left shadow-xs hover:border-slate-300 hover:shadow-sm transition"
+                    className="flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-4 text-left hover:border-gray-300 hover:shadow-xs transition"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <div className={cn("size-9 rounded-lg flex items-center justify-center border", item.iconBg, item.iconColor)}>
-                          <IconComponent className="size-4.5" />
+                        <div className="size-8 rounded border border-gray-100 bg-gray-50 flex items-center justify-center text-gray-600">
+                          <IconComponent className="size-4" />
                         </div>
-                        <span className={cn("text-[10px] font-medium uppercase px-2 py-0.5 rounded border", item.pillBg)}>
+                        <span className="text-[10px] text-gray-400 font-medium">
                           {item.badge}
                         </span>
                       </div>
 
-                      <h2 className="text-sm font-semibold text-slate-900">
+                      <h2 className="text-sm font-semibold text-gray-800">
                         {item.title}
                       </h2>
-                      <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-relaxed">
                         {item.tagline}
                       </p>
                     </div>
 
-                    <div className="mt-5 flex items-center justify-between pt-3 border-t border-slate-100 text-xs font-medium text-slate-800 w-full">
+                    <div className="mt-4 flex items-center justify-between pt-2.5 border-t border-gray-50 text-[11px] font-medium text-gray-600 w-full">
                       <span>Access Portal</span>
-                      <ArrowRight className="size-3.5 text-slate-400" />
+                      <ArrowRight className="size-3 text-gray-400" />
                     </div>
                   </button>
                 );
@@ -388,68 +359,68 @@ function Welcome() {
             </div>
           </div>
         ) : (
-          /* SPLIT AUTH CARD */
-          <div className="w-full max-w-3xl rounded-xl border border-slate-200 bg-white shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-12">
+          /* STEP 2: SPLIT LOGIN FORM */
+          <div className="w-full max-w-2xl rounded-lg border border-gray-200 bg-white shadow-xs overflow-hidden grid grid-cols-1 md:grid-cols-12">
             {/* Left Info Panel */}
-            <div className="md:col-span-5 p-6 bg-slate-50/70 border-r border-slate-200 flex flex-col justify-between">
+            <div className="md:col-span-5 p-5 bg-gray-50/50 border-r border-gray-100 flex flex-col justify-between">
               <div>
                 <button
                   type="button"
                   onClick={() => setSelectedRole(null)}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 mb-5 transition"
+                  className="inline-flex items-center gap-1 text-[11px] text-gray-500 hover:text-gray-700 mb-4 transition"
                 >
-                  <ArrowLeft className="size-3.5" />
-                  All Portals
+                  <ArrowLeft className="size-3" />
+                  Switch Role
                 </button>
 
-                <span className={cn("inline-block text-[10px] font-medium uppercase px-2 py-0.5 rounded border mb-2", currentStakeholder?.pillBg)}>
+                <div className="text-[10px] font-medium uppercase tracking-wider text-gray-400 mb-1">
                   {currentStakeholder?.badge}
-                </span>
+                </div>
 
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-base font-semibold text-gray-800">
                   {currentStakeholder?.title} Portal
                 </h2>
-                <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                <p className="mt-1 text-[11px] text-gray-500 leading-relaxed">
                   {currentStakeholder?.description}
                 </p>
 
-                <div className="mt-5 p-3.5 rounded-lg bg-white border border-slate-200/80">
-                  <div className="text-xl font-bold text-slate-900">{currentStakeholder?.statNumber}</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">{currentStakeholder?.statLabel}</div>
+                <div className="mt-4 p-2.5 rounded border border-gray-100 bg-white">
+                  <div className="text-lg font-semibold text-gray-800">{currentStakeholder?.statNumber}</div>
+                  <div className="text-[10px] text-gray-400">{currentStakeholder?.statLabel}</div>
                 </div>
 
-                <div className="mt-5 space-y-2">
+                <div className="mt-4 space-y-1.5">
                   {currentStakeholder?.features.map((f, i) => (
-                    <div key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
-                      <CheckCircle2 className="size-3.5 mt-0.5 text-slate-400 shrink-0" />
+                    <div key={i} className="flex items-start gap-1.5 text-[11px] text-gray-600">
+                      <CheckCircle2 className="size-3 mt-0.5 text-gray-400 shrink-0" />
                       <span>{f}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-6 pt-3 border-t border-slate-200 text-[10px] text-slate-400">
-                Single Sign-On (SSO) Active
+              <div className="mt-4 pt-2 border-t border-gray-100 text-[10px] text-gray-400">
+                Single Sign-On Active
               </div>
             </div>
 
             {/* Right Form Panel */}
-            <div className="md:col-span-7 p-6 sm:p-7 flex flex-col justify-center bg-white">
-              <div className="flex items-center justify-between mb-5">
+            <div className="md:col-span-7 p-5 sm:p-6 flex flex-col justify-center bg-white">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900">
-                    {authMode === "signin" ? "Authorized Login" : "Registration"}
+                  <h3 className="text-xs font-semibold text-gray-800">
+                    {authMode === "signin" ? "Login" : "Register"}
                   </h3>
-                  <p className="text-xs text-slate-400">Enter institutional credentials</p>
+                  <p className="text-[10px] text-gray-400">Enter your credentials</p>
                 </div>
 
-                <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs">
+                <div className="flex rounded bg-gray-100 p-0.5 text-[11px]">
                   <button
                     type="button"
                     onClick={() => setAuthMode("signin")}
                     className={cn(
-                      "px-2.5 py-1 rounded-md font-medium transition",
-                      authMode === "signin" ? "bg-white shadow-xs text-slate-900" : "text-slate-500"
+                      "px-2 py-0.5 rounded transition",
+                      authMode === "signin" ? "bg-white text-gray-800 font-medium shadow-2xs" : "text-gray-500"
                     )}
                   >
                     Sign In
@@ -458,8 +429,8 @@ function Welcome() {
                     type="button"
                     onClick={() => setAuthMode("signup")}
                     className={cn(
-                      "px-2.5 py-1 rounded-md font-medium transition",
-                      authMode === "signup" ? "bg-white shadow-xs text-slate-900" : "text-slate-500"
+                      "px-2 py-0.5 rounded transition",
+                      authMode === "signup" ? "bg-white text-gray-800 font-medium shadow-2xs" : "text-gray-500"
                     )}
                   >
                     Register
@@ -467,87 +438,87 @@ function Welcome() {
                 </div>
               </div>
 
-              <form onSubmit={handleAuthSubmit} className="space-y-3">
-                <div className="space-y-1">
-                  <Label htmlFor="id-input" className="text-xs font-medium text-slate-700">
+              <form onSubmit={handleAuthSubmit} className="space-y-2.5">
+                <div className="space-y-0.5">
+                  <Label htmlFor="id-input" className="text-[11px] font-medium text-gray-600">
                     {currentStakeholder?.idFieldLabel}
                   </Label>
                   <div className="relative">
-                    <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <IdCard className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
                     <Input
                       id="id-input"
                       value={stakeholderId}
                       onChange={(e) => setStakeholderId(e.target.value)}
                       placeholder={currentStakeholder?.idPlaceholder}
-                      className="pl-9 h-9 text-xs border-slate-200 focus-visible:ring-slate-400"
+                      className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
                     />
                   </div>
                 </div>
 
                 {authMode === "signup" && (
-                  <div className="space-y-1">
-                    <Label htmlFor="org-input" className="text-xs font-medium text-slate-700">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="org-input" className="text-[11px] font-medium text-gray-600">
                       {currentStakeholder?.orgLabel}
                     </Label>
                     <div className="relative">
-                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                      <Building2 className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
                       <Input
                         id="org-input"
                         value={orgInput}
                         onChange={(e) => setOrgInput(e.target.value)}
                         placeholder={currentStakeholder?.orgPlaceholder}
-                        className="pl-9 h-9 text-xs border-slate-200 focus-visible:ring-slate-400"
+                        className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
                       />
                     </div>
                   </div>
                 )}
 
-                <div className="space-y-1">
-                  <Label htmlFor="email-input" className="text-xs font-medium text-slate-700">
+                <div className="space-y-0.5">
+                  <Label htmlFor="email-input" className="text-[11px] font-medium text-gray-600">
                     {currentStakeholder?.emailLabel}
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
                     <Input
                       id="email-input"
                       type="email"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
                       placeholder={currentStakeholder?.emailPlaceholder}
-                      className="pl-9 h-9 text-xs border-slate-200 focus-visible:ring-slate-400"
+                      className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="pwd-input" className="text-xs font-medium text-slate-700">
+                <div className="space-y-0.5">
+                  <Label htmlFor="pwd-input" className="text-[11px] font-medium text-gray-600">
                     Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-gray-400" />
                     <Input
                       id="pwd-input"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="pl-9 h-9 text-xs border-slate-200 focus-visible:ring-slate-400"
+                      className="pl-8 h-8 text-[11px] border-gray-200 bg-white focus-visible:ring-gray-300"
                     />
                   </div>
                 </div>
 
                 <Button
                   type="submit"
-                  className={cn("w-full h-9 text-xs font-medium transition mt-2", currentStakeholder?.buttonClass)}
+                  className="w-full h-8 text-xs font-medium transition mt-2 bg-blue-600 hover:bg-blue-700 text-white shadow-none"
                 >
                   {authMode === "signin"
-                    ? `Access ${currentStakeholder?.title} Dashboard`
-                    : `Complete Registration`}
-                  <ArrowRight className="size-3.5 ml-1.5" />
+                    ? `Continue as ${currentStakeholder?.title}`
+                    : `Register`}
+                  <ArrowRight className="size-3 ml-1" />
                 </Button>
 
-                <p className="text-center text-[10px] text-slate-400 pt-1">
-                  Demo bypass active. Any test credentials accepted.
+                <p className="text-center text-[10px] text-gray-400 pt-0.5">
+                  Demo mode active. Any credentials accepted.
                 </p>
               </form>
             </div>
@@ -555,8 +526,8 @@ function Welcome() {
         )}
       </main>
 
-      <footer className="border-t border-slate-200/80 bg-white py-3 px-6 text-center text-[11px] text-slate-400">
-        SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Frameworks.
+      <footer className="border-t border-gray-100 bg-white py-2.5 px-6 text-center text-[10px] text-gray-400">
+        SkillBridge &copy; 2026. Higher Education & Industry Frameworks.
       </footer>
     </div>
   );
