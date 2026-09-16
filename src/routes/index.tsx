@@ -96,7 +96,7 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     tagline: "Hire pre-screened talent with audited skill scores.",
     description: "Discover candidates with verified competencies and campus academic audit trails.",
     icon: Briefcase,
-    imageUrl: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "https://www.betterup.com/blog/hiring-manager-vs-recruiter",
     pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
     iconBg: "bg-emerald-100/70 border-emerald-200",
     iconColor: "text-emerald-700",
