@@ -18,6 +18,7 @@ import {
   Sparkles,
   CheckCircle2,
   BadgeCheck,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAppState, type RoleId } from "@/lib/app-state";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -252,6 +254,7 @@ function Welcome() {
   const [emailInput, setEmailInput] = useState("");
   const [password, setPassword] = useState("");
   const [orgInput, setOrgInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentStakeholder = STAKEHOLDERS.find((s) => s.id === selectedRole);
 
@@ -285,41 +288,109 @@ function Welcome() {
     }
   }, []);
 
-  function handleAuthSubmit(e: React.FormEvent) {
+  async function handleAuthSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedRole || !currentStakeholder) return;
 
-    const emailValue = emailInput.trim() || `${selectedRole}@college.edu`;
+    const emailValue = emailInput.trim();
     const finalOrg = orgInput.trim() || currentStakeholder.orgPlaceholder;
 
-    signIn(emailValue);
-    completeRegistration(selectedRole, finalOrg);
+    // 1. Email Format Check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailValue)) {
+      toast.error("Invalid Email", { description: "Please enter a valid official email address." });
+      return;
+    }
 
-    toast.success(
-      authMode === "signin"
-        ? `Logged in as ${currentStakeholder.title}`
-        : `Registered as ${currentStakeholder.title}`
-    );
+    // 2. Password Strength Check (Min 8 characters)
+    if (password.length < 8) {
+      toast.error("Weak Password", { description: "Password must be at least 8 characters long." });
+      return;
+    }
 
-    navigate({ to: `/${selectedRole}` });
+    setIsSubmitting(true);
+
+    try {
+      if (authMode === "signup") {
+        // REAL SIGNUP WITH SUPABASE EMAIL VERIFICATION
+        const { data, error } = await supabase.auth.signUp({
+          email: emailValue,
+          password: password,
+          options: {
+            data: {
+              role: selectedRole,
+              stakeholder_id: stakeholderId,
+              organization: finalOrg,
+            },
+            emailRedirectTo: window.location.origin,
+          },
+        });
+
+        if (error) {
+          toast.error("Registration Failed", { description: error.message });
+          return;
+        }
+
+        // Email Verification Link sent to Real Inbox
+        toast.success("Verification Email Dispatched! ✉️", {
+          description: `A confirmation link was sent to ${emailValue}. Please click the link in your inbox before logging in.`,
+          duration: 9000,
+        });
+
+        // Switch to signin view after sign up
+        setAuthMode("signin");
+      } else {
+        // REAL SIGNIN WITH SUPABASE AUTHENTICATION
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: emailValue,
+          password: password,
+        });
+
+        if (error) {
+          if (
+            error.message.toLowerCase().includes("email not confirmed") ||
+            error.message.toLowerCase().includes("unconfirmed")
+          ) {
+            toast.error("Email Not Verified!", {
+              description: "Please check your inbox and verify your email before logging in.",
+              duration: 7000,
+            });
+          } else {
+            toast.error("Authentication Failed", { description: error.message });
+          }
+          return;
+        }
+
+        // Sync with app state
+        signIn(emailValue);
+        completeRegistration(selectedRole, finalOrg);
+
+        toast.success(`Welcome back! Authenticated as ${currentStakeholder.title}`);
+        navigate({ to: `/${selectedRole}` });
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected authentication error occurred.";
+      toast.error("Error", { description: errorMessage });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <div className="min-h-screen relative flex flex-col font-sans text-slate-900 overflow-x-hidden">
       <div id="google_translate_element" style={{ display: "none" }} />
 
-      {/* HIGH-END ARCHITECTURAL / INFRASTRUCTURE BACKGROUND AS PER REFERENCE */}
+      {/* BACKGROUND INFRASTRUCTURE */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2200&q=85"
           alt="Modern Architectural Infrastructure"
           className="w-full h-full object-cover object-center"
         />
-        {/* Deep blue to slate gradient overlay matching SkyStructure reference */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0B1E3B]/85 via-[#0D2447]/80 to-[#F8FAFC]" />
       </div>
 
-      {/* ENTERPRISE GLASS NAVBAR */}
+      {/* NAVBAR */}
       <header className="relative z-40 border-b border-white/10 bg-[#0B1E3B]/60 backdrop-blur-md px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-base shadow-sm">
@@ -351,9 +422,8 @@ function Welcome() {
       {/* MAIN VIEW */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
         {!selectedRole ? (
-          /* STEP 1: HERO HEADER & 4 ELEVATED STAKEHOLDER CARDS */
+          /* STEP 1: HERO & 4 STAKEHOLDER CARDS */
           <div className="w-full max-w-6xl py-6 sm:py-10">
-            {/* Architectural Hero Header */}
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-xs text-xs font-semibold text-blue-100 mb-4">
                 <Sparkles className="size-3.5 text-blue-300" />
@@ -367,7 +437,6 @@ function Welcome() {
               </p>
             </div>
 
-            {/* 4 CARDS (ELEVATED & CRISP CONTRAST) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
               {STAKEHOLDERS.map((item) => {
                 const IconComponent = item.icon;
@@ -378,7 +447,6 @@ function Welcome() {
                     onClick={() => setSelectedRole(item.id)}
                     className="group flex flex-col justify-between rounded-2xl border border-white/20 bg-white/95 backdrop-blur-md overflow-hidden text-left shadow-xl hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300"
                   >
-                    {/* Visual Header */}
                     <div className="relative h-44 w-full overflow-hidden bg-slate-100">
                       <img
                         src={item.imageUrl}
@@ -417,7 +485,7 @@ function Welcome() {
             </div>
           </div>
         ) : (
-          /* STEP 2: SPLIT AUTH DIALOG WITH ELEVATED GLASS */
+          /* STEP 2: REAL SUPABASE AUTH DIALOG */
           <div className="w-full max-w-4xl rounded-2xl border border-white/20 bg-white/95 backdrop-blur-xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-6">
             
             {/* Left Hero Panel */}
@@ -450,7 +518,6 @@ function Welcome() {
                   {currentStakeholder?.description}
                 </p>
 
-                {/* Stat Box */}
                 <div className="mt-6 p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
                   <div className="text-2xl font-black text-white">{currentStakeholder?.statNumber}</div>
                   <div className="text-[11px] text-white/75 mt-0.5">{currentStakeholder?.statLabel}</div>
@@ -478,7 +545,11 @@ function Welcome() {
                   <h3 className="text-base font-bold text-slate-900">
                     {authMode === "signin" ? "Authorized Login" : "New Registration"}
                   </h3>
-                  <p className="text-xs text-slate-500">Fill in your official institutional credentials</p>
+                  <p className="text-xs text-slate-500">
+                    {authMode === "signin"
+                      ? "Enter your credentials to access your portal"
+                      : "Create your verified institutional account"}
+                  </p>
                 </div>
 
                 <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs">
@@ -514,6 +585,7 @@ function Welcome() {
                     <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <Input
                       id="id-input"
+                      required
                       value={stakeholderId}
                       onChange={(e) => setStakeholderId(e.target.value)}
                       placeholder={currentStakeholder?.idPlaceholder}
@@ -531,6 +603,7 @@ function Welcome() {
                       <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
                         id="org-input"
+                        required
                         value={orgInput}
                         onChange={(e) => setOrgInput(e.target.value)}
                         placeholder={currentStakeholder?.orgPlaceholder}
@@ -549,6 +622,7 @@ function Welcome() {
                     <Input
                       id="email-input"
                       type="email"
+                      required
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
                       placeholder={currentStakeholder?.emailPlaceholder}
@@ -559,13 +633,14 @@ function Welcome() {
 
                 <div className="space-y-1">
                   <Label htmlFor="pwd-input" className="text-xs font-semibold text-slate-700">
-                    Password <span className="text-red-500">*</span>
+                    Password (Min. 8 characters) <span className="text-red-500">*</span>
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <Input
                       id="pwd-input"
                       type="password"
+                      required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
@@ -576,16 +651,24 @@ function Welcome() {
 
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className={cn("w-full h-10 text-xs font-bold transition mt-2", currentStakeholder?.buttonClass)}
                 >
-                  {authMode === "signin"
-                    ? `Enter as ${currentStakeholder?.title}`
-                    : `Complete Registration`}
-                  <ArrowRight className="size-4 ml-1.5" />
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="size-4 animate-spin" />
+                      Verifying with Supabase...
+                    </span>
+                  ) : authMode === "signin" ? (
+                    `Sign In as ${currentStakeholder?.title}`
+                  ) : (
+                    `Create Account & Send Verification Email`
+                  )}
+                  {!isSubmitting && <ArrowRight className="size-4 ml-1.5" />}
                 </Button>
 
                 <p className="text-center text-[10px] text-slate-400 pt-1">
-                  Single-sign-on active. Instant test verification enabled for preview.
+                  Secured by Supabase Identity Engine & Industry Audit Protocols.
                 </p>
               </form>
             </div>
