@@ -19,6 +19,7 @@ import {
   CheckCircle2,
   BadgeCheck,
   Loader2,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,7 +90,7 @@ const STAKEHOLDERS: StakeholderTheme[] = [
     emailLabel: "Student Email",
     emailPlaceholder: "student@gmail.com",
     orgLabel: "College / University Name",
-    orgPlaceholder: "VIT Vellore",
+    orgPlaceholder: "Type your college name to search...",
   },
   {
     id: "recruiter",
@@ -256,6 +257,13 @@ function Welcome() {
   const [orgInput, setOrgInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // College Database Search State
+  const [collegeSearch, setCollegeSearch] = useState("");
+  const [collegeResults, setCollegeResults] = useState<{ id: string; name: string; state?: string; category?: string }[]>([]);
+  const [isSearchingColleges, setIsSearchingColleges] = useState(false);
+  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const currentStakeholder = STAKEHOLDERS.find((s) => s.id === selectedRole);
 
   useEffect(() => {
@@ -288,21 +296,57 @@ function Welcome() {
     }
   }, []);
 
+  // Close college search dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowCollegeDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Debounced Supabase College Search
+  useEffect(() => {
+    if (selectedRole !== "student" && selectedRole !== "academician") return;
+    const term = collegeSearch.trim();
+    if (term.length < 2) {
+      setCollegeResults([]);
+      setIsSearchingColleges(false);
+      return;
+    }
+
+    setIsSearchingColleges(true);
+    const delayDebounce = setTimeout(async () => {
+      const { data, error } = await supabase
+        .from("colleges")
+        .select("id, name, state, category")
+        .ilike("name", `%${term}%`)
+        .limit(10);
+
+      if (!error && data) {
+        setCollegeResults(data);
+      }
+      setIsSearchingColleges(false);
+    }, 280);
+
+    return () => clearTimeout(delayDebounce);
+  }, [collegeSearch, selectedRole]);
+
   async function handleAuthSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedRole || !currentStakeholder) return;
 
     const emailValue = emailInput.trim();
-    const finalOrg = orgInput.trim() || currentStakeholder.orgPlaceholder;
+    const finalOrg = (selectedRole === "student" ? (collegeSearch.trim() || orgInput.trim()) : orgInput.trim()) || currentStakeholder.orgPlaceholder;
 
-    // 1. Email Format Check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailValue)) {
-      toast.error("Invalid Email", { description: "Please enter a valid official email address." });
+      toast.error("Invalid Email", { description: "Please enter a valid email address." });
       return;
     }
 
-    // 2. Password Strength Check (Min 8 characters)
     if (password.length < 8) {
       toast.error("Weak Password", { description: "Password must be at least 8 characters long." });
       return;
@@ -312,8 +356,7 @@ function Welcome() {
 
     try {
       if (authMode === "signup") {
-        // REAL SIGNUP WITH SUPABASE EMAIL VERIFICATION
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email: emailValue,
           password: password,
           options: {
@@ -331,17 +374,14 @@ function Welcome() {
           return;
         }
 
-        // Email Verification Link sent to Real Inbox
-        toast.success("Verification Email Dispatched! ✉️", {
-          description: `A confirmation link was sent to ${emailValue}. Please click the link in your inbox before logging in.`,
+        toast.success("Verification Email Sent! ✉️", {
+          description: `A confirmation link was sent to ${emailValue}. Please verify in your inbox before signing in.`,
           duration: 9000,
         });
 
-        // Switch to signin view after sign up
         setAuthMode("signin");
       } else {
-        // REAL SIGNIN WITH SUPABASE AUTHENTICATION
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email: emailValue,
           password: password,
         });
@@ -361,7 +401,6 @@ function Welcome() {
           return;
         }
 
-        // Sync with app state
         signIn(emailValue);
         completeRegistration(selectedRole, finalOrg);
 
@@ -369,7 +408,7 @@ function Welcome() {
         navigate({ to: `/${selectedRole}` });
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "An unexpected authentication error occurred.";
+      const errorMessage = err instanceof Error ? err.message : "An authentication error occurred.";
       toast.error("Error", { description: errorMessage });
     } finally {
       setIsSubmitting(false);
@@ -380,17 +419,15 @@ function Welcome() {
     <div className="min-h-screen relative flex flex-col font-sans text-slate-900 overflow-x-hidden">
       <div id="google_translate_element" style={{ display: "none" }} />
 
-      {/* BACKGROUND INFRASTRUCTURE */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img
           src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2200&q=85"
-          alt="Modern Architectural Infrastructure"
+          alt="Modern Infrastructure"
           className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0B1E3B]/85 via-[#0D2447]/80 to-[#F8FAFC]" />
       </div>
 
-      {/* NAVBAR */}
       <header className="relative z-40 border-b border-white/10 bg-[#0B1E3B]/60 backdrop-blur-md px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-base shadow-sm">
@@ -419,10 +456,8 @@ function Welcome() {
         </div>
       </header>
 
-      {/* MAIN VIEW */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
         {!selectedRole ? (
-          /* STEP 1: HERO & 4 STAKEHOLDER CARDS */
           <div className="w-full max-w-6xl py-6 sm:py-10">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-xs text-xs font-semibold text-blue-100 mb-4">
@@ -485,10 +520,8 @@ function Welcome() {
             </div>
           </div>
         ) : (
-          /* STEP 2: REAL SUPABASE AUTH DIALOG */
           <div className="w-full max-w-4xl rounded-2xl border border-white/20 bg-white/95 backdrop-blur-xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-6">
             
-            {/* Left Hero Panel */}
             <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-slate-900 text-white min-h-[360px]">
               <img
                 src={currentStakeholder?.imageUrl}
@@ -538,7 +571,6 @@ function Welcome() {
               </div>
             </div>
 
-            {/* Right Form Panel */}
             <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-center bg-white">
               <div className="flex items-center justify-between mb-5">
                 <div>
@@ -547,8 +579,8 @@ function Welcome() {
                   </h3>
                   <p className="text-xs text-slate-500">
                     {authMode === "signin"
-                      ? "Enter your credentials to access your portal"
-                      : "Create your verified institutional account"}
+                      ? "Enter your verified credentials to continue"
+                      : "Register with pan-India institutional database"}
                   </p>
                 </div>
 
@@ -595,21 +627,79 @@ function Welcome() {
                 </div>
 
                 {authMode === "signup" && (
-                  <div className="space-y-1">
+                  <div className="space-y-1 relative" ref={dropdownRef}>
                     <Label htmlFor="org-input" className="text-xs font-semibold text-slate-700">
                       {currentStakeholder?.orgLabel} <span className="text-red-500">*</span>
                     </Label>
-                    <div className="relative">
-                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-                      <Input
-                        id="org-input"
-                        required
-                        value={orgInput}
-                        onChange={(e) => setOrgInput(e.target.value)}
-                        placeholder={currentStakeholder?.orgPlaceholder}
-                        className="pl-9 h-10 text-xs border-slate-200 bg-white"
-                      />
-                    </div>
+                    
+                    {selectedRole === "student" ? (
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <Input
+                          id="org-input"
+                          required
+                          value={collegeSearch}
+                          onChange={(e) => {
+                            setCollegeSearch(e.target.value);
+                            setShowCollegeDropdown(true);
+                          }}
+                          onFocus={() => setShowCollegeDropdown(true)}
+                          placeholder="Type 2+ letters to search (e.g. IIT, JNTU, CBIT, BITS)..."
+                          className="pl-9 pr-8 h-10 text-xs border-slate-200 bg-white"
+                        />
+                        {isSearchingColleges && (
+                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 animate-spin text-blue-600" />
+                        )}
+
+                        {showCollegeDropdown && collegeSearch.trim().length >= 2 && (
+                          <div className="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-2xl">
+                            {isSearchingColleges ? (
+                              <div className="p-3 text-xs text-slate-400 text-center flex items-center justify-center gap-2">
+                                <Loader2 className="size-3.5 animate-spin" /> Searching pan-India colleges...
+                              </div>
+                            ) : collegeResults.length > 0 ? (
+                              collegeResults.map((c) => (
+                                <button
+                                  key={c.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setCollegeSearch(c.name);
+                                    setOrgInput(c.name);
+                                    setShowCollegeDropdown(false);
+                                  }}
+                                  className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-blue-50 hover:text-blue-700 border-b border-slate-100 last:border-0 transition"
+                                >
+                                  <div className="font-semibold text-slate-900">{c.name}</div>
+                                  <div className="text-[10px] text-slate-400 flex items-center gap-2 mt-0.5">
+                                    {c.state && <span>{c.state}</span>}
+                                    {c.category && <span className="bg-slate-100 px-1 rounded text-slate-500">{c.category}</span>}
+                                  </div>
+                                </button>
+                              ))
+                            ) : (
+                              <div className="p-3 text-xs text-slate-500">
+                                <span className="font-semibold text-slate-700">College not found in pre-index.</span>
+                                <div className="text-[11px] text-slate-400 mt-0.5">
+                                  You can continue typing your college name manually.
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                        <Input
+                          id="org-input"
+                          required
+                          value={orgInput}
+                          onChange={(e) => setOrgInput(e.target.value)}
+                          placeholder={currentStakeholder?.orgPlaceholder}
+                          className="pl-9 h-10 text-xs border-slate-200 bg-white"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -657,7 +747,7 @@ function Welcome() {
                   {isSubmitting ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="size-4 animate-spin" />
-                      Verifying with Supabase...
+                      Processing Request...
                     </span>
                   ) : authMode === "signin" ? (
                     `Sign In as ${currentStakeholder?.title}`
@@ -668,7 +758,7 @@ function Welcome() {
                 </Button>
 
                 <p className="text-center text-[10px] text-slate-400 pt-1">
-                  Secured by Supabase Identity Engine & Industry Audit Protocols.
+                  Pan-India Institutional Directory Active • Secured by Supabase Engine
                 </p>
               </form>
             </div>
@@ -676,7 +766,6 @@ function Welcome() {
         )}
       </main>
 
-      {/* FOOTER */}
       <footer className="relative z-10 border-t border-slate-200/80 bg-white/80 backdrop-blur-md py-4 px-6 text-center text-xs text-slate-500">
         SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Infrastructure Frameworks.
       </footer>
