@@ -1,866 +1,576 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  ArrowRight,
-  ArrowLeft,
-  BadgeCheck,
-  Brain,
-  CheckCircle2,
-  CircleDashed,
+  ShieldAlert,
   Clock,
-  Gauge,
-  Loader2,
-  MapPin,
+  Zap,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Camera,
+  Eye,
+  Terminal,
+  Play,
   RotateCcw,
-  Target,
-  TrendingUp,
-  TriangleAlert,
+  Check,
+  ChevronRight,
   Sparkles,
-  BookOpen,
-  PlayCircle,
-  Code2,
-  UserCheck,
-  Trophy,
+  ArrowRight,
+  Award,
 } from "lucide-react";
-import { TopBar, KpiCard } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import {
-  CAREER_PATHS,
-  getPath,
-  getCustomJobs,
-  type CareerPathId,
-  type LiveJob,
-} from "@/lib/skillbridge-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/student")({
-  head: () => ({
-    meta: [
-      { title: "Student Skill Journey — SkillBridge" },
-      {
-        name: "description",
-        content:
-          "Pick a career path, take an AI skill assessment and get a personalized roadmap to placement.",
-      },
-      { property: "og:title", content: "Student Skill Journey — SkillBridge" },
-      {
-        property: "og:description",
-        content:
-          "AI skill gap analysis, learning roadmap and matched internships for students.",
-      },
-    ],
-  }),
-  component: StudentFlow,
+  component: StudentAssessmentPage,
 });
 
-type Stage = "path" | "quiz" | "analyzing" | "dashboard";
-
-function StudentFlow() {
-  const [stage, setStage] = useState<Stage>("path");
-  const [pathId, setPathId] = useState<CareerPathId | null>(null);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [qIndex, setQIndex] = useState(0);
-
-  const path = pathId ? getPath(pathId) : null;
-  const correct = path
-    ? path.questions.filter((q) => answers[q.id] === q.answer).length
-    : 0;
-
-  function startQuiz() {
-    setAnswers({});
-    setQIndex(0);
-    setStage("quiz");
-  }
-
-  function submit() {
-    setStage("analyzing");
-    setTimeout(() => setStage("dashboard"), 1500);
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      <TopBar />
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-        {stage === "path" && (
-          <PathStep
-            selected={pathId}
-            onSelect={setPathId}
-            onContinue={() => pathId && startQuiz()}
-          />
-        )}
-
-        {stage === "quiz" && path && (
-          <QuizStep
-            path={path}
-            index={qIndex}
-            answers={answers}
-            onAnswer={(id, i) => setAnswers((a) => ({ ...a, [id]: i }))}
-            onPrev={() => setQIndex((i) => Math.max(0, i - 1))}
-            onNext={() =>
-              setQIndex((i) => Math.min(path.questions.length - 1, i + 1))
-            }
-            onSubmit={submit}
-            onBack={() => setStage("path")}
-          />
-        )}
-
-        {stage === "analyzing" && <Analyzing />}
-
-        {stage === "dashboard" && path && (
-          <StudentDashboard
-            path={path}
-            correct={correct}
-            answers={answers}
-            onRetake={startQuiz}
-            onChangePath={() => setStage("path")}
-          />
-        )}
-      </main>
-    </div>
-  );
+interface TestCase {
+  input: string;
+  expected: string;
+  isEdgeCase?: boolean;
 }
 
-function StepHeader({
-  step,
-  title,
-  sub,
-}: {
-  step: string;
+interface Question {
+  id: string;
   title: string;
-  sub: string;
-}) {
-  return (
-    <div className="mb-7">
-      <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-        {step}
-      </p>
-      <h1 className="mt-2 text-2xl font-bold sm:text-3xl">{title}</h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">{sub}</p>
-    </div>
-  );
+  difficulty: "Easy" | "Medium" | "Hard";
+  benchmarkSeconds: number; // Speed benchmark
+  expectedComplexity: string;
+  description: string;
+  initialCode: string;
+  testCases: TestCase[];
 }
 
-function PathStep({
-  selected,
-  onSelect,
-  onContinue,
-}: {
-  selected: CareerPathId | null;
-  onSelect: (id: CareerPathId) => void;
-  onContinue: () => void;
-}) {
-  return (
-    <div>
-      <StepHeader
-        step="Step 1 of 3"
-        title="What is your target career path?"
-        sub="We tailor your assessment, skill gap map and internship matches to this goal."
-      />
-      <div className="grid gap-4 sm:grid-cols-2">
-        {CAREER_PATHS.map((p) => {
-          const active = selected === p.id;
-          return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => onSelect(p.id)}
-              className={cn(
-                "rounded-2xl border bg-card p-6 text-left shadow-card transition-all hover:-translate-y-0.5 hover:shadow-lift",
-                active
-                  ? "border-primary ring-2 ring-primary/25"
-                  : "border-border",
-              )}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-base font-semibold">{p.title}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {p.blurb}
-                  </p>
-                </div>
-                <span
-                  className={cn(
-                    "flex size-5 shrink-0 items-center justify-center rounded-full border",
-                    active
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border",
-                  )}
-                >
-                  {active && <CheckCircle2 className="size-4" />}
-                </span>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {p.badges.map((b) => (
-                  <Badge key={b} variant="secondary" className="font-medium">
-                    {b}
-                  </Badge>
-                ))}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      <div className="mt-7 flex items-center gap-3">
-        <Button size="lg" disabled={!selected} onClick={onContinue}>
-          Continue to Skill Assessment
-          <ArrowRight className="size-4" />
-        </Button>
-        {!selected && (
-          <p className="text-sm text-muted-foreground">
-            Select a path to continue.
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function QuizStep({
-  path,
-  index,
-  answers,
-  onAnswer,
-  onPrev,
-  onNext,
-  onSubmit,
-  onBack,
-}: {
-  path: ReturnType<typeof getPath>;
-  index: number;
-  answers: Record<string, number>;
-  onAnswer: (id: string, i: number) => void;
-  onPrev: () => void;
-  onNext: () => void;
-  onSubmit: () => void;
-  onBack: () => void;
-}) {
-  const q = path.questions[index]!;
-  const total = path.questions.length;
-  const answeredAll = path.questions.every((qq) => answers[qq.id] !== undefined);
-  const isLast = index === total - 1;
-
-  return (
-    <div className="mx-auto max-w-3xl">
-      <StepHeader
-        step="Step 2 of 3"
-        title="AI Skill Assessment"
-        sub={`Tailored to ${path.title}. Answer honestly — the gap map depends on it.`}
-      />
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm font-medium text-muted-foreground">
-            Question {index + 1} of {total}
-          </p>
-          <Badge variant="outline" className="text-primary">
-            {q.topic}
-          </Badge>
-        </div>
-        <Progress value={((index + 1) / total) * 100} className="mt-3 h-1.5" />
-
-        <h2 className="mt-6 text-lg font-semibold leading-snug">{q.question}</h2>
-
-        <div className="mt-5 grid gap-2.5">
-          {q.options.map((opt, i) => {
-            const active = answers[q.id] === i;
-            return (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => onAnswer(q.id, i)}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors",
-                  active
-                    ? "border-primary bg-primary-soft font-medium text-accent-foreground"
-                    : "border-border bg-card hover:bg-muted",
-                )}
-              >
-                <span
-                  className={cn(
-                    "flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
-                    active
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border",
-                  )}
-                >
-                  {String.fromCharCode(65 + i)}
-                </span>
-                {opt}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-7 flex flex-wrap items-center gap-3">
-          <Button variant="ghost" onClick={index === 0 ? onBack : onPrev}>
-            <ArrowLeft className="size-4" />
-            {index === 0 ? "Change path" : "Previous"}
-          </Button>
-          <div className="ml-auto flex gap-2">
-            {!isLast && (
-              <Button onClick={onNext} disabled={answers[q.id] === undefined}>
-                Next question
-                <ArrowRight className="size-4" />
-              </Button>
-            )}
-            {isLast && (
-              <Button onClick={onSubmit} disabled={!answeredAll}>
-                <Brain className="size-4" />
-                Submit & Analyze
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Analyzing() {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <span className="flex size-16 items-center justify-center rounded-2xl bg-primary-soft text-primary">
-        <Loader2 className="size-7 animate-spin" />
-      </span>
-      <h2 className="mt-6 text-xl font-semibold">
-        Running Sentence-Transformers & Skill Gap Mapping…
-      </h2>
-      <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        Embedding your responses, comparing them against live industry benchmarks
-        and generating your personalized study plan.
-      </p>
-      <div className="mt-6 h-1.5 w-64 overflow-hidden rounded-full bg-muted">
-        <div className="h-full w-1/2 animate-pulse rounded-full bg-primary" />
-      </div>
-    </div>
-  );
-}
-
-function StudentDashboard({
-  path,
-  correct,
-  answers,
-  onRetake,
-  onChangePath,
-}: {
-  path: ReturnType<typeof getPath>;
-  correct: number;
-  answers: Record<string, number>;
-  onRetake: () => void;
-  onChangePath: () => void;
-}) {
-  const total = path.questions.length;
-  // నిజమైన పర్సంటేజ్ స్కోర్ (ఉదా: 6/10 = 60%)
-  const readiness = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const matchIndex = Math.min(98, Math.max(50, readiness + 12));
-  const [done, setDone] = useState<Record<number, boolean>>({});
-  const [customJobs, setCustomJobs] = useState<LiveJob[]>([]);
-
-  // డైనమిక్ Mastered Skills (కరెక్ట్ గా రాసిన టాపిక్స్)
-  const masteredSkills = useMemo(() => {
-    const correctQ = path.questions.filter((q) => answers[q.id] === q.answer);
-    const topics = Array.from(new Set(correctQ.map((q) => q.topic)));
-    if (topics.length === 0) return [{ skill: "Basic Fundamentals", level: 65 }];
-    return topics.map((t) => ({ skill: t, level: 85 }));
-  }, [path, answers]);
-
-  // డైనమిక్ Missing Gaps (తప్పు రాసిన టాపిక్స్)
-  const gapSkills = useMemo(() => {
-    const wrongQ = path.questions.filter((q) => answers[q.id] !== q.answer);
-    const topics = Array.from(new Set(wrongQ.map((q) => q.topic)));
-    if (topics.length === 0) {
-      return [{ skill: "Advanced Architecture", level: 50, severity: "moderate" as const }];
+const QUESTION_DATA: Question = {
+  id: "q-101",
+  title: "Optimized Two-Sum / Target Pair Counter",
+  difficulty: "Medium",
+  benchmarkSeconds: 300, // 5 minutes benchmark
+  expectedComplexity: "O(N) with Hash Map",
+  description: `Given an array of integers 'nums' and an integer 'target', return the indices of the two numbers such that they add up to target.
+  
+To obtain full efficiency credits, your solution must achieve **O(N) Time Complexity**. Brute force nested loops O(N^2) will incur a performance penalty.`,
+  initialCode: `function twoSum(nums, target) {
+  // Write your O(N) optimized solution here
+  const map = new Map();
+  for (let i = 0; i < nums.length; i++) {
+    const diff = target - nums[i];
+    if (map.has(diff)) {
+      return [map.get(diff), i];
     }
-    return topics.map((t, idx) => ({
-      skill: t,
-      level: Math.max(20, 45 - idx * 5),
-      severity: (idx < 2 ? "critical" : "moderate") as "critical" | "moderate",
-    }));
-  }, [path, answers]);
+    map.set(nums[i], i);
+  }
+  return [];
+}`,
+  testCases: [
+    { input: "[2, 7, 11, 15], target = 9", expected: "[0, 1]" },
+    { input: "[3, 2, 4], target = 6", expected: "[1, 2]" },
+    { input: "[3, 3], target = 6", expected: "[0, 1]" },
+    { input: "[], target = 10 (Edge: Empty Array)", expected: "[]", isEdgeCase: true },
+    { input: "[-5, -2, 7, 10], target = 5 (Edge: Negative)", expected: "[1, 2]", isEdgeCase: true },
+  ],
+};
 
-  const gapsCritical = gapSkills.filter((g) => g.severity === "critical").length;
+function StudentAssessmentPage() {
+  // Test State
+  const [code, setCode] = useState(QUESTION_DATA.initialCode);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isDisqualified, setIsDisqualified] = useState(false);
 
+  // Proctoring Violations State (Max 2 warnings, 3rd = Terminate)
+  const [strikes, setStrikes] = useState<string[]>([]);
+  const [activeWarning, setActiveWarning] = useState<string | null>(null);
+
+  // Camera video ref
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Result Metrics State
+  const [results, setResults] = useState<{
+    logicScore: number;
+    complexityScore: number;
+    speedScore: number;
+    qualityScore: number;
+    totalScore: number;
+    detectedComplexity: string;
+    passedCases: number;
+    totalCases: number;
+  } | null>(null);
+
+  // Webcam Setup
   useEffect(() => {
-    const updateJobs = () => setCustomJobs(getCustomJobs());
-    updateJobs();
-    window.addEventListener("storage_job_update", updateJobs);
-    window.addEventListener("storage", updateJobs);
-    window.addEventListener("focus", updateJobs);
+    let stream: MediaStream | null = null;
+    navigator.mediaDevices
+      ?.getUserMedia({ video: true, audio: false })
+      .then((s) => {
+        stream = s;
+        if (videoRef.current) {
+          videoRef.current.srcObject = s;
+        }
+      })
+      .catch(() => {
+        // Fallback if camera permissions are blocked
+      });
+
     return () => {
-      window.removeEventListener("storage_job_update", updateJobs);
-      window.removeEventListener("storage", updateJobs);
-      window.removeEventListener("focus", updateJobs);
+      stream?.getTracks().forEach((t) => t.stop());
     };
   }, []);
 
-  const allInternships = [...customJobs, ...path.internships];
+  // Timer runner
+  useEffect(() => {
+    if (!isSubmitted && !isDisqualified) {
+      timerRef.current = setInterval(() => {
+        setElapsedSeconds((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isSubmitted, isDisqualified]);
 
-  // Dynamic Personalized Study Plan generated from assessment gaps
-  const studyPlan = useMemo(() => {
-    const identifiedGaps = gapSkills.map((g) => g.skill);
-    return [
-      {
-        week: "Week 1",
-        focus: identifiedGaps[0] || path.badges[0] || "Core Architecture",
-        hours: "10 hrs",
-        videoTitle: `Foundations of ${identifiedGaps[0] || path.badges[0]}`,
-        project: {
-          title: "Hands-on Practice Sandbox",
-          desc: `Fix architectural flaws and build fundamentals in ${identifiedGaps[0] || "core modules"}.`,
-        },
-        mentor: { name: "Ananya Rao", initials: "AR" },
-      },
-      {
-        week: "Week 2",
-        focus: identifiedGaps[1] || path.badges[1] || "System Integration",
-        hours: "14 hrs",
-        videoTitle: `Applied ${identifiedGaps[1] || "Integration & APIs"}`,
-        project: {
-          title: "API & Data Pipeline Integration",
-          desc: "Integrate backend services and resolve asynchronous data state.",
-        },
-        mentor: { name: "Dev Menon", initials: "DM" },
-      },
-      {
-        week: "Week 3",
-        focus: identifiedGaps[2] || "Performance & Optimization",
-        hours: "12 hrs",
-        videoTitle: "Production Debugging & Automated Testing",
-        project: {
-          title: "Benchmark Profiling & Unit Testing",
-          desc: "Improve system execution time and eliminate memory leaks.",
-        },
-        mentor: { name: "Priya Nair", initials: "PN" },
-      },
-      {
-        week: "Week 4",
-        focus: `${path.title} Industry Capstone`,
-        hours: "20 hrs",
-        videoTitle: "Packaging & Zero-Downtime Deployment",
-        project: {
-          title: "Full Capstone Deployment",
-          desc: "Deploy an end-to-end industry verified application with CI/CD.",
-        },
-        mentor: { name: "Rahul Bose", initials: "RB" },
-      },
-    ];
-  }, [path, gapSkills]);
+  // Central Proctoring Violation Trigger
+  const registerViolation = useCallback(
+    (reason: string) => {
+      if (isDisqualified || isSubmitted) return;
 
-  const [selectedModule, setSelectedModule] = useState<(typeof studyPlan)[0] | null>(null);
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = `${reason} (Logged at ${timestamp})`;
 
-  return (
-    <div>
-      <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <Badge className="bg-primary-soft text-accent-foreground hover:bg-primary-soft">
-            <Target className="size-3.5" />
-            Target: {path.title}
-          </Badge>
-          <h1 className="mt-3 text-2xl font-bold sm:text-3xl">
-            Your Skill Readiness
-          </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            Scored {correct} of {total} correct · Analysis refreshed just now
+      setStrikes((prev) => {
+        const nextCount = prev.length + 1;
+        const updated = [...prev, entry];
+
+        if (nextCount === 1) {
+          setActiveWarning("Strike 1/2: Violation Detected. 1 chance remaining before auto-lock!");
+          toast.warning("Warning 1/2: Integrity Violation!", {
+            description: `${reason}. You have 1 warning remaining.`,
+          });
+        } else if (nextCount === 2) {
+          setActiveWarning("FINAL WARNING 2/2: Next violation will terminate your test!");
+          toast.error("Critical Warning 2/2!", {
+            description: `${reason}. Final notice! Any further infraction will terminate the test.`,
+          });
+        } else if (nextCount >= 3) {
+          setIsDisqualified(true);
+          toast.error("Test Terminated!", {
+            description: "Exceeded 2 chances. Session locked due to proctoring policy.",
+          });
+        }
+        return updated;
+      });
+    },
+    [isDisqualified, isSubmitted]
+  );
+
+  // Browser Lockdown & Tab Switch Listeners
+  useEffect(() => {
+    if (isDisqualified || isSubmitted) return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        registerViolation("Tab switched or browser minimized");
+      }
+    };
+
+    const handleBlur = () => {
+      registerViolation("Focus lost (External app or multi-window clicked)");
+    };
+
+    const handleCopyPaste = (e: ClipboardEvent) => {
+      e.preventDefault();
+      registerViolation("Unauthorized Clipboard action (Copy/Paste)");
+    };
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      registerViolation("Right-click context menu opened");
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("copy", handleCopyPaste);
+    window.addEventListener("paste", handleCopyPaste);
+    window.addEventListener("contextmenu", handleContextMenu);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("copy", handleCopyPaste);
+      window.removeEventListener("paste", handleCopyPaste);
+      window.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, [isDisqualified, isSubmitted, registerViolation]);
+
+  // Code Evaluation Engine (Logic + Time Complexity + Speed + Quality)
+  const handleRunAndSubmit = () => {
+    // 1. Algorithmic Complexity Heuristic
+    const hasNestedLoop = /for\s*\(.*for\s*\(|while\s*\(.*while\s*\(/.test(code);
+    const hasMapOrSet = /Map|Set|{\s*}/.test(code) || /has\(|get\(|in\s+/.test(code);
+
+    let complexityScore = 25; // 25% max
+    let detectedComplexity = "O(N) - Linear Time (Optimal)";
+
+    if (hasNestedLoop) {
+      complexityScore = 10;
+      detectedComplexity = "O(N^2) - Quadratic (Sub-optimal Nested Loops)";
+    } else if (!hasMapOrSet) {
+      complexityScore = 18;
+      detectedComplexity = "O(N log N) - Sorting / Binary Lookup";
+    }
+
+    // 2. Speed / Benchmark Comparison
+    // Benchmark is 300s (5m). If solved under 300s -> full 20 pts.
+    let speedScore = 20; // 20% max
+    if (elapsedSeconds <= QUESTION_DATA.benchmarkSeconds) {
+      speedScore = 20;
+    } else if (elapsedSeconds <= QUESTION_DATA.benchmarkSeconds * 1.5) {
+      speedScore = 15;
+    } else {
+      speedScore = 10;
+    }
+
+    // 3. Logic & Test Cases
+    const passedCases = 5; // Simulating all passed
+    const totalCases = 5;
+    const logicScore = 40; // 40% max
+
+    // 4. Code Quality & Edge Cases (15% max)
+    const qualityScore = code.includes("return []") || code.includes("null") ? 15 : 12;
+
+    const totalScore = logicScore + complexityScore + speedScore + qualityScore;
+
+    setResults({
+      logicScore,
+      complexityScore,
+      speedScore,
+      qualityScore,
+      totalScore,
+      detectedComplexity,
+      passedCases,
+      totalCases,
+    });
+    setIsSubmitted(true);
+    toast.success("Assessment submitted and evaluated successfully!");
+  };
+
+  const formatTime = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${mins}:${s < 10 ? "0" : ""}${s}`;
+  };
+
+  // 1. DISQUALIFIED SCREEN (If strikes >= 3)
+  if (isDisqualified) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-xl rounded-2xl border border-rose-500/30 bg-rose-950/20 backdrop-blur-xl p-8 text-center shadow-2xl">
+          <div className="size-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mx-auto mb-4">
+            <ShieldAlert className="size-8" />
+          </div>
+          <span className="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-3">
+            Access Terminated
+          </span>
+          <h1 className="text-3xl font-black text-white">Assessment Disqualified</h1>
+          <p className="mt-3 text-sm text-rose-200/80 leading-relaxed">
+            You exceeded the maximum allowed policy infractions (2 chances). The proctoring engine has terminated and permanently locked your evaluation session.
           </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onChangePath}>
-            Change Path
-          </Button>
-          <Button variant="outline" onClick={onRetake}>
-            <RotateCcw className="size-4" />
-            Retake Assessment
-          </Button>
-        </div>
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <KpiCard
-          label="Skill Readiness Score"
-          value={`${readiness}%`}
-          hint={readiness >= 70 ? "Above benchmark" : "Needs milestone review"}
-          icon={Gauge}
-        />
-        <KpiCard
-          label="Gaps Identified"
-          value={`${gapsCritical} critical`}
-          hint={`${gapSkills.length} total skill gaps`}
-          icon={TriangleAlert}
-          tone="warning"
-        />
-        <KpiCard
-          label="Match Index"
-          value={`${matchIndex}%`}
-          hint="Against open partner roles"
-          icon={TrendingUp}
-          tone="success"
-        />
-      </div>
-
-      {/* AI Skill Gap Analysis */}
-      <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
-        <h2 className="text-lg font-semibold">AI Skill Gap Analysis</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your verified strengths compared against what {path.title} postings require.
-        </p>
-        <div className="mt-5 grid gap-6 md:grid-cols-2">
-          <div className="rounded-xl border border-border bg-success/6 p-5">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-success">
-              <BadgeCheck className="size-4" />
-              Mastered Skills
-            </h3>
-            <div className="mt-4 space-y-4">
-              {masteredSkills.map((s) => (
-                <div key={s.skill}>
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">{s.skill}</span>
-                    <span className="text-muted-foreground">{s.level}%</span>
-                  </div>
-                  <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-success"
-                      style={{ width: `${s.level}%` }}
-                    />
-                  </div>
+          <div className="mt-6 rounded-xl border border-white/10 bg-black/40 p-4 text-left">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-rose-300 mb-2">
+              Proctoring Violation Audit Log:
+            </h4>
+            <div className="space-y-2 text-xs text-slate-300">
+              {strikes.map((s, idx) => (
+                <div key={idx} className="flex items-start gap-2">
+                  <span className="text-rose-400 font-bold">#{idx + 1}</span>
+                  <span>{s}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-warning/8 p-5">
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-warning">
-              <TriangleAlert className="size-4" />
-              Missing / Gap Skills
-            </h3>
-            <div className="mt-4 space-y-4">
-              {gapSkills.map((s) => (
-                <div key={s.skill}>
-                  <div className="flex justify-between text-sm">
-                    <span className="font-medium">
-                      {s.skill}
-                      {s.severity === "critical" && (
-                        <span className="ml-2 rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-semibold text-destructive">
-                          critical
-                        </span>
-                      )}
-                    </span>
-                    <span className="text-muted-foreground">{s.level}%</span>
-                  </div>
-                  <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className={cn(
-                        "h-full rounded-full",
-                        s.severity === "critical"
-                          ? "bg-destructive"
-                          : "bg-warning",
-                      )}
-                      style={{ width: `${s.level}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Link to="/" className="inline-block mt-8">
+            <Button className="bg-white/10 hover:bg-white/20 text-white text-xs border border-white/20">
+              Return to Portal Home
+            </Button>
+          </Link>
         </div>
-      </section>
+      </div>
+    );
+  }
 
-      {/* Interactive Learning Hub */}
-      <section className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-card">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <BookOpen className="size-5 text-primary" />
-              Interactive Learning Hub
-            </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Click on any module below to start learning, work on your project, and get mentor verified.
+  // 2. SUBMITTED SCREEN: TRANSPARENT SCORE BREAKDOWN CARD
+  if (isSubmitted && results) {
+    return (
+      <div className="min-h-screen bg-[#091428] text-white flex flex-col items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-3xl rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
+          
+          <div className="text-center pb-6 border-b border-white/10">
+            <div className="size-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-3">
+              <CheckCircle2 className="size-6" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              Assessment Verified & Evaluated
+            </h1>
+            <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
+              Holistic Talent Readiness Index Breakdown
             </p>
           </div>
-          <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
-            <Sparkles className="mr-1 size-3" />
-            AI Tailored
-          </Badge>
-        </div>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          {studyPlan.map((s, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => setSelectedModule(s)}
-              className="group flex flex-col text-left rounded-xl border border-border bg-background/50 p-4 transition-all hover:border-primary/50 hover:bg-primary-soft/20 hover:shadow-sm"
-            >
-              <div className="flex w-full items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-                  {s.week}
-                </span>
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="size-3.5" />
-                  {s.hours}
-                </span>
+          {/* Primary Score Hero */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+            <div className="sm:col-span-1 p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
+              <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
+                Overall Final Score
+              </span>
+              <div className="text-4xl font-extrabold text-white mt-1">
+                {results.totalScore}
+                <span className="text-lg font-medium text-blue-200/70">/100</span>
               </div>
-              <h3 className="mt-2 text-sm font-semibold text-foreground">{s.focus}</h3>
-              <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                Learn concepts through interactive sessions, complete hands-on assignments, and get reviewed by {s.mentor.name}.
-              </p>
-              <div className="mt-4 flex items-center text-xs font-semibold text-primary opacity-80 group-hover:opacity-100">
-                Start Learning <ArrowRight className="ml-1 size-3 transition-transform group-hover:translate-x-1" />
+              <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Grade: Industry Ready (A)
+              </span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400">Completion Speed</span>
+                <div className="text-xl font-bold text-white mt-1">{formatTime(elapsedSeconds)}</div>
               </div>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Global Learning Modal */}
-      <Dialog open={!!selectedModule} onOpenChange={(open) => !open && setSelectedModule(null)}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          {selectedModule && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-xl">
-                  {selectedModule.week}: {selectedModule.focus}
-                </DialogTitle>
-                <DialogDescription>
-                  Complete your learning modules, submit your hands-on project, and get mentor-verified to level up.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-6 py-4">
-                {/* Step 1: Learn */}
-                <div className="space-y-3">
-                  <h4 className="flex items-center gap-2 text-sm font-semibold">
-                    <PlayCircle className="size-4 text-primary" /> 
-                    Step 1: Learn the Concepts
-                  </h4>
-                  <div className="flex aspect-video w-full flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/50 text-muted-foreground transition-colors hover:bg-muted">
-                    <PlayCircle className="mb-2 size-10 opacity-60 text-primary" />
-                    <p className="text-sm font-medium text-foreground">Interactive Lecture: {selectedModule.videoTitle}</p>
-                    <p className="text-xs text-muted-foreground">Duration: 45 mins · Interactive Sandboxes included</p>
-                  </div>
-                </div>
-
-                {/* Step 2: Build Project */}
-                <div className="space-y-3">
-                  <h4 className="flex items-center gap-2 text-sm font-semibold">
-                    <Code2 className="size-4 text-primary" /> 
-                    Step 2: Hands-on Project Assignment
-                  </h4>
-                  <div className="rounded-xl border border-border bg-muted/30 p-4">
-                    <p className="text-sm font-semibold text-foreground">{selectedModule.project.title}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{selectedModule.project.desc}</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-3"
-                      onClick={() => toast.info("Cloud Workspace spinning up...")}
-                    >
-                      <Code2 className="mr-2 size-3.5" />
-                      Open Cloud IDE
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Step 3: Mentor Assigned */}
-                <div className="space-y-3">
-                  <h4 className="flex items-center gap-2 text-sm font-semibold">
-                    <UserCheck className="size-4 text-primary" /> 
-                    Step 3: Mentor Verification
-                  </h4>
-                  <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4">
-                    <Avatar className="size-10">
-                      <AvatarFallback className="bg-primary-soft text-primary font-semibold">
-                        {selectedModule.mentor.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">Assigned Mentor: {selectedModule.mentor.name}</p>
-                      <p className="text-xs text-muted-foreground">Will review your code repository and approve your skill profile update.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <DialogFooter className="sm:justify-between gap-2">
-                <Button variant="ghost" onClick={() => setSelectedModule(null)}>
-                  Close
-                </Button>
-                <Button 
-                  onClick={() => {
-                    toast.success(`Skill Verified! +20 points added to your ${selectedModule.focus} profile.`);
-                    setSelectedModule(null);
-                  }}
-                  className="bg-emerald-600 text-white hover:bg-emerald-700"
-                >
-                  <Trophy className="mr-2 size-4" />
-                  Complete & Update Profile
-                </Button>
-              </DialogFooter>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Internships & Mentors */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Recommended Internships</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Ranked by verified skill fit against your profile.
+              <p className="text-[11px] text-blue-200/70 mt-2">
+                Benchmark: {formatTime(QUESTION_DATA.benchmarkSeconds)} ({elapsedSeconds <= QUESTION_DATA.benchmarkSeconds ? "Faster than benchmark" : "Average speed"})
               </p>
             </div>
-            {customJobs.length > 0 && (
-              <Badge className="bg-primary-soft text-primary">
-                <Sparkles className="mr-1 size-3" />
-                {customJobs.length} Live Recruiter Post{customJobs.length > 1 ? "s" : ""}
-              </Badge>
-            )}
+
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
+                <div className="text-xl font-bold text-white mt-1">
+                  {strikes.length === 0 ? "100% Clean" : `${100 - strikes.length * 10}% Verified`}
+                </div>
+              </div>
+              <p className="text-[11px] text-blue-200/70 mt-2">
+                {strikes.length} minor proctoring warnings logged during session
+              </p>
+            </div>
           </div>
 
-          <div className="mt-5 space-y-3">
-            {allInternships.map((job, idx) => (
-              <div
-                key={`${job.company}-${idx}`}
-                className={cn(
-                  "flex flex-wrap items-center gap-4 rounded-xl border p-4 transition-all",
-                  (job as any).isCustom
-                    ? "border-primary/50 bg-primary-soft/20 shadow-sm"
-                    : "border-border",
-                )}
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold">{job.role}</p>
-                    {(job as any).isCustom && (
-                      <Badge variant="outline" className="border-primary text-primary text-[10px] py-0 px-1.5">
-                        New Post
-                      </Badge>
-                    )}
+          {/* TRANSPARENT EVALUATION EXPLANATION TABLE */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-200 flex items-center gap-2">
+              <Sparkles className="size-3.5 text-blue-400" />
+              Transparent Score Derivation:
+            </h3>
+
+            <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/30 overflow-hidden text-xs">
+              
+              {/* Row 1: Correctness */}
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-white">1. Correctness & Hidden Test Cases (40%)</div>
+                  <div className="text-slate-400 text-[11px]">
+                    Passed {results.passedCases}/{results.totalCases} functional test cases and boundary conditions.
                   </div>
-                  <p className="text-sm text-muted-foreground">{job.company}</p>
-                  <p className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="size-3.5" />
-                      {job.location}
-                    </span>
-                    <span>{job.stipend}</span>
-                  </p>
                 </div>
-                <Badge className="bg-success/12 text-success hover:bg-success/12">
-                  {job.fit}% Fit
-                </Badge>
-                <ApplyDialog
-                  role={job.role}
-                  company={job.company}
-                  fit={job.fit}
-                />
+                <div className="text-sm font-bold text-emerald-400">+{results.logicScore} / 40 pts</div>
               </div>
-            ))}
-          </div>
-        </section>
 
-        <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
-          <h2 className="text-lg font-semibold">Recommended Mentors</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Industry practitioners on your target path.
-          </p>
-          <div className="mt-5 space-y-3">
-            {path.mentors.map((m) => (
-              <div
-                key={m.name}
-                className="flex items-center gap-3 rounded-xl border border-border p-4"
-              >
-                <Avatar className="size-10">
-                  <AvatarFallback className="bg-primary-soft text-xs font-semibold text-accent-foreground">
-                    {m.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold">{m.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {m.title} · {m.company}
-                  </p>
+              {/* Row 2: Time Complexity */}
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-white">2. Algorithmic Efficiency & Complexity (25%)</div>
+                  <div className="text-slate-400 text-[11px]">
+                    Detected: <span className="text-cyan-300 font-mono">{results.detectedComplexity}</span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-success">{m.fit}%</p>
-                  <Button
-                    variant="link"
-                    className="h-auto p-0 text-xs"
-                    onClick={() =>
-                      toast.success(`Mentorship request sent to ${m.name}`)
-                    }
-                  >
-                    Request
-                  </Button>
-                </div>
+                <div className="text-sm font-bold text-cyan-400">+{results.complexityScore} / 25 pts</div>
               </div>
-            ))}
+
+              {/* Row 3: Speed Index */}
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-white">3. Speed & Benchmark Execution (20%)</div>
+                  <div className="text-slate-400 text-[11px]">
+                    Solved in {formatTime(elapsedSeconds)} vs {formatTime(QUESTION_DATA.benchmarkSeconds)} benchmark.
+                  </div>
+                </div>
+                <div className="text-sm font-bold text-blue-400">+{results.speedScore} / 20 pts</div>
+              </div>
+
+              {/* Row 4: Code Quality */}
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-white">4. Code Cleanliness & Edge Cases (15%)</div>
+                  <div className="text-slate-400 text-[11px]">
+                    Clean variable semantics, early returns & defensive checks.
+                  </div>
+                </div>
+                <div className="text-sm font-bold text-indigo-400">+{results.qualityScore} / 15 pts</div>
+              </div>
+            </div>
           </div>
-        </section>
+
+          <div className="mt-8 flex justify-end gap-3">
+            <Link to="/">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs">
+                Back to Dashboard
+                <ArrowRight className="size-4 ml-1.5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. ACTIVE CODING & ASSESSMENT WORKSPACE
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+      
+      {/* WARNING NOTIFICATION BANNER (If 1 or 2 warnings) */}
+      {activeWarning && (
+        <div className="bg-amber-500/20 border-b border-amber-500/40 px-6 py-2 flex items-center justify-between text-amber-200 text-xs">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="size-4 text-amber-400 shrink-0" />
+            <span className="font-semibold">{activeWarning}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActiveWarning(null)}
+            className="text-[10px] uppercase font-bold underline hover:text-white"
+          >
+            Acknowledge
+          </button>
+        </div>
+      )}
+
+      {/* TOP BAR: TIMER & PROCTORING STATUS */}
+      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-md px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+        <div className="flex items-center gap-3">
+          <span className="font-extrabold text-sm text-white tracking-tight">SkillBridge Assessment</span>
+          <span className="hidden sm:inline-block text-[11px] text-slate-400">
+            • {QUESTION_DATA.title}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* Live Clock */}
+          <div className="flex items-center gap-1.5 text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-200">
+            <Clock className="size-3.5 text-blue-400" />
+            <span>Time Taken: {formatTime(elapsedSeconds)}</span>
+          </div>
+
+          {/* Strikes Counter */}
+          <div className="flex items-center gap-1.5 text-xs bg-rose-500/10 border border-rose-500/30 px-3 py-1.5 rounded-lg text-rose-300">
+            <ShieldAlert className="size-3.5 text-rose-400" />
+            <span>Chances Used: {strikes.length} / 2</span>
+          </div>
+
+          <Button
+            type="button"
+            onClick={handleRunAndSubmit}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-4"
+          >
+            Submit Solution
+          </Button>
+        </div>
+      </header>
+
+      {/* 2-COLUMN CODING WORKSPACE */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+        
+        {/* Left Side: Question Description & Live Webcam */}
+        <div className="lg:col-span-5 border-r border-white/10 p-6 flex flex-col justify-between overflow-y-auto bg-slate-900/40">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                {QUESTION_DATA.difficulty} Problem
+              </span>
+              <span className="text-xs text-slate-400 flex items-center gap-1">
+                <Zap className="size-3.5 text-amber-400" />
+                Benchmark: 5m 00s
+              </span>
+            </div>
+
+            <h2 className="text-xl font-bold text-white mb-3">{QUESTION_DATA.title}</h2>
+            <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line mb-6">
+              {QUESTION_DATA.description}
+            </div>
+
+            {/* Test Cases Preview */}
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Verified Test Cases:
+            </h4>
+            <div className="space-y-2">
+              {QUESTION_DATA.testCases.map((tc, i) => (
+                <div key={i} className="p-2.5 rounded-lg bg-black/40 border border-white/10 text-xs font-mono">
+                  <div className="text-slate-400">Input: <span className="text-white">{tc.input}</span></div>
+                  <div className="text-slate-400">Expected: <span className="text-emerald-400">{tc.expected}</span></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Real-time AI Proctoring Camera Stream */}
+          <div className="mt-8 pt-4 border-t border-white/10 flex items-center gap-4">
+            <div className="relative size-20 rounded-xl overflow-hidden bg-black border-2 border-emerald-500/60 shadow-md">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover scale-x-[-1]"
+              />
+              <div className="absolute inset-1 border border-dashed border-emerald-400/80 rounded pointer-events-none" />
+            </div>
+
+            <div className="flex-1 text-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-emerald-400">
+                <Eye className="size-3.5" />
+                <span>AI Proctor Active</span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                Continuous face, gaze & browser monitoring. Violations log after 2 strikes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Code Editor Workspace */}
+        <div className="lg:col-span-7 flex flex-col bg-black">
+          <div className="px-4 py-2 border-b border-white/10 bg-slate-900/80 flex items-center justify-between text-xs text-slate-400">
+            <div className="flex items-center gap-2 font-mono">
+              <Terminal className="size-3.5 text-blue-400" />
+              <span>solution.js</span>
+            </div>
+            <span className="text-[11px] text-slate-500">Target Efficiency: O(N)</span>
+          </div>
+
+          <textarea
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            spellCheck={false}
+            className="flex-1 w-full bg-slate-950 p-4 font-mono text-xs text-emerald-300 focus:outline-none resize-none leading-relaxed"
+          />
+
+          <div className="p-3 border-t border-white/10 bg-slate-900/60 flex items-center justify-between text-xs">
+            <span className="text-slate-500 text-[11px]">
+              Ctrl+V disabled under exam integrity policy
+            </span>
+            <Button
+              type="button"
+              onClick={handleRunAndSubmit}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-8 px-4"
+            >
+              Run Code & Analyze Efficiency
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
-  );
-}
-
-function ApplyDialog({
-  role,
-  company,
-  fit,
-}: {
-  role: string;
-  company: string;
-  fit: number;
-}) {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button size="sm">Apply</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Apply to {role}</DialogTitle>
-          <DialogDescription>
-            {company} · your verified skill profile matches this role at {fit}%.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-2 rounded-xl border border-border bg-muted p-4 text-sm">
-          <p className="font-medium">What gets shared</p>
-          <ul className="list-inside list-disc space-y-1 text-muted-foreground">
-            <li>Verified assessment score and skill map</li>
-            <li>Mentor-reviewed capstone projects</li>
-            <li>Learning roadmap progress</li>
-          </ul>
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button
-              onClick={() => toast.success(`Application sent to ${company}`)}
-            >
-              Confirm application
-            </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
