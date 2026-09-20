@@ -14,14 +14,12 @@ import {
   Sparkles,
   ArrowRight,
   BookOpen,
-  HelpCircle,
   Code2,
   ShieldCheck,
   Search,
   Bug,
-  Cpu,
   Layers,
-  Award,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -102,34 +100,38 @@ const CATEGORIES = [
 ];
 
 // -------------------------------------------------------------
-// 20 CORE THEORY QUESTIONS BANK (TIER 1)
+// BASE QUESTION POOL FOR SAMPLING & SHUFFLING
 // -------------------------------------------------------------
-const TIER1_QUESTIONS = [
-  { id: 1, q: "In the JavaScript V8 engine, where are object references and execution contexts stored?", opt: ["Stack for execution context, Heap for objects", "Heap for all primitives and closures", "Stack holds all variables exclusively", "Directly in OS Virtual Memory"], ans: "A" },
-  { id: 2, q: "What is the primary advantage of B-Tree indices over Hash indices in relational databases?", opt: ["Faster O(1) single-point lookups", "Efficient range scans (BETWEEN, >, <)", "Zero disk footprint on persistent storage", "Automatic table denormalization"], ans: "B" },
-  { id: 3, q: "Which HTTP status code signifies that a client must authenticate itself to get the requested response?", opt: ["403 Forbidden", "401 Unauthorized", "400 Bad Request", "422 Unprocessable Entity"], ans: "B" },
-  { id: 4, q: "What problem does the CAP Theorem state distributed data stores cannot simultaneously achieve?", opt: ["Consistency, Availability, and Partition Tolerance", "Concurrency, Atomicity, and Performance", "Caching, Availability, and Persistence", "Throughput, Latency, and Scalability"], ans: "A" },
-  { id: 5, q: "What is the time complexity to insert an element into an existing Min-Heap of size N?", opt: ["O(1)", "O(log N)", "O(N)", "O(N log N)"], ans: "B" },
-  { id: 6, q: "In React, why must hooks only be called at the top level and not inside loops or conditions?", opt: ["To preserve call order across renders for internal linked-lists", "To prevent memory leaks in V8 garbage collection", "React compiler converts hooks to global window variables", "Loops force hooks to execute in parallel threads"], ans: "A" },
-  { id: 7, q: "Which SQL isolation level protects against both Dirty Reads and Non-Repeatable Reads?", opt: ["Read Uncommitted", "Read Committed", "Repeatable Read", "Snapshot Read Only"], ans: "C" },
-  { id: 8, q: "What is the fundamental purpose of a Reverse Proxy (e.g., NGINX)?", opt: ["Cache client-side browser cookies", "Distribute incoming traffic and terminate SSL before upstream servers", "Compile frontend TypeScript into JavaScript", "Directly execute SQL stored procedures"], ans: "B" },
-  { id: 9, q: "In Docker containerization, how does a container differ fundamentally from a Virtual Machine (VM)?", opt: ["Containers share the host OS kernel and use cgroups/namespaces", "Containers emulate complete virtual hardware and BIOS", "Containers require a Type-1 Hypervisor on bare metal", "Containers cannot communicate over TCP/IP networks"], ans: "A" },
-  { id: 10, q: "What security vulnerability occurs when user input is directly concatenated into a dynamic SQL query?", opt: ["Cross-Site Scripting (XSS)", "SQL Injection (SQLi)", "Cross-Site Request Forgery (CSRF)", "Buffer Overflow"], ans: "B" },
-  { id: 11, q: "In Redis, what is the default eviction policy when maxmemory is reached without specified keys?", opt: ["noeviction (returns error on writes)", "allkeys-lru", "volatile-random", "volatile-ttl"], ans: "A" },
-  { id: 12, q: "What is the primary role of a Vector Database in Generative AI architectures?", opt: ["Indexing high-dimensional embeddings for cosine similarity retrieval", "Compressing LLM weights for mobile execution", "Executing SQL window functions on text", "Parsing JSON payloads from webhooks"], ans: "A" },
-  { id: 13, q: "What does the ACID 'I' stand for in database transaction properties?", opt: ["Integrity", "Isolation", "Immutability", "Indexing"], ans: "B" },
-  { id: 14, q: "Which cryptographic algorithm is based on asymmetric public-private keypairs?", opt: ["AES-256", "RSA", "DES", "Blowfish"], ans: "B" },
-  { id: 15, q: "In Git, what does 'git rebase' do compared to 'git merge'?", opt: ["Reapplies commits on top of another base tip for a linear history", "Creates a 3-way merge commit combining divergent trees", "Permanently destroys remote branches", "Pushes code directly to production without testing"], ans: "A" },
-  { id: 16, q: "What is the space complexity of an in-place QuickSort algorithm on average?", opt: ["O(1)", "O(log N) auxiliary stack space", "O(N) contiguous array allocation", "O(N^2) recursive frames"], ans: "B" },
-  { id: 17, q: "In RESTful API design, which method is expected to be idempotent?", opt: ["POST", "PUT", "PATCH (without precondition)", "CONNECT"], ans: "B" },
-  { id: 18, q: "Which protocol operates at the Transport Layer (Layer 4) of the OSI model providing reliable ordered delivery?", opt: ["IP", "TCP", "HTTP", "DNS"], ans: "B" },
-  { id: 19, q: "What is the primary cause of a 'Race Condition' in concurrent programming?", opt: ["Multiple threads accessing shared mutable state without proper synchronization", "CPU clock speed running faster than RAM bus speed", "Garbage collection pausing the main execution thread", "Stack overflow due to infinite recursion"], ans: "A" },
-  { id: 20, q: "What design pattern defines a one-to-many dependency between objects so that when one changes state, all dependents are notified?", opt: ["Singleton Pattern", "Observer Pattern", "Factory Pattern", "Adapter Pattern"], ans: "B" },
+interface ProcessedQuestion {
+  id: string;
+  question: string;
+  options: { id: string; text: string }[];
+  correctAnswer: string;
+}
+
+const RAW_QUESTION_POOL = [
+  { id: "q-1", question: "In the JavaScript V8 engine, where are object references and execution contexts stored?", options: [{ id: "A", text: "Stack for execution context, Heap for objects" }, { id: "B", text: "Heap for all primitives and closures" }, { id: "C", text: "Stack holds all variables exclusively" }, { id: "D", text: "Directly in OS Virtual Memory" }], correctAnswer: "A" },
+  { id: "q-2", question: "What is the primary advantage of B-Tree indices over Hash indices in relational databases?", options: [{ id: "A", text: "Faster O(1) single-point lookups" }, { id: "B", text: "Efficient range scans (BETWEEN, >, <)" }, { id: "C", text: "Zero disk footprint on persistent storage" }, { id: "D", text: "Automatic table denormalization" }], correctAnswer: "B" },
+  { id: "q-3", question: "Which HTTP status code signifies that a client must authenticate itself to get the requested response?", options: [{ id: "A", text: "403 Forbidden" }, { id: "B", text: "401 Unauthorized" }, { id: "C", text: "400 Bad Request" }, { id: "D", text: "422 Unprocessable Entity" }], correctAnswer: "B" },
+  { id: "q-4", question: "What problem does the CAP Theorem state distributed data stores cannot simultaneously achieve?", options: [{ id: "A", text: "Consistency, Availability, and Partition Tolerance" }, { id: "B", text: "Concurrency, Atomicity, and Performance" }, { id: "C", text: "Caching, Availability, and Persistence" }, { id: "D", text: "Throughput, Latency, and Scalability" }], correctAnswer: "A" },
+  { id: "q-5", question: "What is the time complexity to insert an element into an existing Min-Heap of size N?", options: [{ id: "A", text: "O(1)" }, { id: "B", text: "O(log N)" }, { id: "C", text: "O(N)" }, { id: "D", text: "O(N log N)" }], correctAnswer: "B" },
+  { id: "q-6", question: "In React, why must hooks only be called at the top level and not inside loops or conditions?", options: [{ id: "A", text: "To preserve call order across renders for internal linked-lists" }, { id: "B", text: "To prevent memory leaks in V8 garbage collection" }, { id: "C", text: "React compiler converts hooks to global window variables" }, { id: "D", text: "Loops force hooks to execute in parallel threads" }], correctAnswer: "A" },
+  { id: "q-7", question: "Which SQL isolation level protects against both Dirty Reads and Non-Repeatable Reads?", options: [{ id: "A", text: "Read Uncommitted" }, { id: "B", text: "Read Committed" }, { id: "C", text: "Repeatable Read" }, { id: "D", text: "Snapshot Read Only" }], correctAnswer: "C" },
+  { id: "q-8", question: "What is the fundamental purpose of a Reverse Proxy (e.g., NGINX)?", options: [{ id: "A", text: "Cache client-side browser cookies" }, { id: "B", text: "Distribute incoming traffic and terminate SSL before upstream servers" }, { id: "C", text: "Compile frontend TypeScript into JavaScript" }, { id: "D", text: "Directly execute SQL stored procedures" }], correctAnswer: "B" },
+  { id: "q-9", question: "In Docker containerization, how does a container differ fundamentally from a Virtual Machine (VM)?", options: [{ id: "A", text: "Containers share the host OS kernel and use cgroups/namespaces" }, { id: "B", text: "Containers emulate complete virtual hardware and BIOS" }, { id: "C", text: "Containers require a Type-1 Hypervisor on bare metal" }, { id: "D", text: "Containers cannot communicate over TCP/IP networks" }], correctAnswer: "A" },
+  { id: "q-10", question: "What security vulnerability occurs when user input is directly concatenated into a dynamic SQL query?", options: [{ id: "A", text: "Cross-Site Scripting (XSS)" }, { id: "B", text: "SQL Injection (SQLi)" }, { id: "C", text: "Cross-Site Request Forgery (CSRF)" }, { id: "D", text: "Buffer Overflow" }], correctAnswer: "B" },
+  { id: "q-11", question: "In Redis, what is the default eviction policy when maxmemory is reached without specified keys?", options: [{ id: "A", text: "noeviction (returns error on writes)" }, { id: "B", text: "allkeys-lru" }, { id: "C", text: "volatile-random" }, { id: "D", text: "volatile-ttl" }], correctAnswer: "A" },
+  { id: "q-12", question: "What is the primary role of a Vector Database in Generative AI architectures?", options: [{ id: "A", text: "Indexing high-dimensional embeddings for cosine similarity retrieval" }, { id: "B", text: "Compressing LLM weights for mobile execution" }, { id: "C", text: "Executing SQL window functions on text" }, { id: "D", text: "Parsing JSON payloads from webhooks" }], correctAnswer: "A" },
+  { id: "q-13", question: "What does the ACID 'I' stand for in database transaction properties?", options: [{ id: "A", text: "Integrity" }, { id: "B", text: "Isolation" }, { id: "C", text: "Immutability" }, { id: "D", text: "Indexing" }], correctAnswer: "B" },
+  { id: "q-14", question: "Which cryptographic algorithm is based on asymmetric public-private keypairs?", options: [{ id: "A", text: "AES-256" }, { id: "B", text: "RSA" }, { id: "C", text: "DES" }, { id: "D", text: "Blowfish" }], correctAnswer: "B" },
+  { id: "q-15", question: "In Git, what does 'git rebase' do compared to 'git merge'?", options: [{ id: "A", text: "Reapplies commits on top of another base tip for a linear history" }, { id: "B", text: "Creates a 3-way merge commit combining divergent trees" }, { id: "C", text: "Permanently destroys remote branches" }, { id: "D", text: "Pushes code directly to production without testing" }], correctAnswer: "A" },
+  { id: "q-16", question: "What is the space complexity of an in-place QuickSort algorithm on average?", options: [{ id: "A", text: "O(1)" }, { id: "B", text: "O(log N) auxiliary stack space" }, { id: "C", text: "O(N) contiguous array allocation" }, { id: "D", text: "O(N^2) recursive frames" }], correctAnswer: "B" },
+  { id: "q-17", question: "In RESTful API design, which method is expected to be idempotent?", options: [{ id: "A", text: "POST" }, { id: "B", text: "PUT" }, { id: "C", text: "PATCH (without precondition)" }, { id: "D", text: "CONNECT" }], correctAnswer: "B" },
+  { id: "q-18", question: "Which protocol operates at the Transport Layer (Layer 4) of the OSI model providing reliable ordered delivery?", options: [{ id: "A", text: "IP" }, { id: "B", text: "TCP" }, { id: "C", text: "HTTP" }, { id: "D", text: "DNS" }], correctAnswer: "B" },
+  { id: "q-19", question: "What is the primary cause of a 'Race Condition' in concurrent programming?", options: [{ id: "A", text: "Multiple threads accessing shared mutable state without proper synchronization" }, { id: "B", text: "CPU clock speed running faster than RAM bus speed" }, { id: "C", text: "Garbage collection pausing the main execution thread" }, { id: "D", text: "Stack overflow due to infinite recursion" }], correctAnswer: "A" },
+  { id: "q-20", question: "What design pattern defines a one-to-many dependency between objects so that when one changes state, all dependents are notified?", options: [{ id: "A", text: "Singleton Pattern" }, { id: "B", text: "Observer Pattern" }, { id: "C", text: "Factory Pattern" }, { id: "D", text: "Adapter Pattern" }], correctAnswer: "B" },
 ];
 
-// -------------------------------------------------------------
-// TIER 2 & 3 & 4 DATA
-// -------------------------------------------------------------
 const DEBUGGING_SCENARIO = {
   title: "Production Incident: Memory Leak & Unhandled Promise in Webhook Handler",
   description: `A Node.js microservice handling high-volume payment webhooks crashes every 4 hours with:
@@ -198,12 +200,52 @@ const SYSTEM_DESIGN_SCENARIO = {
 Which architecture tradeoff offers the optimal scalability and lowest write latency?`,
   options: [
     { id: "A", text: "Redis Sorted Sets (ZSET): Uses SkipLists + Hash Table for O(log N) score updates and O(log N + M) range queries in memory." },
-    { id: "B", text: "PostgreSQL table with `ORDER BY score DESC LIMIT 100` queried directly by clients every 500ms." },
+    { id: "B", text: "PostgreSQL table with ORDER BY score DESC LIMIT 100 queried directly by clients every 500ms." },
     { id: "C", text: "Store scores in MongoDB documents and run full aggregation pipelines on every user refresh." },
     { id: "D", text: "Write all events to a static JSON file on AWS S3 and synchronize via webhooks." },
   ],
   correctAnswer: "A",
 };
+
+// -------------------------------------------------------------
+// FISHER-YATES ANTI-COLLISION SHUFFLE ENGINE
+// -------------------------------------------------------------
+function shuffle<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Shuffles both the questions list & internal option letters per student
+function generateAntiCheatExamSet(questions: typeof RAW_QUESTION_POOL): ProcessedQuestion[] {
+  const shuffledQuestions = shuffle(questions);
+  return shuffledQuestions.map((q) => {
+    const originalCorrectOption = q.options.find((opt) => opt.id === q.correctAnswer);
+    const shuffledOptions = shuffle(q.options);
+
+    let newCorrectLetter = "A";
+    const reassignedOptions = shuffledOptions.map((opt, idx) => {
+      const newLetter = String.fromCharCode(65 + idx);
+      if (originalCorrectOption && opt.text === originalCorrectOption.text) {
+        newCorrectLetter = newLetter;
+      }
+      return {
+        id: newLetter,
+        text: opt.text,
+      };
+    });
+
+    return {
+      id: q.id,
+      question: q.question,
+      options: reassignedOptions,
+      correctAnswer: newCorrectLetter,
+    };
+  });
+}
 
 function StudentAssessmentEngine() {
   const { userEmail } = useAppState();
@@ -216,19 +258,21 @@ function StudentAssessmentEngine() {
   const [domainSearch, setDomainSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Multi-Tier Tabs: "theory" | "debugging" | "coding" | "architecture"
+  // Multi-Tier Navigation
   const [activeTab, setActiveTab] = useState<"theory" | "debugging" | "coding" | "architecture">("theory");
 
-  // Tier 1 Answers State (Map questionId -> selectedOption)
-  const [theoryAnswers, setTheoryAnswers] = useState<Record<number, string>>({});
+  // Dynamic Randomized Exam Questions (Student-Unique)
+  const [studentQuestions, setStudentQuestions] = useState<ProcessedQuestion[]>([]);
+  const [theoryAnswers, setTheoryAnswers] = useState<Record<string, string>>({});
   const [currentTheoryIndex, setCurrentTheoryIndex] = useState(0);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
-  // Tier 2 & 3 & 4 Answers
+  // Tier 2, 3, 4 States
   const [debuggingAnswer, setDebuggingAnswer] = useState<string | null>(null);
   const [code, setCode] = useState(CODING_DATA.initialCode);
   const [systemDesignAnswer, setSystemDesignAnswer] = useState<string | null>(null);
 
-  // Camera & Proctoring
+  // Camera & Anti-Cheat Proctoring
   const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -237,7 +281,7 @@ function StudentAssessmentEngine() {
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Holistic Evaluation Matrix State
+  // Holistic Evaluation Matrix
   const [evaluation, setEvaluation] = useState<{
     theoryScore: number;
     debuggingScore: number;
@@ -250,7 +294,61 @@ function StudentAssessmentEngine() {
     competencyBadge: string;
   } | null>(null);
 
-  // Camera Activation Hook
+  // Load Unique Questions dynamically per Student
+  const handleProceedToGuidelines = async () => {
+    if (!selectedDomain) return;
+
+    setIsLoadingQuestions(true);
+    try {
+      // 1. Check for previously attempted question IDs for this student in Supabase
+      const { data: pastAttempts } = await supabase
+        .from("student_assessments")
+        .select("attempted_question_ids")
+        .eq("student_email", userEmail || "")
+        .eq("role_id", selectedDomain);
+
+      const usedIds: string[] = [];
+      pastAttempts?.forEach((row: { attempted_question_ids?: string[] }) => {
+        if (row.attempted_question_ids && Array.isArray(row.attempted_question_ids)) {
+          usedIds.push(...row.attempted_question_ids);
+        }
+      });
+
+      // 2. Fetch fresh questions from Supabase assessment_questions table
+      let query = supabase
+        .from("assessment_questions")
+        .select("*")
+        .eq("role_id", selectedDomain)
+        .eq("question_type", "mcq");
+
+      if (usedIds.length > 0) {
+        query = query.not("id", "in", `(${usedIds.join(",")})`);
+      }
+
+      const { data: dbQuestions, error } = await query.limit(20);
+
+      if (!error && dbQuestions && dbQuestions.length >= 10) {
+        const formatted = dbQuestions.map((q: any) => ({
+          id: q.id,
+          question: q.prompt,
+          options: q.options || [],
+          correctAnswer: q.correct_answer || "A",
+        }));
+        setStudentQuestions(generateAntiCheatExamSet(formatted));
+      } else {
+        // Fallback to randomized local master pool
+        setStudentQuestions(generateAntiCheatExamSet(RAW_QUESTION_POOL));
+      }
+    } catch (err) {
+      console.error(err);
+      setStudentQuestions(generateAntiCheatExamSet(RAW_QUESTION_POOL));
+    } finally {
+      setIsLoadingQuestions(false);
+      setAssessmentStage("guidelines");
+    }
+  };
+
+  // Camera Validation Hook
   useEffect(() => {
     if (assessmentStage !== "guidelines" && assessmentStage !== "testing") return;
 
@@ -289,7 +387,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Anti-Cheat Violation Handler
+  // Anti-Cheat Violation Handler (2-Strike System)
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
@@ -302,7 +400,7 @@ function StudentAssessmentEngine() {
         if (next.length === 1) {
           setActiveAlert("Strike 1/2: Integrity Violation Logged. 1 chance remaining!");
           toast.warning("Warning 1/2: Rule Violated!", {
-            description: `${reason}. You have 1 strike left before permanent lockout.`,
+            description: `${reason}. You have only 1 chance left before permanent lockout.`,
           });
         } else if (next.length === 2) {
           setActiveAlert("CRITICAL WARNING 2/2: Next violation will terminate your test!");
@@ -321,7 +419,7 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Focus & Security Listeners
+  // Security Focus Listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -329,7 +427,7 @@ function StudentAssessmentEngine() {
       if (document.hidden) registerStrike("Tab switched or browser minimized");
     };
     const onWindowBlur = () => {
-      registerStrike("Window focus lost (external application clicked)");
+      registerStrike("Window focus lost (external click)");
     };
     const onCopyPaste = (e: ClipboardEvent) => {
       e.preventDefault();
@@ -358,20 +456,21 @@ function StudentAssessmentEngine() {
   }, [assessmentStage, isDisqualified, registerStrike]);
 
   // -------------------------------------------------------------
-  // COMPREHENSIVE 360-DEGREE EVALUATION FORMULA
+  // FINAL EVALUATION CALCULATION & SUPABASE SYNC
   // -------------------------------------------------------------
   const handleFinalSubmit = async () => {
     // 1. Tier 1 Theory (Max 25 pts)
     let correctTheoryCount = 0;
-    TIER1_QUESTIONS.forEach((q) => {
-      if (theoryAnswers[q.id] === q.ans) correctTheoryCount++;
+    studentQuestions.forEach((q) => {
+      if (theoryAnswers[q.id] === q.correctAnswer) correctTheoryCount++;
     });
-    const theoryScore = Math.round((correctTheoryCount / TIER1_QUESTIONS.length) * 25);
+    const totalCount = studentQuestions.length || 20;
+    const theoryScore = Math.round((correctTheoryCount / totalCount) * 25);
 
     // 2. Tier 2 Debugging Triage (Max 20 pts)
     const debuggingScore = debuggingAnswer === DEBUGGING_SCENARIO.correctAnswer ? 20 : 0;
 
-    // 3. Tier 3 Algorithmic Coding & Big-O Complexity (Max 30 pts)
+    // 3. Tier 3 Algorithmic Complexity (Max 30 pts)
     const hasNestedLoop = /for\s*\(.*for\s*\(|while\s*\(.*while\s*\(/.test(code);
     const hasHashMap = /Map|Set|complement|diff/.test(code);
     let codingScore = 30;
@@ -389,7 +488,7 @@ function StudentAssessmentEngine() {
     const designScore = systemDesignAnswer === SYSTEM_DESIGN_SCENARIO.correctAnswer ? 15 : 0;
 
     // 5. Benchmark Speed (Max 10 pts)
-    const totalBenchmark = 720; // 12 minutes standard target
+    const totalBenchmark = 720; // 12 minutes
     let speedScore = 10;
     if (totalElapsed <= totalBenchmark) {
       speedScore = 10;
@@ -399,7 +498,6 @@ function StudentAssessmentEngine() {
       speedScore = 5;
     }
 
-    // Proctor Authenticity Trust (Max 100%)
     const trustScore = Math.max(0, 100 - strikes.length * 15);
     const totalMeritScore = theoryScore + debuggingScore + codingScore + designScore + speedScore;
 
@@ -419,8 +517,9 @@ function StudentAssessmentEngine() {
       competencyBadge,
     });
 
-    // Supabase Ledger Audit Sync
+    // Save Scorecard and Attempted Question IDs in Supabase
     try {
+      const attemptedIds = studentQuestions.map((q) => q.id);
       await supabase.from("student_assessments").insert({
         student_email: userEmail || "verified.student@portal.ac.in",
         role_id: selectedDomain === "custom-domain" ? "fullstack-web" : selectedDomain,
@@ -431,6 +530,7 @@ function StudentAssessmentEngine() {
         competency_badge: competencyBadge,
         time_elapsed_seconds: totalElapsed,
         strikes_count: strikes.length,
+        attempted_question_ids: attemptedIds,
       });
     } catch (err) {
       console.error("Failed to sync scorecard with Supabase:", err);
@@ -452,7 +552,7 @@ function StudentAssessmentEngine() {
       : DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain;
 
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION (36 DOMAINS)
+  // VIEW 1: DOMAIN SELECTION (36 DOMAINS + SEARCH)
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
     const filteredDomains = DOMAIN_OPTIONS.filter((d) => {
@@ -475,7 +575,7 @@ function StudentAssessmentEngine() {
               Choose Your Engineering Specialization
             </h1>
             <p className="text-xs text-blue-200/70 mt-1">
-              Select your targeted domain to initialize the 4-Tier Talent Readiness Assessment Engine.
+              Select your targeted domain. Each student receives an anti-collision randomized question set.
             </p>
 
             <div className="mt-3 relative max-w-lg mx-auto">
@@ -578,12 +678,24 @@ function StudentAssessmentEngine() {
               Back to Home
             </Link>
             <Button
-              disabled={!selectedDomain || (selectedDomain === "custom-domain" && !customDomainText.trim())}
-              onClick={() => setAssessmentStage("guidelines")}
+              disabled={
+                !selectedDomain ||
+                (selectedDomain === "custom-domain" && !customDomainText.trim()) ||
+                isLoadingQuestions
+              }
+              onClick={handleProceedToGuidelines}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
             >
-              Continue to Assessment Room
-              <ArrowRight className="size-4 ml-1.5" />
+              {isLoadingQuestions ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="size-3.5 animate-spin" /> Randomizing Unique Exam Set...
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5">
+                  Continue to Assessment Room
+                  <ArrowRight className="size-4" />
+                </span>
+              )}
             </Button>
           </div>
         </div>
@@ -606,7 +718,7 @@ function StudentAssessmentEngine() {
           </span>
           <h1 className="text-3xl font-black text-white">Assessment Terminated</h1>
           <p className="mt-3 text-sm text-rose-200/80 leading-relaxed">
-            Your assessment session has been permanently revoked. You exceeded the maximum allowed policy infractions (2 chances).
+            Your assessment session has been permanently revoked. You exceeded the maximum allowed policy infractions (2 chances). All inputs are locked.
           </p>
 
           <div className="mt-6 rounded-xl border border-white/10 bg-black/50 p-4 text-left">
@@ -652,7 +764,6 @@ function StudentAssessmentEngine() {
             </p>
           </div>
 
-          {/* Top 3 Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
             <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
               <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
@@ -688,7 +799,6 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* 4-Tier Granular Breakdown */}
           <div className="space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-blue-200 flex items-center gap-2">
               <Sparkles className="size-3.5 text-blue-400" />
@@ -876,9 +986,10 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: 4-TIER ACTIVE ASSESSMENT ENGINE
+  // VIEW 5: ACTIVE 4-TIER ASSESSMENT ENGINE
   // -------------------------------------------------------------
-  const currentQ = TIER1_QUESTIONS[currentTheoryIndex];
+  const activeQuestions = studentQuestions.length > 0 ? studentQuestions : generateAntiCheatExamSet(RAW_QUESTION_POOL);
+  const currentQ = activeQuestions[currentTheoryIndex] || activeQuestions[0];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -898,7 +1009,7 @@ function StudentAssessmentEngine() {
         </div>
       )}
 
-      {/* Header Navigation for 4 Tiers */}
+      {/* 4-Tier Navigation Header */}
       <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-md px-6 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <span className="font-extrabold text-sm text-white tracking-tight">
@@ -914,7 +1025,7 @@ function StudentAssessmentEngine() {
               )}
             >
               <BookOpen className="size-3.5" />
-              1. Theory ({Object.keys(theoryAnswers).length}/20)
+              1. Theory ({Object.keys(theoryAnswers).length}/{activeQuestions.length})
             </button>
             <button
               onClick={() => setActiveTab("debugging")}
@@ -969,35 +1080,33 @@ function StudentAssessmentEngine() {
         </div>
       </header>
 
-      {/* Main Multi-Tier Interface */}
       <div className="flex-1 flex overflow-hidden">
-        {/* TIER 1: THEORY BLITZ */}
+        {/* TIER 1: THEORY BLITZ (20 ANTI-COLLISION QUESTIONS) */}
         {activeTab === "theory" && (
           <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
-                  Tier 1 • Question {currentTheoryIndex + 1} of 20
+                  Tier 1 • Question {currentTheoryIndex + 1} of {activeQuestions.length} (Anti-Cheat Seed Active)
                 </span>
                 <span className="text-xs text-slate-400">
-                  Answered: {Object.keys(theoryAnswers).length} / 20
+                  Answered: {Object.keys(theoryAnswers).length} / {activeQuestions.length}
                 </span>
               </div>
 
               <h2 className="text-lg sm:text-xl font-bold text-white mb-6 leading-relaxed">
-                {currentQ.q}
+                {currentQ?.question}
               </h2>
 
               <div className="space-y-3">
-                {currentQ.opt.map((text, idx) => {
-                  const letter = String.fromCharCode(65 + idx);
-                  const isSelected = theoryAnswers[currentQ.id] === letter;
+                {currentQ?.options.map((opt) => {
+                  const isSelected = theoryAnswers[currentQ.id] === opt.id;
                   return (
                     <button
-                      key={letter}
+                      key={opt.id}
                       type="button"
                       onClick={() =>
-                        setTheoryAnswers((prev) => ({ ...prev, [currentQ.id]: letter }))
+                        setTheoryAnswers((prev) => ({ ...prev, [currentQ.id]: opt.id }))
                       }
                       className={cn(
                         "w-full p-4 rounded-xl border text-left text-xs sm:text-sm font-medium transition flex items-center justify-between",
@@ -1006,7 +1115,7 @@ function StudentAssessmentEngine() {
                           : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900 hover:border-white/20"
                       )}
                     >
-                      <span>{text}</span>
+                      <span>{opt.text}</span>
                       <div
                         className={cn(
                           "size-5 rounded-full border flex items-center justify-center text-[10px] font-bold",
@@ -1015,7 +1124,7 @@ function StudentAssessmentEngine() {
                             : "border-white/30 text-slate-400"
                         )}
                       >
-                        {letter}
+                        {opt.id}
                       </div>
                     </button>
                   );
@@ -1031,7 +1140,7 @@ function StudentAssessmentEngine() {
               >
                 Previous Question
               </Button>
-              {currentTheoryIndex < TIER1_QUESTIONS.length - 1 ? (
+              {currentTheoryIndex < activeQuestions.length - 1 ? (
                 <Button
                   onClick={() => setCurrentTheoryIndex((prev) => prev + 1)}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold"
@@ -1052,13 +1161,13 @@ function StudentAssessmentEngine() {
           </div>
         )}
 
-        {/* TIER 2: PRODUCTION BUG TRIAGE */}
+        {/* TIER 2: PRODUCTION INCIDENT DEBUGGING */}
         {activeTab === "debugging" && (
           <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                  Tier 2 • Real-World Incident Debugging (20 Pts)
+                  Tier 2 • Real-World Production Bug Triage (20 Pts)
                 </span>
               </div>
 
@@ -1072,7 +1181,7 @@ function StudentAssessmentEngine() {
               </div>
 
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-                Root Cause & Defensive Fix Options:
+                Root Cause & Defensive Fix Strategy:
               </h3>
               <div className="space-y-3">
                 {DEBUGGING_SCENARIO.options.map((opt) => (
@@ -1106,7 +1215,7 @@ function StudentAssessmentEngine() {
           </div>
         )}
 
-        {/* TIER 3: ALGORITHMIC CHALLENGE */}
+        {/* TIER 3: ALGORITHMIC CODING & BIG-O EVALUATION */}
         {activeTab === "coding" && (
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
             <div className="lg:col-span-5 border-r border-white/10 p-6 flex flex-col justify-between overflow-y-auto bg-slate-900/40">
