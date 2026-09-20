@@ -179,7 +179,7 @@ function LanguageMenu() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
     if (match && match[1]) {
       setCurrentLang(match[1]);
     }
@@ -201,10 +201,31 @@ function LanguageMenu() {
     window.location.reload();
   };
 
+  // Complete List of 22 Scheduled Indian Languages + English
   const languages = [
     { code: "en", label: "English", native: "English" },
     { code: "te", label: "Telugu", native: "తెలుగు" },
     { code: "hi", label: "Hindi", native: "हिंदी" },
+    { code: "ta", label: "Tamil", native: "தமிழ்" },
+    { code: "kn", label: "Kannada", native: "ಕನ್ನಡ" },
+    { code: "ml", label: "Malayalam", native: "മലയാളം" },
+    { code: "mr", label: "Marathi", native: "मराठी" },
+    { code: "bn", label: "Bengali", native: "বাংলা" },
+    { code: "gu", label: "Gujarati", native: "ગુજરાતી" },
+    { code: "pa", label: "Punjabi", native: "ਪੰਜਾਬੀ" },
+    { code: "or", label: "Odia", native: "ଓଡ଼ିଆ" },
+    { code: "ur", label: "Urdu", native: "اردو" },
+    { code: "as", label: "Assamese", native: "অসমীয়া" },
+    { code: "ne", label: "Nepali", native: "नेपाली" },
+    { code: "sa", label: "Sanskrit", native: "संस्कृतम्" },
+    { code: "sd", label: "Sindhi", native: "سنڌي" },
+    { code: "ks", label: "Kashmiri", native: "کٲشُر" },
+    { code: "mai", label: "Maithili", native: "मैथिली" },
+    { code: "mni", label: "Manipuri", native: "মৈতৈলোন্" },
+    { code: "brx", label: "Bodo", native: "बड़ो" },
+    { code: "sat", label: "Santali", native: "ᱥᱟᱱᱛᱟᱲᱤ" },
+    { code: "doi", label: "Dogri", native: "डोगरी" },
+    { code: "kok", label: "Konkani", native: "कोंकणी" },
   ];
 
   return (
@@ -219,10 +240,10 @@ function LanguageMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl z-50">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+        <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1 sticky top-0 bg-white z-10">
             <Globe className="size-3.5" />
-            Language
+            Select Language (22 Official)
           </div>
           {languages.map((lang) => (
             <button
@@ -232,10 +253,10 @@ function LanguageMenu() {
               className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
             >
               <div className="flex flex-col text-left">
-                <span>{lang.native}</span>
+                <span className="font-semibold text-slate-900">{lang.native}</span>
                 <span className="text-[10px] text-slate-400">{lang.label}</span>
               </div>
-              {currentLang === lang.code && <Check className="size-3.5 text-blue-600" />}
+              {currentLang === lang.code && <Check className="size-3.5 text-blue-600 stroke-[2.5]" />}
             </button>
           ))}
         </div>
@@ -285,7 +306,11 @@ function Welcome() {
           };
           if (w.google?.translate?.TranslateElement) {
             new w.google.translate.TranslateElement(
-              { pageLanguage: "en", includedLanguages: "en,te,hi", autoDisplay: false },
+              {
+                pageLanguage: "en",
+                includedLanguages: "en,te,hi,ta,kn,ml,mr,bn,gu,pa,ur,or,as,ne,sd,sa,ks,mai,mni,brx,sat,doi,kok",
+                autoDisplay: false,
+              },
               "google_translate_element"
             );
           }
