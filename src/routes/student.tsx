@@ -3,7 +3,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {
   ShieldAlert,
   Clock,
-  Zap,
   CheckCircle2,
   AlertTriangle,
   Camera,
@@ -13,7 +12,6 @@ import {
   ChevronRight,
   Sparkles,
   ArrowRight,
-  ArrowLeft,
   BookOpen,
   Code2,
   ShieldCheck,
@@ -25,21 +23,13 @@ import {
   Loader2,
   Hand,
   UserCheck,
-  FolderGit2,
   Award,
-  RefreshCw,
   Compass,
-  MessageSquare,
   Lock,
   Unlock,
   Target,
   CheckSquare,
   Square,
-  XCircle,
-  HelpCircle,
-  Star,
-  Calendar,
-  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -53,7 +43,7 @@ export const Route = createFileRoute("/student")({
 });
 
 // -------------------------------------------------------------
-// 1. ALL 36 COMPREHENSIVE DOMAIN TRACKS (COMPLETE LIST)
+// 1. ALL 36 COMPREHENSIVE DOMAIN TRACKS
 // -------------------------------------------------------------
 const DOMAIN_OPTIONS = [
   // SOFTWARE & SYSTEM ENGINEERING
@@ -121,7 +111,7 @@ const CATEGORIES = [
 ];
 
 // -------------------------------------------------------------
-// 2. COMPLETE 20-QUESTION POOL (TOPIC-MAPPED FOR SKILL GAPS)
+// 2. COMPLETE 20-QUESTION POOL
 // -------------------------------------------------------------
 interface ProcessedQuestion {
   id: string;
@@ -155,7 +145,6 @@ const MASTER_QUESTION_POOL: ProcessedQuestion[] = [
 ];
 
 const DEBUGGING_SCENARIO = {
-  id: "dbg-1",
   title: "Production Incident: Memory Leak & Unhandled Promise in Webhook Handler",
   description: `A Node.js microservice handling high-volume payment webhooks crashes every 4 hours with:
 FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory.
@@ -166,13 +155,8 @@ const auditLogCache = []; // Global memory array
 
 app.post('/api/webhook', async (req, res) => {
   const payload = req.body;
-  
-  // Bug 1: Unbounded array growth in heap memory
   auditLogCache.push({ timestamp: Date.now(), data: payload });
-  
-  // Bug 2: Unhandled async error (service crashes on network failure)
   paymentService.processTransaction(payload);
-  
   res.status(200).send({ received: true });
 });`,
   options: [
@@ -185,15 +169,7 @@ app.post('/api/webhook', async (req, res) => {
 };
 
 const CODING_DATA = {
-  id: "code-1",
   title: "Optimized Target Pair Finder (Two-Sum)",
-  expectedComplexity: "O(N) Linear Time",
-  description: `Given an array of integers 'nums' and an integer 'target', return indices of the two numbers such that they add up to target.
-
-Requirements:
-- Your solution must run in O(N) time complexity using a single traversal with a Hash Map.
-- Brute-force nested loops O(N^2) will receive reduced marks.
-- Must cleanly handle edge cases.`,
   placeholderTemplate: `function twoSum(nums, target) {\n  // Implement O(N) Hash Map solution here\n}`,
   testCases: [
     { input: "[2, 7, 11, 15], target = 9", expected: "[0, 1]" },
@@ -202,7 +178,6 @@ Requirements:
 };
 
 const SYSTEM_DESIGN_SCENARIO = {
-  id: "arch-1",
   title: "Tier 4: Architecture Tradeoff - Live Leaderboard at Scale",
   scenario: `Your platform needs to support a real-time leaderboard for 5 million active users during a nationwide campus hiring drive. The system must support:
 - Top 100 ranking queries with sub-50ms latency.
@@ -216,84 +191,6 @@ Which architecture tradeoff offers the optimal scalability and lowest write late
     { id: "D", text: "Write all events to a static JSON file on AWS S3 and synchronize via webhooks." },
   ],
   correctAnswer: "A",
-};
-
-// -------------------------------------------------------------
-// 3. TARGETED ACTION GUIDES, CAPSTONES & PLATFORM MENTORS
-// -------------------------------------------------------------
-const TOPIC_ACTION_GUIDES: Record<string, { actionSteps: string[]; recommendedProjectTitle: string; projectDetails: string }> = {
-  "Memory Management": {
-    actionSteps: [
-      "Deep dive into V8 Garbage Collection phases (Scavenge nursery vs Mark-Sweep-Compact tenured space)",
-      "Profile real-time memory leaks using Chrome DevTools Memory Inspector & Heap Snapshots",
-      "Avoid memory retention anti-patterns (unbounded global arrays, detached DOM trees, uncleared intervals)",
-    ],
-    recommendedProjectTitle: "Production Heap Profiler & Event Listener Leak Sentinel",
-    projectDetails: "Construct an autonomous Node.js service monitoring process.memoryUsage() that dumps heap snapshots upon 85% RAM saturation.",
-  },
-  "Databases & Indexing": {
-    actionSteps: [
-      "Understand B-Tree node branching factors vs Hash index point lookup constraints",
-      "Analyze query execution plans with EXPLAIN (ANALYZE, BUFFERS) to eliminate sequential table scans",
-      "Design multi-column composite indexes following the Leftmost Prefix Indexing rule",
-    ],
-    recommendedProjectTitle: "High-Throughput Relational Query Index Optimizer",
-    projectDetails: "Optimize a 2-million record PostgreSQL transactional database from 940ms query execution down to sub-10ms with composite indexes.",
-  },
-  "Distributed Systems": {
-    actionSteps: [
-      "Master CAP Theorem latency-consistency trade-offs (CP vs AP distributed configurations)",
-      "Implement Redis Sorted Sets (ZSET) SkipList mechanics for O(log N) leaderboard indexing",
-      "Decouple stateful operations through distributed commit logs (Apache Kafka / RabbitMQ)",
-    ],
-    recommendedProjectTitle: "Real-Time Distributed Leaderboard Engine with WebSockets & Redis",
-    projectDetails: "Architect an in-memory ranking service supporting 100,000 active concurrent connections with sub-30ms rank retrieval latency.",
-  },
-  "Protocols & Web APIs": {
-    actionSteps: [
-      "Understand HTTP/2 multiplexed streams vs HTTP/1.1 Head-of-Line blocking",
-      "Build truly idempotent REST APIs using unique client idempotency keys stored in Redis",
-      "Configure Reverse Proxy SSL termination, HTTP keep-alive, and connection pooling on NGINX",
-    ],
-    recommendedProjectTitle: "High-Concurrency Layer-7 API Gateway & Rate Limiter",
-    projectDetails: "Build an edge reverse proxy in Go or Node.js implementing Token Bucket rate limiting and upstream failover circuit breakers.",
-  },
-  "Data Structures & Big-O": {
-    actionSteps: [
-      "Master Hash Map collision resolution (Separate Chaining vs Open Addressing)",
-      "Implement Priority Queues with Min-Heaps for top-K streaming elements in O(N log K)",
-      "Apply Two-Pointer and Sliding Window paradigms to eliminate nested quadratic O(N^2) loops",
-    ],
-    recommendedProjectTitle: "In-Memory Sliding Window Log Rate Limiter",
-    projectDetails: "Implement an algorithmic sliding-window rate limiter handling 30,000 requests/sec with exact time-window compliance.",
-  },
-  "Application Security": {
-    actionSteps: [
-      "Prevent SQL Injection via strict parameterized queries and ORM prepared statements",
-      "Implement asymmetric RSA / ECC cryptography for digital credential verification",
-      "Harden web endpoints with CSP headers, sanitized inputs, and Zero Trust Token architecture",
-    ],
-    recommendedProjectTitle: "Zero-Trust Web Security & Vulnerability Auditing Gateway",
-    projectDetails: "Develop an automated security middleware that scans API payloads for SQLi, XSS vectors, and enforce cryptographic request signatures.",
-  },
-  "DevOps & Infrastructure": {
-    actionSteps: [
-      "Master Linux cgroups and namespaces governing Docker container process isolation",
-      "Construct multi-stage Dockerfiles minimizing production container images by 70%",
-      "Automate end-to-end CI/CD testing pipelines with GitHub Actions and container registries",
-    ],
-    recommendedProjectTitle: "Self-Healing Container Deployment Pipeline & Metrics Exporter",
-    projectDetails: "Build a GitHub Actions CI/CD deployment pipeline with Docker containerization, automated testing, and Prometheus health telemetry.",
-  },
-  "Frontend Architecture": {
-    actionSteps: [
-      "Study React fiber reconciliation, render passes, and hook linked-list indices",
-      "Optimize web vital metrics (LCP, FID, CLS) using code splitting and lazy asset loading",
-      "Structure enterprise global state using clean unidirectional data flow patterns",
-    ],
-    recommendedProjectTitle: "High-Performance Interactive Virtualized Data Grid",
-    projectDetails: "Develop a virtualized DOM table handling 50,000 live streaming rows with 60 FPS scrolling and zero frame drops.",
-  },
 };
 
 interface Mentor {
@@ -370,42 +267,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     bio: "Focuses on linear algorithmic restructuring, priority heap optimization, and cache-locality data layout.",
     availableDays: "Tue, Fri, Sun",
   },
-  {
-    id: "m-6",
-    name: "Rohan Kulkarni",
-    role: "Principal DevSecOps Architect",
-    company: "Palo Alto Networks",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80",
-    specializationTopic: "Application Security",
-    rating: 4.91,
-    matchScore: 91,
-    bio: "Zero Trust architecture, public-key verification algorithms, and container runtime threat analysis.",
-    availableDays: "Mon, Thu, Sat",
-  },
-  {
-    id: "m-7",
-    name: "Ananya Deshmukh",
-    role: "Staff SRE & Platform Architect",
-    company: "PhonePe",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80",
-    specializationTopic: "DevOps & Infrastructure",
-    rating: 4.89,
-    matchScore: 93,
-    bio: "Kubernetes orchestration, automated canary releases, Linux kernel cgroups, and Prometheus alerting.",
-    availableDays: "Tue, Thu, Sun",
-  },
-  {
-    id: "m-8",
-    name: "Karthik Subramanian",
-    role: "Principal UI Systems Engineer",
-    company: "Uber Engineering",
-    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80",
-    specializationTopic: "Frontend Architecture",
-    rating: 4.94,
-    matchScore: 95,
-    bio: "V8 memory models, React concurrency, micro-frontend federation, and high-FPS canvas rendering.",
-    availableDays: "Wed, Fri, Sat",
-  },
 ];
 
 interface ImprovementWeek {
@@ -429,9 +290,8 @@ const INTERNSHIP_CATALOG: Internship[] = [
   { id: "int-1", role: "Junior Software Engineer Intern", company: "Zomato / Blinkit", stipend: "₹35,000 / month", location: "Hybrid (Bengaluru)", minCutoff: 65, skillsNeeded: ["JavaScript", "REST APIs", "SQL"] },
   { id: "int-2", role: "Backend Systems Trainee", company: "Razorpay", stipend: "₹45,000 / month", location: "Bengaluru", minCutoff: 75, skillsNeeded: ["Node.js / Java", "Redis", "Distributed DB"] },
   { id: "int-3", role: "Full Stack Developer Associate", company: "Swiggy Labs", stipend: "₹40,000 / month", location: "Hyderabad", minCutoff: 70, skillsNeeded: ["React", "TypeScript", "Microservices"] },
-  { id: "int-4", role: "AI / Data Science Trainee", company: "Fractal Analytics", stipend: "₹32,000 / month", location: "Mumbai / Hybrid", minCutoff: 70, skillsNeeded: ["Python", "PyTorch", "Data Pipelines"] },
-  { id: "int-5", role: "Cloud & DevOps Apprentice", company: "Jio Platforms", stipend: "₹28,000 / month", location: "Hyderabad", minCutoff: 60, skillsNeeded: ["Docker", "Linux", "CI/CD"] },
-  { id: "int-6", role: "Core Embedded & VLSI Trainee", company: "Qualcomm / Texas Instruments", stipend: "₹50,000 / month", location: "Bengaluru", minCutoff: 80, skillsNeeded: ["Embedded C", "ARM", "Verilog"] },
+  { id: "int-4", role: "Cloud & DevOps Apprentice", company: "Jio Platforms", stipend: "₹28,000 / month", location: "Hyderabad", minCutoff: 60, skillsNeeded: ["Docker", "Linux", "CI/CD"] },
+  { id: "int-5", role: "Core Embedded & VLSI Trainee", company: "Qualcomm / Texas Instruments", stipend: "₹50,000 / month", location: "Bengaluru", minCutoff: 80, skillsNeeded: ["Embedded C", "ARM", "Verilog"] },
 ];
 
 function shuffle<T>(array: T[]): T[] {
@@ -446,8 +306,6 @@ function shuffle<T>(array: T[]): T[] {
 function StudentAssessmentEngine() {
   const { userEmail } = useAppState();
 
-  // Workflow Stages:
-  // 1. Domain -> 2. Guidelines -> 3. Testing -> 4. Result/Gaps -> 5. Mentor Hub -> 6. Placements
   const [assessmentStage, setAssessmentStage] = useState<
     "domain-selection" | "guidelines" | "testing" | "result-gaps" | "mentor-hub" | "placements"
   >("domain-selection");
@@ -459,7 +317,6 @@ function StudentAssessmentEngine() {
 
   const [activeTab, setActiveTab] = useState<"theory" | "debugging" | "coding" | "architecture">("theory");
 
-  // Questions and User Answers
   const [studentQuestions, setStudentQuestions] = useState<ProcessedQuestion[]>([]);
   const [theoryAnswers, setTheoryAnswers] = useState<Record<string, string>>({});
   const [currentTheoryIndex, setCurrentTheoryIndex] = useState(0);
@@ -469,7 +326,6 @@ function StudentAssessmentEngine() {
   const [code, setCode] = useState(CODING_DATA.placeholderTemplate);
   const [systemDesignAnswer, setSystemDesignAnswer] = useState<string | null>(null);
 
-  // Proctoring
   const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -482,7 +338,6 @@ function StudentAssessmentEngine() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastPixelData = useRef<Uint8ClampedArray | null>(null);
 
-  // Exact 7-Metric Result Record
   const [scoreReport, setScoreReport] = useState<{
     totalQuestions: number;
     attemptedQuestions: number;
@@ -500,12 +355,10 @@ function StudentAssessmentEngine() {
     topicGaps: { topic: string; correct: number; total: number; percentage: number; status: "Strong" | "Average" | "Needs Improvement" }[];
   } | null>(null);
 
-  // Mentorship Pipeline
   const [assignedMentor, setAssignedMentor] = useState<Mentor | null>(null);
   const [improvementPlan, setImprovementPlan] = useState<ImprovementWeek[]>([]);
   const [readinessScore, setReadinessScore] = useState(0);
 
-  // Dynamic Question Retrieval & Shuffling
   const handleProceedToGuidelines = async () => {
     if (!selectedDomain) return;
     setIsLoadingQuestions(true);
@@ -564,7 +417,7 @@ function StudentAssessmentEngine() {
       setTotalElapsed(0);
       setStrikes([]);
       setCurrentTheoryIndex(0);
-    } catch (err) {
+    } catch {
       setStudentQuestions(shuffle(MASTER_QUESTION_POOL));
     } finally {
       setIsLoadingQuestions(false);
@@ -572,7 +425,6 @@ function StudentAssessmentEngine() {
     }
   };
 
-  // Camera Activation
   useEffect(() => {
     if (assessmentStage !== "guidelines" && assessmentStage !== "testing") return;
     let stream: MediaStream | null = null;
@@ -592,7 +444,6 @@ function StudentAssessmentEngine() {
     return () => { stream?.getTracks().forEach((track) => track.stop()); };
   }, [assessmentStage]);
 
-  // Assessment Timer
   useEffect(() => {
     if (assessmentStage === "testing" && !isDisqualified) {
       timerRef.current = setInterval(() => setTotalElapsed((prev) => prev + 1), 1000);
@@ -602,7 +453,6 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Strike System
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
@@ -626,7 +476,6 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Vision Gaze & Hand Gesture Detection Loop
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -689,7 +538,6 @@ function StudentAssessmentEngine() {
     return () => clearInterval(visionInterval);
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  // Full Security & Focus Listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -714,11 +562,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  // -------------------------------------------------------------
-  // ACCURATE SCORING ENGINE (ZERO DEFAULT BIAS FIX)
-  // -------------------------------------------------------------
   const submitAssessmentAndEvaluate = async () => {
-    // Total Tasks = 20 Theory + 1 Bug + 1 Code + 1 Architecture = 23 Total Tasks
     const totalQuestions = (studentQuestions.length || 20) + 3;
     let attemptedQuestions = 0;
     let correctAnswers = 0;
@@ -726,7 +570,6 @@ function StudentAssessmentEngine() {
 
     const topicStats: Record<string, { correct: number; total: number }> = {};
 
-    // 1. Evaluate Theory Questions (Weight: 3 pts each = 60 pts max)
     studentQuestions.forEach((q) => {
       if (!topicStats[q.topic]) topicStats[q.topic] = { correct: 0, total: 0 };
       topicStats[q.topic].total += 1;
@@ -743,9 +586,8 @@ function StudentAssessmentEngine() {
       }
     });
 
-    const theoryPoints = correctAnswers * 3; // Max 60
+    const theoryPoints = correctAnswers * 3;
 
-    // 2. Evaluate Debugging Task (Weight: 15 pts max)
     let debugPoints = 0;
     if (debuggingAnswer !== null && debuggingAnswer !== undefined) {
       attemptedQuestions += 1;
@@ -757,10 +599,8 @@ function StudentAssessmentEngine() {
       }
     }
 
-    // 3. Evaluate Coding Task (Weight: 15 pts max)
     let codingPoints = 0;
     const cleanCode = code.replace(CODING_DATA.placeholderTemplate, "").trim();
-    // Only counts as attempted if student wrote more than 15 characters of real logic
     const isCodeAttempted = cleanCode.length > 15;
 
     if (isCodeAttempted) {
@@ -779,7 +619,6 @@ function StudentAssessmentEngine() {
       }
     }
 
-    // 4. Evaluate Architecture Task (Weight: 10 pts max)
     let archPoints = 0;
     if (systemDesignAnswer !== null && systemDesignAnswer !== undefined) {
       attemptedQuestions += 1;
@@ -792,8 +631,6 @@ function StudentAssessmentEngine() {
     }
 
     const unattemptedQuestions = totalQuestions - attemptedQuestions;
-
-    // STRICT SCORING: If attempted is 0, score is strictly 0. Never assign default 30.
     const rawScore = theoryPoints + debugPoints + codingPoints + archPoints;
     const finalScore = attemptedQuestions === 0 ? 0 : Math.min(100, rawScore);
     const finalPercentage = attemptedQuestions === 0 ? 0 : Math.round((finalScore / 100) * 100);
@@ -826,7 +663,6 @@ function StudentAssessmentEngine() {
       topicGaps,
     });
 
-    // 4-Week Guidance Plan
     const primaryWeakness = weakSkills[0] || "Memory Management";
     const secondaryWeakness = weakSkills[1] || "Databases & Indexing";
 
@@ -869,10 +705,8 @@ function StudentAssessmentEngine() {
       },
     ]);
 
-    // Initial readiness index based on actual score (0 if 0 attempted)
     setReadinessScore(attemptedQuestions === 0 ? 0 : Math.min(50, Math.round(finalScore * 0.5)));
 
-    // Save accurate score to Supabase
     try {
       const attemptedIds = studentQuestions.map((q) => q.id);
       await supabase.from("student_assessments").insert({
@@ -925,7 +759,7 @@ function StudentAssessmentEngine() {
       : DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain;
 
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION (ALL 36 DOMAINS + SEARCH + PILLS)
+  // VIEW 1: DOMAIN SELECTION
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
     const filteredDomains = DOMAIN_OPTIONS.filter((d) => {
@@ -940,7 +774,6 @@ function StudentAssessmentEngine() {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
         <div className="w-full max-w-6xl rounded-2xl border border-white/15 bg-slate-900/95 backdrop-blur-xl p-5 sm:p-8 shadow-2xl flex flex-col max-h-[92vh]">
-          {/* Top Row with 22-Language Selector */}
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold text-slate-400">Language Preference:</span>
             <LanguageSelector />
@@ -1251,7 +1084,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 4: ACTIVE 4-TIER ASSESSMENT (WITH FLOATING PiP VIDEO)
+  // VIEW 4: ACTIVE 4-TIER ASSESSMENT
   // -------------------------------------------------------------
   const activeQuestions = studentQuestions.length > 0 ? studentQuestions : MASTER_QUESTION_POOL;
   const currentQ = activeQuestions[currentTheoryIndex] || activeQuestions[0];
@@ -1740,10 +1573,7 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* ------------------------------------------------------------- */}
-          {/* PROMINENT REQUIRED SECTION: NEXT STEP -> MENTOR GUIDANCE      */}
-          {/* (NO IMMEDIATE PLACEMENTS DISPLAYED)                           */}
-          {/* ------------------------------------------------------------- */}
+          {/* PROMINENT NEXT STEP: MENTOR GUIDANCE FIRST */}
           <div className="p-6 sm:p-8 rounded-2xl border-2 border-cyan-500/50 bg-gradient-to-r from-blue-950/80 via-slate-900 to-cyan-950/80 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-2 text-center sm:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-bold">
