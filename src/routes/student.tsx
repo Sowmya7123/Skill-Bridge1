@@ -35,6 +35,8 @@ import {
   Target,
   CheckSquare,
   Square,
+  XCircle,
+  HelpCircle,
   Star,
   Calendar,
   ExternalLink,
@@ -153,6 +155,7 @@ const MASTER_QUESTION_POOL: ProcessedQuestion[] = [
 ];
 
 const DEBUGGING_SCENARIO = {
+  id: "dbg-1",
   title: "Production Incident: Memory Leak & Unhandled Promise in Webhook Handler",
   description: `A Node.js microservice handling high-volume payment webhooks crashes every 4 hours with:
 FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory.
@@ -182,34 +185,24 @@ app.post('/api/webhook', async (req, res) => {
 };
 
 const CODING_DATA = {
+  id: "code-1",
   title: "Optimized Target Pair Finder (Two-Sum)",
   expectedComplexity: "O(N) Linear Time",
   description: `Given an array of integers 'nums' and an integer 'target', return indices of the two numbers such that they add up to target.
 
 Requirements:
 - Your solution must run in O(N) time complexity using a single traversal with a Hash Map.
-- Brute-force nested loops O(N^2) will be penalized in the efficiency score.
+- Brute-force nested loops O(N^2) will receive reduced marks.
 - Must cleanly handle edge cases.`,
-  initialCode: `function twoSum(nums, target) {
-  // Write your O(N) optimized solution here
-  const map = new Map();
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-    if (map.has(complement)) {
-      return [map.get(complement), i];
-    }
-    map.set(nums[i], i);
-  }
-  return [];
-}`,
+  placeholderTemplate: `function twoSum(nums, target) {\n  // Implement O(N) Hash Map solution here\n}`,
   testCases: [
     { input: "[2, 7, 11, 15], target = 9", expected: "[0, 1]" },
     { input: "[3, 2, 4], target = 6", expected: "[1, 2]" },
-    { input: "[3, 3], target = 6", expected: "[0, 1]" },
   ],
 };
 
 const SYSTEM_DESIGN_SCENARIO = {
+  id: "arch-1",
   title: "Tier 4: Architecture Tradeoff - Live Leaderboard at Scale",
   scenario: `Your platform needs to support a real-time leaderboard for 5 million active users during a nationwide campus hiring drive. The system must support:
 - Top 100 ranking queries with sub-50ms latency.
@@ -226,7 +219,7 @@ Which architecture tradeoff offers the optimal scalability and lowest write late
 };
 
 // -------------------------------------------------------------
-// 3. TARGETED ACTION GUIDES, CAPSTONES & MENTORS
+// 3. TARGETED ACTION GUIDES, CAPSTONES & PLATFORM MENTORS
 // -------------------------------------------------------------
 const TOPIC_ACTION_GUIDES: Record<string, { actionSteps: string[]; recommendedProjectTitle: string; projectDetails: string }> = {
   "Memory Management": {
@@ -311,7 +304,6 @@ interface Mentor {
   avatar: string;
   specializationTopic: string;
   rating: number;
-  activeMentees: number;
   matchScore: number;
   bio: string;
   availableDays: string;
@@ -326,7 +318,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "Memory Management",
     rating: 4.9,
-    activeMentees: 28,
     matchScore: 97,
     bio: "Specializes in high-throughput node runtime bottlenecks, heap dump telemetry, and async execution frames.",
     availableDays: "Tue, Thu, Sat (Evening)",
@@ -339,7 +330,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "Databases & Indexing",
     rating: 4.95,
-    activeMentees: 34,
     matchScore: 94,
     bio: "Authority on PostgreSQL query planning, LSM storage trees, partition scaling, and transaction isolation.",
     availableDays: "Mon, Wed, Fri",
@@ -352,7 +342,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "Distributed Systems",
     rating: 4.88,
-    activeMentees: 19,
     matchScore: 92,
     bio: "Deep expertise in consistent hashing, distributed consensus, Redis SkipLists, and event bus infrastructure.",
     availableDays: "Sat, Sun (Afternoon)",
@@ -365,7 +354,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "Protocols & Web APIs",
     rating: 4.92,
-    activeMentees: 22,
     matchScore: 90,
     bio: "Specialist in idempotent payments infrastructure, HTTP/2 multiplexing, and NGINX reverse-proxy clusters.",
     availableDays: "Wed, Thu, Sat",
@@ -378,7 +366,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "Data Structures & Big-O",
     rating: 4.96,
-    activeMentees: 45,
     matchScore: 96,
     bio: "Focuses on linear algorithmic restructuring, priority heap optimization, and cache-locality data layout.",
     availableDays: "Tue, Fri, Sun",
@@ -391,7 +378,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "Application Security",
     rating: 4.91,
-    activeMentees: 20,
     matchScore: 91,
     bio: "Zero Trust architecture, public-key verification algorithms, and container runtime threat analysis.",
     availableDays: "Mon, Thu, Sat",
@@ -404,7 +390,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "DevOps & Infrastructure",
     rating: 4.89,
-    activeMentees: 26,
     matchScore: 93,
     bio: "Kubernetes orchestration, automated canary releases, Linux kernel cgroups, and Prometheus alerting.",
     availableDays: "Tue, Thu, Sun",
@@ -417,7 +402,6 @@ const PLATFORM_MENTORS: Mentor[] = [
     avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80",
     specializationTopic: "Frontend Architecture",
     rating: 4.94,
-    activeMentees: 38,
     matchScore: 95,
     bio: "V8 memory models, React concurrency, micro-frontend federation, and high-FPS canvas rendering.",
     availableDays: "Wed, Fri, Sat",
@@ -475,54 +459,51 @@ function StudentAssessmentEngine() {
 
   const [activeTab, setActiveTab] = useState<"theory" | "debugging" | "coding" | "architecture">("theory");
 
-  // Questions and Real Answers
+  // Questions and User Answers
   const [studentQuestions, setStudentQuestions] = useState<ProcessedQuestion[]>([]);
   const [theoryAnswers, setTheoryAnswers] = useState<Record<string, string>>({});
   const [currentTheoryIndex, setCurrentTheoryIndex] = useState(0);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
-  // Other Tiers States
   const [debuggingAnswer, setDebuggingAnswer] = useState<string | null>(null);
-  const [code, setCode] = useState(CODING_DATA.initialCode);
+  const [code, setCode] = useState(CODING_DATA.placeholderTemplate);
   const [systemDesignAnswer, setSystemDesignAnswer] = useState<string | null>(null);
 
-  // Proctoring & Anti-Cheat
+  // Proctoring
   const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [strikes, setStrikes] = useState<string[]>([]);
   const [isDisqualified, setIsDisqualified] = useState(false);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
-
-  // Vision Gaze & Hand Gesture Tracking States
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gazeStatus, setGazeStatus] = useState<"Center" | "Looking Left" | "Looking Right" | "Looking Down">("Center");
   const [handGestureDetected, setHandGestureDetected] = useState(false);
-  const gazeOffscreenCount = useRef(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastPixelData = useRef<Uint8ClampedArray | null>(null);
 
-  // Evaluation & Gaps
-  const [evaluation, setEvaluation] = useState<{
-    totalMeritScore: number;
+  // Exact 7-Metric Result Record
+  const [scoreReport, setScoreReport] = useState<{
+    totalQuestions: number;
+    attemptedQuestions: number;
+    unattemptedQuestions: number;
+    correctAnswers: number;
+    wrongAnswers: number;
+    score: number;
+    percentage: number;
     theoryScore: number;
     debuggingScore: number;
     codingScore: number;
     designScore: number;
-    speedScore: number;
-    trustScore: number;
-    detectedComplexity: string;
-    competencyBadge: string;
     strongSkills: string[];
     weakSkills: string[];
     topicGaps: { topic: string; correct: number; total: number; percentage: number; status: "Strong" | "Average" | "Needs Improvement" }[];
   } | null>(null);
 
-  // Mentor & Improvement Plan Gating
+  // Mentorship Pipeline
   const [assignedMentor, setAssignedMentor] = useState<Mentor | null>(null);
-  const [mentorSessionBooked, setMentorSessionBooked] = useState(false);
   const [improvementPlan, setImprovementPlan] = useState<ImprovementWeek[]>([]);
-  const [readinessScore, setReadinessScore] = useState(35); // Increases as student checks off milestones
+  const [readinessScore, setReadinessScore] = useState(0);
 
   // Dynamic Question Retrieval & Shuffling
   const handleProceedToGuidelines = async () => {
@@ -572,16 +553,13 @@ function StudentAssessmentEngine() {
           return { id: letter, text: opt.text };
         });
 
-        return {
-          ...q,
-          options: mappedOptions,
-          correctAnswer: newCorrectLetter,
-        };
+        return { ...q, options: mappedOptions, correctAnswer: newCorrectLetter };
       });
 
       setStudentQuestions(shuffled);
       setTheoryAnswers({});
       setDebuggingAnswer(null);
+      setCode(CODING_DATA.placeholderTemplate);
       setSystemDesignAnswer(null);
       setTotalElapsed(0);
       setStrikes([]);
@@ -608,7 +586,7 @@ function StudentAssessmentEngine() {
       })
       .catch(() => {
         setCameraStatus("denied");
-        toast.error("Camera Required", { description: "Camera access is compulsory for verification." });
+        toast.error("Camera Required", { description: "Webcam access is mandatory for proctored testing." });
       });
 
     return () => { stream?.getTracks().forEach((track) => track.stop()); };
@@ -617,9 +595,7 @@ function StudentAssessmentEngine() {
   // Assessment Timer
   useEffect(() => {
     if (assessmentStage === "testing" && !isDisqualified) {
-      timerRef.current = setInterval(() => {
-        setTotalElapsed((prev) => prev + 1);
-      }, 1000);
+      timerRef.current = setInterval(() => setTotalElapsed((prev) => prev + 1), 1000);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -635,14 +611,14 @@ function StudentAssessmentEngine() {
       setStrikes((prev) => {
         const next = [...prev, logEntry];
         if (next.length === 1) {
-          setActiveAlert("Strike 1/2: Integrity Violation Logged. 1 chance remaining!");
-          toast.warning("Warning 1/2: Rule Violated!", { description: reason });
+          setActiveAlert("Strike 1/2: Policy Infraction Recorded. 1 chance remaining!");
+          toast.warning("Warning 1/2: Integrity Violation!", { description: reason });
         } else if (next.length === 2) {
           setActiveAlert("CRITICAL WARNING 2/2: Next violation will terminate your test!");
           toast.error("Critical Strike 2/2!", { description: `${reason}. Final notice!` });
         } else if (next.length >= 3) {
           setIsDisqualified(true);
-          toast.error("Assessment Revoked!", { description: "Maximum policy infractions reached." });
+          toast.error("Assessment Revoked!", { description: "Maximum infractions reached." });
         }
         return next;
       });
@@ -650,7 +626,7 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Real-Time Eye Gaze & Hand Gesture Detection Loop
+  // Vision Gaze & Hand Gesture Detection Loop
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -677,10 +653,7 @@ function StudentAssessmentEngine() {
       for (let y = 0; y < 120; y++) {
         for (let x = 0; x < 160; x++) {
           const idx = (y * 160 + x) * 4;
-          const r = data[idx];
-          const g = data[idx + 1];
-          const b = data[idx + 2];
-          const brightness = (r + g + b) / 3;
+          const brightness = (data[idx] + data[idx + 1] + data[idx + 2]) / 3;
 
           if (x < 50 && brightness > 80) leftWeight += brightness;
           if (x > 110 && brightness > 80) rightWeight += brightness;
@@ -703,19 +676,13 @@ function StudentAssessmentEngine() {
       setGazeStatus(detectedGaze);
 
       if (detectedGaze !== "Center") {
-        gazeOffscreenCount.current += 1;
-        if (gazeOffscreenCount.current >= 4) {
-          registerStrike(`Frequent Eye-Gaze Drift (${detectedGaze})`);
-          gazeOffscreenCount.current = 0;
-        }
-      } else {
-        gazeOffscreenCount.current = Math.max(0, gazeOffscreenCount.current - 1);
+        registerStrike(`Frequent Eye-Gaze Drift (${detectedGaze})`);
       }
 
       if (motionDiffCount > 3500) {
         setHandGestureDetected(true);
         setTimeout(() => setHandGestureDetected(false), 2000);
-        registerStrike("Suspicious Hand Movement / Occlusion Detected");
+        registerStrike("Suspicious Hand Movement / Face Occlusion Detected");
       }
     }, 1200);
 
@@ -748,77 +715,118 @@ function StudentAssessmentEngine() {
   }, [assessmentStage, isDisqualified, registerStrike]);
 
   // -------------------------------------------------------------
-  // CALCULATE SCORE & INITIALIZE MENTOR IMPROVEMENT PLAN
+  // ACCURATE SCORING ENGINE (ZERO DEFAULT BIAS FIX)
   // -------------------------------------------------------------
   const submitAssessmentAndEvaluate = async () => {
-    const topicStats: Record<string, { correct: number; total: number }> = {};
-    let correctTheoryCount = 0;
+    // Total Tasks = 20 Theory + 1 Bug + 1 Code + 1 Architecture = 23 Total Tasks
+    const totalQuestions = (studentQuestions.length || 20) + 3;
+    let attemptedQuestions = 0;
+    let correctAnswers = 0;
+    let wrongAnswers = 0;
 
+    const topicStats: Record<string, { correct: number; total: number }> = {};
+
+    // 1. Evaluate Theory Questions (Weight: 3 pts each = 60 pts max)
     studentQuestions.forEach((q) => {
       if (!topicStats[q.topic]) topicStats[q.topic] = { correct: 0, total: 0 };
       topicStats[q.topic].total += 1;
 
-      if (theoryAnswers[q.id] === q.correctAnswer) {
-        correctTheoryCount += 1;
-        topicStats[q.topic].correct += 1;
+      const userChoice = theoryAnswers[q.id];
+      if (userChoice) {
+        attemptedQuestions += 1;
+        if (userChoice === q.correctAnswer) {
+          correctAnswers += 1;
+          topicStats[q.topic].correct += 1;
+        } else {
+          wrongAnswers += 1;
+        }
       }
     });
 
-    const totalCount = studentQuestions.length || 20;
-    const theoryScore = Math.round((correctTheoryCount / totalCount) * 35);
-    const debuggingScore = debuggingAnswer === DEBUGGING_SCENARIO.correctAnswer ? 20 : 0;
+    const theoryPoints = correctAnswers * 3; // Max 60
 
-    const hasNestedLoop = /for\s*\(.*for\s*\(|while\s*\(.*while\s*\(/.test(code);
-    const hasHashMap = /Map|Set|complement|diff/.test(code);
-    let codingScore = 25;
-    let detectedComplexity = "O(N) - Linear Time (Hash Map)";
-
-    if (hasNestedLoop) {
-      codingScore = 10;
-      detectedComplexity = "O(N^2) - Brute Force";
-    } else if (!hasHashMap) {
-      codingScore = 16;
-      detectedComplexity = "O(N log N) - Sorting / Two Pointers";
+    // 2. Evaluate Debugging Task (Weight: 15 pts max)
+    let debugPoints = 0;
+    if (debuggingAnswer !== null && debuggingAnswer !== undefined) {
+      attemptedQuestions += 1;
+      if (debuggingAnswer === DEBUGGING_SCENARIO.correctAnswer) {
+        correctAnswers += 1;
+        debugPoints = 15;
+      } else {
+        wrongAnswers += 1;
+      }
     }
 
-    const designScore = systemDesignAnswer === SYSTEM_DESIGN_SCENARIO.correctAnswer ? 15 : 0;
-    const speedScore = totalElapsed <= 720 ? 5 : totalElapsed <= 1000 ? 3 : 1;
+    // 3. Evaluate Coding Task (Weight: 15 pts max)
+    let codingPoints = 0;
+    const cleanCode = code.replace(CODING_DATA.placeholderTemplate, "").trim();
+    // Only counts as attempted if student wrote more than 15 characters of real logic
+    const isCodeAttempted = cleanCode.length > 15;
 
-    const totalMeritScore = theoryScore + debuggingScore + codingScore + designScore + speedScore;
-    const trustScore = Math.max(0, 100 - strikes.length * 20);
+    if (isCodeAttempted) {
+      attemptedQuestions += 1;
+      const hasOptimalMap = /Map|Set|complement|diff/i.test(cleanCode);
+      const hasBruteForce = /for\s*\(.*for\s*\(|while\s*\(.*while\s*\(/i.test(cleanCode);
 
-    let competencyBadge = "Gold Certified (Ready-to-Hire)";
-    if (totalMeritScore < 60) competencyBadge = "Bronze Assessed (Needs Mentor Guidance)";
-    else if (totalMeritScore < 80) competencyBadge = "Silver Verified (Job-Ready)";
+      if (hasOptimalMap && !hasBruteForce) {
+        correctAnswers += 1;
+        codingPoints = 15;
+      } else if (!hasBruteForce && cleanCode.length > 25) {
+        codingPoints = 8;
+        wrongAnswers += 1;
+      } else {
+        wrongAnswers += 1;
+      }
+    }
+
+    // 4. Evaluate Architecture Task (Weight: 10 pts max)
+    let archPoints = 0;
+    if (systemDesignAnswer !== null && systemDesignAnswer !== undefined) {
+      attemptedQuestions += 1;
+      if (systemDesignAnswer === SYSTEM_DESIGN_SCENARIO.correctAnswer) {
+        correctAnswers += 1;
+        archPoints = 10;
+      } else {
+        wrongAnswers += 1;
+      }
+    }
+
+    const unattemptedQuestions = totalQuestions - attemptedQuestions;
+
+    // STRICT SCORING: If attempted is 0, score is strictly 0. Never assign default 30.
+    const rawScore = theoryPoints + debugPoints + codingPoints + archPoints;
+    const finalScore = attemptedQuestions === 0 ? 0 : Math.min(100, rawScore);
+    const finalPercentage = attemptedQuestions === 0 ? 0 : Math.round((finalScore / 100) * 100);
 
     const topicGaps = Object.entries(topicStats).map(([topic, stat]) => {
-      const percentage = Math.round((stat.correct / stat.total) * 100);
+      const percentage = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : 0;
       let status: "Strong" | "Average" | "Needs Improvement" = "Needs Improvement";
       if (percentage >= 75) status = "Strong";
       else if (percentage >= 50) status = "Average";
-
       return { topic, correct: stat.correct, total: stat.total, percentage, status };
     });
 
     const strongSkills = topicGaps.filter((t) => t.status === "Strong").map((t) => t.topic);
     const weakSkills = topicGaps.filter((t) => t.status !== "Strong").map((t) => t.topic);
 
-    setEvaluation({
-      totalMeritScore,
-      theoryScore,
-      debuggingScore,
-      codingScore,
-      designScore,
-      speedScore,
-      trustScore,
-      detectedComplexity,
-      competencyBadge,
-      strongSkills: strongSkills.length > 0 ? strongSkills : ["Algorithmic Foundation"],
-      weakSkills: weakSkills.length > 0 ? weakSkills : ["Memory Management", "Distributed Architecture"],
+    setScoreReport({
+      totalQuestions,
+      attemptedQuestions,
+      unattemptedQuestions,
+      correctAnswers,
+      wrongAnswers,
+      score: finalScore,
+      percentage: finalPercentage,
+      theoryScore: theoryPoints,
+      debuggingScore: debugPoints,
+      codingScore: codingPoints,
+      designScore: archPoints,
+      strongSkills: strongSkills.length > 0 ? strongSkills : ["None verified"],
+      weakSkills: weakSkills.length > 0 ? weakSkills : ["Fundamental Core Deficits"],
       topicGaps,
     });
 
-    // Generate tailored 4-week guidance curriculum based on weak topics
+    // 4-Week Guidance Plan
     const primaryWeakness = weakSkills[0] || "Memory Management";
     const secondaryWeakness = weakSkills[1] || "Databases & Indexing";
 
@@ -838,7 +846,7 @@ function StudentAssessmentEngine() {
         focusTopic: secondaryWeakness,
         milestones: [
           { id: "m-2-1", text: `Solve 4 intermediate verification problems on ${secondaryWeakness}`, done: false },
-          { id: "m-2-2", text: "Submit pull request for defensive code review to mentor desk", done: false },
+          { id: "m-2-2", text: "Submit pull request for code review to mentor desk", done: false },
         ],
       },
       {
@@ -861,17 +869,20 @@ function StudentAssessmentEngine() {
       },
     ]);
 
-    // Save baseline score to Supabase
+    // Initial readiness index based on actual score (0 if 0 attempted)
+    setReadinessScore(attemptedQuestions === 0 ? 0 : Math.min(50, Math.round(finalScore * 0.5)));
+
+    // Save accurate score to Supabase
     try {
       const attemptedIds = studentQuestions.map((q) => q.id);
       await supabase.from("student_assessments").insert({
         student_email: userEmail || "student@institution.ac.in",
         role_id: selectedDomain === "custom-domain" ? "fullstack-web" : selectedDomain,
-        total_score: totalMeritScore,
-        logic_score: theoryScore + codingScore,
-        speed_score: speedScore,
-        trust_score: trustScore,
-        competency_badge: competencyBadge,
+        total_score: finalScore,
+        logic_score: theoryPoints + codingPoints,
+        speed_score: 0,
+        trust_score: Math.max(0, 100 - strikes.length * 20),
+        competency_badge: finalScore >= 80 ? "Gold Certified" : finalScore >= 60 ? "Silver Verified" : "Bronze Assessed",
         time_elapsed_seconds: totalElapsed,
         strikes_count: strikes.length,
         attempted_question_ids: attemptedIds,
@@ -880,11 +891,10 @@ function StudentAssessmentEngine() {
       console.error("Scorecard sync error:", err);
     }
 
-    toast.success("Assessment Complete! Review your Diagnostic Gap Analysis.");
+    toast.success("Assessment Complete! Review your Diagnostic Report.");
     setAssessmentStage("result-gaps");
   };
 
-  // Toggle milestone completion & recalculate readiness score
   const toggleMilestone = (weekIdx: number, milestoneId: string) => {
     setImprovementPlan((prev) => {
       const updated = prev.map((week, idx) => {
@@ -897,23 +907,17 @@ function StudentAssessmentEngine() {
 
       const allMilestones = updated.flatMap((w) => w.milestones);
       const completedCount = allMilestones.filter((m) => m.done).length;
-      const basePercentage = 35;
-      const progressBonus = Math.round((completedCount / allMilestones.length) * 65);
-      const newScore = Math.min(100, basePercentage + progressBonus);
-      setReadinessScore(newScore);
+      const progressPercent = Math.round((completedCount / allMilestones.length) * 100);
+      setReadinessScore(progressPercent);
 
-      if (newScore >= 75) {
+      if (progressPercent >= 75) {
         toast.success("Placement Threshold Reached! Placements Board Unlocked 🎉");
       }
       return updated;
     });
   };
 
-  const formatTime = (secs: number) => {
-    const mins = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${mins}m ${s < 10 ? "0" : ""}${s}s`;
-  };
+  const formatTime = (secs: number) => `${Math.floor(secs / 60)}m ${secs % 60 < 10 ? "0" : ""}${secs % 60}s`;
 
   const activeDomainTitle =
     selectedDomain === "custom-domain"
@@ -950,7 +954,7 @@ function StudentAssessmentEngine() {
               Choose Your Engineering Specialization
             </h1>
             <p className="text-xs text-blue-200/70 mt-1">
-              Select your targeted domain. Each student receives an anti-collision randomized question set.
+              Assessment scoring strictly awards marks for correct answers. Unattempted questions award 0 marks.
             </p>
 
             <div className="mt-3 relative max-w-lg mx-auto">
@@ -1146,12 +1150,15 @@ function StudentAssessmentEngine() {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 my-6">
             <div className="md:col-span-7 space-y-4 text-xs text-slate-300">
-              <div className="p-3.5 rounded-xl border border-amber-400/20 bg-amber-500/10 text-amber-200">
+              <div className="p-3.5 rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-200">
                 <span className="font-bold flex items-center gap-1.5 mb-1">
-                  <ShieldAlert className="size-4 text-amber-400" />
-                  Live Proctoring & Eye Gaze Monitoring Active
+                  <ShieldAlert className="size-4 text-blue-400" />
+                  Absolute Merit Scoring Engine
                 </span>
-                Camera video will float on your screen throughout the exam. Eye gaze drifts away from screen or hand gestures covering face will trigger strikes.
+                • Correct Answer = Marks Awarded<br />
+                • Wrong Answer = 0 Marks<br />
+                • Unattempted Question = 0 Marks<br />
+                • 0 Attempted Questions = 0/100 (0%)
               </div>
 
               <div className="space-y-2">
@@ -1337,7 +1344,7 @@ function StudentAssessmentEngine() {
               onClick={submitAssessmentAndEvaluate}
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-4 shadow-sm"
             >
-              Submit & Analyze
+              Submit All & View Scorecard
             </Button>
           </div>
         </header>
@@ -1455,7 +1462,7 @@ function StudentAssessmentEngine() {
             <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-2">
-                  Tier 2 • Real-World Incident Bug Triage (20 Pts)
+                  Tier 2 • Real-World Incident Bug Triage (15 Pts)
                 </span>
                 <h2 className="text-lg font-bold text-white mb-2">{DEBUGGING_SCENARIO.title}</h2>
                 <p className="text-xs text-slate-300 whitespace-pre-line mb-4 leading-relaxed">
@@ -1502,7 +1509,7 @@ function StudentAssessmentEngine() {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                      Target: O(N) Efficiency
+                      Target: O(N) Efficiency (15 Pts)
                     </span>
                   </div>
 
@@ -1535,7 +1542,7 @@ function StudentAssessmentEngine() {
                     <Terminal className="size-3.5 text-blue-400" />
                     <span>solution.js</span>
                   </div>
-                  <span className="text-[11px] text-slate-500">Complexity Evaluation Engine Active</span>
+                  <span className="text-[11px] text-slate-500">Unattempted code earns 0 marks</span>
                 </div>
 
                 <textarea
@@ -1560,7 +1567,7 @@ function StudentAssessmentEngine() {
             <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-purple-400 block mb-2">
-                  Tier 4 • Architecture & Scale Tradeoffs (15 Pts)
+                  Tier 4 • Architecture & Scale Tradeoffs (10 Pts)
                 </span>
                 <h2 className="text-lg font-bold text-white mb-2">{SYSTEM_DESIGN_SCENARIO.title}</h2>
                 <p className="text-xs text-slate-300 whitespace-pre-line mb-6 leading-relaxed">
@@ -1601,9 +1608,9 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: SKILL ANALYSIS RESULT PAGE (NO IMMEDIATE PLACEMENTS)
+  // VIEW 5: SKILL ANALYSIS RESULT (STRICT 7-METRIC ACCURACY)
   // -------------------------------------------------------------
-  if (assessmentStage === "result-gaps" && evaluation) {
+  if (assessmentStage === "result-gaps" && scoreReport) {
     return (
       <div className="min-h-screen bg-[#071224] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
         <div className="w-full max-w-5xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl space-y-8">
@@ -1622,39 +1629,35 @@ function StudentAssessmentEngine() {
             <LanguageSelector />
           </div>
 
-          {/* Overall Skill Score Header Card */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
-              <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
-                Overall Skill Score
-              </span>
-              <div className="text-4xl font-extrabold text-white mt-1">
-                {evaluation.totalMeritScore}
-                <span className="text-lg font-medium text-blue-200/70">/100</span>
-              </div>
-              <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                {evaluation.competencyBadge}
-              </span>
+          {/* EXACT 7 REQUIRED ASSESSMENT RESULT METRICS */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 text-center">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Questions</span>
+              <div className="text-xl font-black text-white mt-1">{scoreReport.totalQuestions}</div>
             </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Completion Pace</span>
-                <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
-              </div>
-              <p className="text-[11px] text-blue-200/70 mt-2">
-                Pace Score: +{evaluation.speedScore} / 5 pts
-              </p>
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-blue-500/30 text-center">
+              <span className="text-[10px] text-blue-300 font-bold uppercase block">Attempted</span>
+              <div className="text-xl font-black text-blue-400 mt-1">{scoreReport.attemptedQuestions}</div>
             </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
-                <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
-              </div>
-              <p className="text-[11px] text-blue-200/70 mt-2">
-                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} strikes logged`}
-              </p>
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-amber-500/30 text-center">
+              <span className="text-[10px] text-amber-300 font-bold uppercase block">Unattempted</span>
+              <div className="text-xl font-black text-amber-400 mt-1">{scoreReport.unattemptedQuestions}</div>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-center">
+              <span className="text-[10px] text-emerald-300 font-bold uppercase block">Correct</span>
+              <div className="text-xl font-black text-emerald-400 mt-1">{scoreReport.correctAnswers}</div>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-rose-500/30 text-center">
+              <span className="text-[10px] text-rose-300 font-bold uppercase block">Wrong</span>
+              <div className="text-xl font-black text-rose-400 mt-1">{scoreReport.wrongAnswers}</div>
+            </div>
+            <div className="p-3.5 rounded-xl bg-blue-600/20 border border-blue-400/40 text-center">
+              <span className="text-[10px] text-blue-200 font-bold uppercase block">Score</span>
+              <div className="text-xl font-black text-white mt-1">{scoreReport.score}/100</div>
+            </div>
+            <div className="p-3.5 rounded-xl bg-indigo-600/20 border border-indigo-400/40 text-center">
+              <span className="text-[10px] text-indigo-200 font-bold uppercase block">Percentage</span>
+              <div className="text-xl font-black text-white mt-1">{scoreReport.percentage}%</div>
             </div>
           </div>
 
@@ -1665,7 +1668,7 @@ function StudentAssessmentEngine() {
                 <Check className="size-4" /> Strong Skills Identified
               </span>
               <div className="flex flex-wrap gap-2 pt-1">
-                {evaluation.strongSkills.map((s) => (
+                {scoreReport.strongSkills.map((s) => (
                   <span key={s} className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-xs font-semibold">
                     {s}
                   </span>
@@ -1678,7 +1681,7 @@ function StudentAssessmentEngine() {
                 <AlertTriangle className="size-4" /> Weak / Missing Skills (Identified Gaps)
               </span>
               <div className="flex flex-wrap gap-2 pt-1">
-                {evaluation.weakSkills.map((w) => (
+                {scoreReport.weakSkills.map((w) => (
                   <span key={w} className="px-3 py-1 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/30 text-xs font-semibold">
                     {w}
                   </span>
@@ -1698,7 +1701,7 @@ function StudentAssessmentEngine() {
             </p>
 
             <div className="space-y-3">
-              {evaluation.topicGaps.map((item) => (
+              {scoreReport.topicGaps.map((item) => (
                 <div
                   key={item.topic}
                   className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
@@ -1750,7 +1753,7 @@ function StudentAssessmentEngine() {
                 Your Next Step: Get Guidance From a Mentor
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-                Your skill analysis identified specific gaps in <strong className="text-rose-400">{evaluation.weakSkills.join(", ")}</strong>. To maximize your hiring outcome, these deficits can be resolved with direct 1:1 mentor guidance and a structured milestone plan before unlocking competitive campus placements.
+                The identified skill gaps can be improved with mentor guidance before applying for placements. Connect with a specialized industry architect to close these deficits through a personalized action plan.
               </p>
             </div>
 
@@ -1769,10 +1772,10 @@ function StudentAssessmentEngine() {
   // -------------------------------------------------------------
   // VIEW 6: MENTOR RECOMMENDATION & PERSONALIZED IMPROVEMENT PLAN
   // -------------------------------------------------------------
-  if (assessmentStage === "mentor-hub" && evaluation) {
-    const primaryWeakness = evaluation.weakSkills[0] || "Memory Management";
+  if (assessmentStage === "mentor-hub" && scoreReport) {
+    const primaryWeakness = scoreReport.weakSkills[0] || "Memory Management";
     const recommendedMentors = PLATFORM_MENTORS.filter(
-      (m) => m.specializationTopic === primaryWeakness || evaluation.weakSkills.includes(m.specializationTopic)
+      (m) => m.specializationTopic === primaryWeakness || scoreReport.weakSkills.includes(m.specializationTopic)
     );
 
     return (
@@ -1782,7 +1785,7 @@ function StudentAssessmentEngine() {
             <div>
               <span className="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">Step 3 of 5 • Mentorship Matching</span>
               <h1 className="text-2xl sm:text-3xl font-black text-white mt-0.5">Matched Industry Mentors</h1>
-              <p className="text-xs text-slate-400">Curated based on your test deficit in: <strong className="text-rose-400">{primaryWeakness}</strong></p>
+              <p className="text-xs text-slate-400">Targeting your verified deficits in: <strong className="text-rose-400">{primaryWeakness}</strong></p>
             </div>
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-right">
@@ -1806,14 +1809,14 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* MENTOR CARDS SECTION */}
+          {/* Mentor Cards Section */}
           <div className="space-y-4">
             <h3 className="text-base font-bold text-white flex items-center gap-2">
               <UserCheck className="size-5 text-cyan-400" /> Platform Mentors Specialized in Your Gaps
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(recommendedMentors.length > 0 ? recommendedMentors : PLATFORM_MENTORS.slice(0, 3)).map((m) => {
+              {(recommendedMentors.length > 0 ? recommendedMentors : PLATFORM_MENTORS).slice(0, 3).map((m) => {
                 const isSelected = assignedMentor?.id === m.id;
                 return (
                   <div
@@ -1835,7 +1838,7 @@ function StudentAssessmentEngine() {
 
                       <div className="space-y-1.5 text-[11px] text-slate-300 p-3 rounded-xl bg-black/40 border border-white/10 mb-4">
                         <div className="flex justify-between"><span className="text-slate-400">Match Accuracy:</span> <strong className="text-emerald-400">{m.matchScore}%</strong></div>
-                        <div className="flex justify-between"><span className="text-slate-400">Specialization:</span> <strong className="text-cyan-300">{m.specializationTopic}</strong></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Target Deficit:</span> <strong className="text-cyan-300">{m.specializationTopic}</strong></div>
                         <div className="flex justify-between"><span className="text-slate-400">Availability:</span> <span>{m.availableDays}</span></div>
                       </div>
                       <p className="text-[11px] text-slate-400 leading-relaxed mb-4">{m.bio}</p>
@@ -1844,7 +1847,6 @@ function StudentAssessmentEngine() {
                     <Button
                       onClick={() => {
                         setAssignedMentor(m);
-                        setMentorSessionBooked(true);
                         toast.success(`Connected with ${m.name}! Your 4-Week Guidance Plan is activated.`);
                       }}
                       className={cn(
@@ -1852,7 +1854,7 @@ function StudentAssessmentEngine() {
                         isSelected ? "bg-emerald-600 text-white" : "bg-cyan-600 hover:bg-cyan-700 text-white"
                       )}
                     >
-                      {isSelected ? "Active Mentor Assigned" : "Select & Connect Mentor"}
+                      {isSelected ? "Active Mentor Assigned" : "Select & Connect"}
                     </Button>
                   </div>
                 );
@@ -1860,7 +1862,7 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* PERSONALIZED IMPROVEMENT PLAN & PROGRESS TRACKER */}
+          {/* Personalized Improvement Plan & Progress Tracker */}
           <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
@@ -1931,14 +1933,14 @@ function StudentAssessmentEngine() {
   // -------------------------------------------------------------
   // VIEW 7: PLACEMENTS BOARD (UNLOCKED ONLY AFTER MENTOR READINESS)
   // -------------------------------------------------------------
-  if (assessmentStage === "placements" && evaluation) {
+  if (assessmentStage === "placements" && scoreReport) {
     return (
       <div className="min-h-screen bg-[#071224] text-white p-6 sm:p-10 font-sans">
         <div className="w-full max-w-5xl mx-auto space-y-6">
           <div className="p-6 rounded-2xl border border-emerald-500/30 bg-slate-900/90 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-1">
-                <Unlock className="size-4" /> Mentor-Endorsed Readiness: {readinessScore}%
+                <Unlock className="size-4" /> Mentor Verified Readiness: {readinessScore}%
               </span>
               <h1 className="text-2xl sm:text-3xl font-black text-white">Active Corporate Placement Tracks</h1>
               <p className="text-xs text-slate-400 mt-1">Unlocked after successfully completing skill remediation and mentor milestones.</p>
