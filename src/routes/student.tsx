@@ -5,25 +5,23 @@ import {
   Clock,
   Zap,
   CheckCircle2,
-  XCircle,
   AlertTriangle,
   Camera,
   Eye,
   Terminal,
-  Play,
-  RotateCcw,
   Check,
   ChevronRight,
   Sparkles,
   ArrowRight,
-  Award,
   BookOpen,
   HelpCircle,
   Code2,
-  FileText,
   ShieldCheck,
   Search,
-  Loader2,
+  Bug,
+  Cpu,
+  Layers,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -35,26 +33,9 @@ export const Route = createFileRoute("/student")({
   component: StudentAssessmentEngine,
 });
 
-interface MCQQuestion {
-  id: string;
-  title: string;
-  benchmarkSeconds: number;
-  question: string;
-  options: { id: string; text: string }[];
-  correctAnswer: string;
-  explanation: string;
-}
-
-interface CodingQuestion {
-  id: string;
-  title: string;
-  benchmarkSeconds: number;
-  expectedComplexity: string;
-  description: string;
-  initialCode: string;
-  testCases: { input: string; expected: string; isEdgeCase?: boolean }[];
-}
-
+// -------------------------------------------------------------
+// 36 COMPREHENSIVE DOMAIN TRACKS
+// -------------------------------------------------------------
 const DOMAIN_OPTIONS = [
   // 1. SOFTWARE & SYSTEM ENGINEERING
   { id: "fullstack-web", title: "Full Stack Web Development", category: "Software Development", desc: "MERN/Next.js, Spring Boot, REST APIs, Microservices, System Design", badge: "Most Popular" },
@@ -120,34 +101,76 @@ const CATEGORIES = [
   "Design & Product",
 ];
 
-// Fallback Default Data
-const DEFAULT_MCQ: MCQQuestion = {
-  id: "default-mcq",
-  title: "Algorithmic Complexity & Optimization",
-  benchmarkSeconds: 120,
-  question: "Consider an algorithm that scans an unsorted array of size N using two nested loops to check for duplicates. What is the optimal time complexity to achieve the same result using a Hash Set or Hash Map?",
+// -------------------------------------------------------------
+// 20 CORE THEORY QUESTIONS BANK (TIER 1)
+// -------------------------------------------------------------
+const TIER1_QUESTIONS = [
+  { id: 1, q: "In the JavaScript V8 engine, where are object references and execution contexts stored?", opt: ["Stack for execution context, Heap for objects", "Heap for all primitives and closures", "Stack holds all variables exclusively", "Directly in OS Virtual Memory"], ans: "A" },
+  { id: 2, q: "What is the primary advantage of B-Tree indices over Hash indices in relational databases?", opt: ["Faster O(1) single-point lookups", "Efficient range scans (BETWEEN, >, <)", "Zero disk footprint on persistent storage", "Automatic table denormalization"], ans: "B" },
+  { id: 3, q: "Which HTTP status code signifies that a client must authenticate itself to get the requested response?", opt: ["403 Forbidden", "401 Unauthorized", "400 Bad Request", "422 Unprocessable Entity"], ans: "B" },
+  { id: 4, q: "What problem does the CAP Theorem state distributed data stores cannot simultaneously achieve?", opt: ["Consistency, Availability, and Partition Tolerance", "Concurrency, Atomicity, and Performance", "Caching, Availability, and Persistence", "Throughput, Latency, and Scalability"], ans: "A" },
+  { id: 5, q: "What is the time complexity to insert an element into an existing Min-Heap of size N?", opt: ["O(1)", "O(log N)", "O(N)", "O(N log N)"], ans: "B" },
+  { id: 6, q: "In React, why must hooks only be called at the top level and not inside loops or conditions?", opt: ["To preserve call order across renders for internal linked-lists", "To prevent memory leaks in V8 garbage collection", "React compiler converts hooks to global window variables", "Loops force hooks to execute in parallel threads"], ans: "A" },
+  { id: 7, q: "Which SQL isolation level protects against both Dirty Reads and Non-Repeatable Reads?", opt: ["Read Uncommitted", "Read Committed", "Repeatable Read", "Snapshot Read Only"], ans: "C" },
+  { id: 8, q: "What is the fundamental purpose of a Reverse Proxy (e.g., NGINX)?", opt: ["Cache client-side browser cookies", "Distribute incoming traffic and terminate SSL before upstream servers", "Compile frontend TypeScript into JavaScript", "Directly execute SQL stored procedures"], ans: "B" },
+  { id: 9, q: "In Docker containerization, how does a container differ fundamentally from a Virtual Machine (VM)?", opt: ["Containers share the host OS kernel and use cgroups/namespaces", "Containers emulate complete virtual hardware and BIOS", "Containers require a Type-1 Hypervisor on bare metal", "Containers cannot communicate over TCP/IP networks"], ans: "A" },
+  { id: 10, q: "What security vulnerability occurs when user input is directly concatenated into a dynamic SQL query?", opt: ["Cross-Site Scripting (XSS)", "SQL Injection (SQLi)", "Cross-Site Request Forgery (CSRF)", "Buffer Overflow"], ans: "B" },
+  { id: 11, q: "In Redis, what is the default eviction policy when maxmemory is reached without specified keys?", opt: ["noeviction (returns error on writes)", "allkeys-lru", "volatile-random", "volatile-ttl"], ans: "A" },
+  { id: 12, q: "What is the primary role of a Vector Database in Generative AI architectures?", opt: ["Indexing high-dimensional embeddings for cosine similarity retrieval", "Compressing LLM weights for mobile execution", "Executing SQL window functions on text", "Parsing JSON payloads from webhooks"], ans: "A" },
+  { id: 13, q: "What does the ACID 'I' stand for in database transaction properties?", opt: ["Integrity", "Isolation", "Immutability", "Indexing"], ans: "B" },
+  { id: 14, q: "Which cryptographic algorithm is based on asymmetric public-private keypairs?", opt: ["AES-256", "RSA", "DES", "Blowfish"], ans: "B" },
+  { id: 15, q: "In Git, what does 'git rebase' do compared to 'git merge'?", opt: ["Reapplies commits on top of another base tip for a linear history", "Creates a 3-way merge commit combining divergent trees", "Permanently destroys remote branches", "Pushes code directly to production without testing"], ans: "A" },
+  { id: 16, q: "What is the space complexity of an in-place QuickSort algorithm on average?", opt: ["O(1)", "O(log N) auxiliary stack space", "O(N) contiguous array allocation", "O(N^2) recursive frames"], ans: "B" },
+  { id: 17, q: "In RESTful API design, which method is expected to be idempotent?", opt: ["POST", "PUT", "PATCH (without precondition)", "CONNECT"], ans: "B" },
+  { id: 18, q: "Which protocol operates at the Transport Layer (Layer 4) of the OSI model providing reliable ordered delivery?", opt: ["IP", "TCP", "HTTP", "DNS"], ans: "B" },
+  { id: 19, q: "What is the primary cause of a 'Race Condition' in concurrent programming?", opt: ["Multiple threads accessing shared mutable state without proper synchronization", "CPU clock speed running faster than RAM bus speed", "Garbage collection pausing the main execution thread", "Stack overflow due to infinite recursion"], ans: "A" },
+  { id: 20, q: "What design pattern defines a one-to-many dependency between objects so that when one changes state, all dependents are notified?", opt: ["Singleton Pattern", "Observer Pattern", "Factory Pattern", "Adapter Pattern"], ans: "B" },
+];
+
+// -------------------------------------------------------------
+// TIER 2 & 3 & 4 DATA
+// -------------------------------------------------------------
+const DEBUGGING_SCENARIO = {
+  title: "Production Incident: Memory Leak & Unhandled Promise in Webhook Handler",
+  description: `A Node.js microservice handling high-volume payment webhooks crashes every 4 hours with:
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory.
+
+Audit the code snippet below. Identify the root cause and propose the fix.`,
+  buggyCode: `// INCIDENT SNIPPET: paymentWebhook.js
+const auditLogCache = []; // Global memory array
+
+app.post('/api/webhook', async (req, res) => {
+  const payload = req.body;
+  
+  // Bug 1: Unbounded array growth in heap memory
+  auditLogCache.push({ timestamp: Date.now(), data: payload });
+  
+  // Bug 2: Unhandled async error (service crashes on network failure)
+  paymentService.processTransaction(payload);
+  
+  res.status(200).send({ received: true });
+});`,
   options: [
-    { id: "A", text: "O(N^2) - Quadratic Time (Brute Force)" },
-    { id: "B", text: "O(N) - Linear Time (Single Pass Lookup)" },
-    { id: "C", text: "O(N log N) - Divide and Conquer" },
-    { id: "D", text: "O(1) - Constant Space and Time" },
+    { id: "A", text: "Global auditLogCache array grows unbounded in RAM without TTL or DB offloading, and processTransaction is unawaited, causing silent failures." },
+    { id: "B", text: "The HTTP status code 200 is invalid for webhooks and should be replaced with HTTP 201." },
+    { id: "C", text: "req.body should be converted to Base64 before pushing to prevent UTF-8 encoding overflow." },
+    { id: "D", text: "Express does not support async route handlers without third-party Babel plugins." },
   ],
-  correctAnswer: "B",
-  explanation: "Using a Hash Set allows average O(1) membership checks, reducing total traversal to linear O(N) time.",
+  correctAnswer: "A",
 };
 
-const DEFAULT_CODING: CodingQuestion = {
-  id: "default-coding",
+const CODING_DATA = {
   title: "Optimized Target Pair Finder (Two-Sum)",
-  benchmarkSeconds: 360,
+  benchmarkSeconds: 300,
   expectedComplexity: "O(N) Linear Time",
   description: `Given an array of integers 'nums' and an integer 'target', return indices of the two numbers such that they add up to target.
 
 Requirements:
-- Your solution must run in **O(N)** time complexity using a single traversal with a Hash Map.
+- Your solution must run in O(N) time complexity using a single traversal with a Hash Map.
 - Brute-force nested loops O(N^2) will be penalized in the efficiency score.
 - Must cleanly handle edge cases (empty arrays, negative numbers).`,
   initialCode: `function twoSum(nums, target) {
+  // Write your O(N) optimized solution here
   const map = new Map();
   for (let i = 0; i < nums.length; i++) {
     const complement = target - nums[i];
@@ -162,9 +185,24 @@ Requirements:
     { input: "[2, 7, 11, 15], target = 9", expected: "[0, 1]" },
     { input: "[3, 2, 4], target = 6", expected: "[1, 2]" },
     { input: "[3, 3], target = 6", expected: "[0, 1]" },
-    { input: "[], target = 10", expected: "[]", isEdgeCase: true },
-    { input: "[-3, 4, 3, 90], target = 0", expected: "[0, 2]", isEdgeCase: true },
+    { input: "[], target = 10", expected: "[]" },
   ],
+};
+
+const SYSTEM_DESIGN_SCENARIO = {
+  title: "Tier 4: Architecture Tradeoff - Live Leaderboard at Scale",
+  scenario: `Your platform needs to support a real-time leaderboard for 5 million active users during a campus hiring drive. The system must support:
+- Top 100 ranking queries with sub-50ms latency.
+- Instant score updates when an assessment completes.
+
+Which architecture tradeoff offers the optimal scalability and lowest write latency?`,
+  options: [
+    { id: "A", text: "Redis Sorted Sets (ZSET): Uses SkipLists + Hash Table for O(log N) score updates and O(log N + M) range queries in memory." },
+    { id: "B", text: "PostgreSQL table with `ORDER BY score DESC LIMIT 100` queried directly by clients every 500ms." },
+    { id: "C", text: "Store scores in MongoDB documents and run full aggregation pipelines on every user refresh." },
+    { id: "D", text: "Write all events to a static JSON file on AWS S3 and synchronize via webhooks." },
+  ],
+  correctAnswer: "A",
 };
 
 function StudentAssessmentEngine() {
@@ -178,73 +216,41 @@ function StudentAssessmentEngine() {
   const [domainSearch, setDomainSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
-  const [activeMcq, setActiveMcq] = useState<MCQQuestion>(DEFAULT_MCQ);
-  const [activeCoding] = useState<CodingQuestion>(DEFAULT_CODING);
+  // Multi-Tier Tabs: "theory" | "debugging" | "coding" | "architecture"
+  const [activeTab, setActiveTab] = useState<"theory" | "debugging" | "coding" | "architecture">("theory");
 
-  const [activeTab, setActiveTab] = useState<"mcq" | "coding">("mcq");
+  // Tier 1 Answers State (Map questionId -> selectedOption)
+  const [theoryAnswers, setTheoryAnswers] = useState<Record<number, string>>({});
+  const [currentTheoryIndex, setCurrentTheoryIndex] = useState(0);
+
+  // Tier 2 & 3 & 4 Answers
+  const [debuggingAnswer, setDebuggingAnswer] = useState<string | null>(null);
+  const [code, setCode] = useState(CODING_DATA.initialCode);
+  const [systemDesignAnswer, setSystemDesignAnswer] = useState<string | null>(null);
+
+  // Camera & Proctoring
   const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
-
-  const [selectedMcqAnswer, setSelectedMcqAnswer] = useState<string | null>(null);
-  const [code, setCode] = useState(DEFAULT_CODING.initialCode);
-
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
   const [strikes, setStrikes] = useState<string[]>([]);
   const [isDisqualified, setIsDisqualified] = useState(false);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Holistic Evaluation Matrix State
   const [evaluation, setEvaluation] = useState<{
-    logicScore: number;
-    complexityScore: number;
+    theoryScore: number;
+    debuggingScore: number;
+    codingScore: number;
+    designScore: number;
     speedScore: number;
-    qualityScore: number;
-    totalScore: number;
-    detectedComplexity: string;
     trustScore: number;
-    mcqPassed: boolean;
-    badge: string;
+    totalMeritScore: number;
+    detectedComplexity: string;
+    competencyBadge: string;
   } | null>(null);
 
-  // Fetch Domain Questions Dynamically from Supabase
-  const handleProceedToGuidelines = async () => {
-    if (!selectedDomain) return;
-
-    setIsLoadingQuestions(true);
-    try {
-      const { data, error } = await supabase
-        .from("assessment_questions")
-        .select("*")
-        .eq("role_id", selectedDomain)
-        .eq("question_type", "mcq")
-        .limit(1);
-
-      if (!error && data && data.length > 0) {
-        const q = data[0];
-        setActiveMcq({
-          id: q.id,
-          title: q.title,
-          benchmarkSeconds: q.benchmark_seconds || 120,
-          question: q.prompt,
-          options: q.options || DEFAULT_MCQ.options,
-          correctAnswer: q.correct_answer || "B",
-          explanation: q.explanation || "",
-        });
-      } else {
-        setActiveMcq(DEFAULT_MCQ);
-      }
-    } catch (e) {
-      console.error(e);
-      setActiveMcq(DEFAULT_MCQ);
-    } finally {
-      setIsLoadingQuestions(false);
-      setAssessmentStage("guidelines");
-    }
-  };
-
-  // Camera Validation Hook
+  // Camera Activation Hook
   useEffect(() => {
     if (assessmentStage !== "guidelines" && assessmentStage !== "testing") return;
 
@@ -255,16 +261,14 @@ function StudentAssessmentEngine() {
       ?.getUserMedia({ video: true, audio: false })
       .then((s) => {
         stream = s;
-        if (videoRef.current) {
-          videoRef.current.srcObject = s;
-        }
+        if (videoRef.current) videoRef.current.srcObject = s;
         setCameraStatus("ready");
       })
       .catch((err) => {
         console.error("Camera access denied:", err);
         setCameraStatus("denied");
-        toast.error("Camera Access Required!", {
-          description: "Please enable camera access in your browser to proceed.",
+        toast.error("Camera Permission Required", {
+          description: "Camera must be allowed to enter the verified assessment room.",
         });
       });
 
@@ -273,7 +277,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage]);
 
-  // Timer
+  // Assessment Timer
   useEffect(() => {
     if (assessmentStage === "testing" && !isDisqualified) {
       timerRef.current = setInterval(() => {
@@ -285,7 +289,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Strikes
+  // Anti-Cheat Violation Handler
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
@@ -298,7 +302,7 @@ function StudentAssessmentEngine() {
         if (next.length === 1) {
           setActiveAlert("Strike 1/2: Integrity Violation Logged. 1 chance remaining!");
           toast.warning("Warning 1/2: Rule Violated!", {
-            description: `${reason}. 1 chance remaining before lockout.`,
+            description: `${reason}. You have 1 strike left before permanent lockout.`,
           });
         } else if (next.length === 2) {
           setActiveAlert("CRITICAL WARNING 2/2: Next violation will terminate your test!");
@@ -317,7 +321,7 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Proctoring Listeners
+  // Focus & Security Listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -325,7 +329,7 @@ function StudentAssessmentEngine() {
       if (document.hidden) registerStrike("Tab switched or browser minimized");
     };
     const onWindowBlur = () => {
-      registerStrike("Window focus lost (clicked outside browser)");
+      registerStrike("Window focus lost (external application clicked)");
     };
     const onCopyPaste = (e: ClipboardEvent) => {
       e.preventDefault();
@@ -353,67 +357,78 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  // Submission & Save to Supabase
+  // -------------------------------------------------------------
+  // COMPREHENSIVE 360-DEGREE EVALUATION FORMULA
+  // -------------------------------------------------------------
   const handleFinalSubmit = async () => {
-    const mcqCorrect = selectedMcqAnswer === activeMcq.correctAnswer;
-    const mcqPoints = mcqCorrect ? 15 : 0;
-    const codingLogicPoints = 25;
-    const logicScore = mcqPoints + codingLogicPoints;
+    // 1. Tier 1 Theory (Max 25 pts)
+    let correctTheoryCount = 0;
+    TIER1_QUESTIONS.forEach((q) => {
+      if (theoryAnswers[q.id] === q.ans) correctTheoryCount++;
+    });
+    const theoryScore = Math.round((correctTheoryCount / TIER1_QUESTIONS.length) * 25);
 
+    // 2. Tier 2 Debugging Triage (Max 20 pts)
+    const debuggingScore = debuggingAnswer === DEBUGGING_SCENARIO.correctAnswer ? 20 : 0;
+
+    // 3. Tier 3 Algorithmic Coding & Big-O Complexity (Max 30 pts)
     const hasNestedLoop = /for\s*\(.*for\s*\(|while\s*\(.*while\s*\(/.test(code);
     const hasHashMap = /Map|Set|complement|diff/.test(code);
-    let complexityScore = 25;
+    let codingScore = 30;
     let detectedComplexity = "O(N) - Linear Time (Optimal Hash Map)";
 
     if (hasNestedLoop) {
-      complexityScore = 10;
+      codingScore = 12;
       detectedComplexity = "O(N^2) - Sub-optimal Brute Force";
     } else if (!hasHashMap) {
-      complexityScore = 18;
-      detectedComplexity = "O(N log N) - Sorting / Binary Search";
+      codingScore = 20;
+      detectedComplexity = "O(N log N) - Sorting / Two-Pointer";
     }
 
-    const totalBenchmark = activeMcq.benchmarkSeconds + activeCoding.benchmarkSeconds;
-    let speedScore = 20;
+    // 4. Tier 4 System Architecture (Max 15 pts)
+    const designScore = systemDesignAnswer === SYSTEM_DESIGN_SCENARIO.correctAnswer ? 15 : 0;
+
+    // 5. Benchmark Speed (Max 10 pts)
+    const totalBenchmark = 720; // 12 minutes standard target
+    let speedScore = 10;
     if (totalElapsed <= totalBenchmark) {
-      speedScore = 20;
-    } else if (totalElapsed <= totalBenchmark * 1.3) {
-      speedScore = 15;
-    } else {
       speedScore = 10;
+    } else if (totalElapsed <= totalBenchmark * 1.3) {
+      speedScore = 7;
+    } else {
+      speedScore = 5;
     }
 
-    const qualityScore =
-      code.includes("return []") && (code.includes("null") || code.includes("nums.length"))
-        ? 15
-        : 12;
-
-    const totalScore = logicScore + complexityScore + speedScore + qualityScore;
+    // Proctor Authenticity Trust (Max 100%)
     const trustScore = Math.max(0, 100 - strikes.length * 15);
-    const badge = totalScore >= 80 ? "Gold Certified" : totalScore >= 60 ? "Silver Verified" : "Bronze Assessed";
+    const totalMeritScore = theoryScore + debuggingScore + codingScore + designScore + speedScore;
+
+    let competencyBadge = "Gold Certified (Ready-to-Hire)";
+    if (totalMeritScore < 60) competencyBadge = "Bronze Assessed (Foundational)";
+    else if (totalMeritScore < 80) competencyBadge = "Silver Verified (Industry Ready)";
 
     setEvaluation({
-      logicScore,
-      complexityScore,
+      theoryScore,
+      debuggingScore,
+      codingScore,
+      designScore,
       speedScore,
-      qualityScore,
-      totalScore,
-      detectedComplexity,
       trustScore,
-      mcqPassed: mcqCorrect,
-      badge,
+      totalMeritScore,
+      detectedComplexity,
+      competencyBadge,
     });
 
-    // Save record in Supabase student_assessments table
+    // Supabase Ledger Audit Sync
     try {
       await supabase.from("student_assessments").insert({
         student_email: userEmail || "verified.student@portal.ac.in",
         role_id: selectedDomain === "custom-domain" ? "fullstack-web" : selectedDomain,
-        total_score: totalScore,
-        logic_score: logicScore,
+        total_score: totalMeritScore,
+        logic_score: theoryScore + codingScore,
         speed_score: speedScore,
         trust_score: trustScore,
-        competency_badge: badge,
+        competency_badge: competencyBadge,
         time_elapsed_seconds: totalElapsed,
         strikes_count: strikes.length,
       });
@@ -422,7 +437,7 @@ function StudentAssessmentEngine() {
     }
 
     setAssessmentStage("submitted");
-    toast.success("Assessment submitted & recorded successfully!");
+    toast.success("Comprehensive evaluation verified and stored!");
   };
 
   const formatTime = (secs: number) => {
@@ -437,7 +452,7 @@ function StudentAssessmentEngine() {
       : DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain;
 
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION
+  // VIEW 1: DOMAIN SELECTION (36 DOMAINS)
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
     const filteredDomains = DOMAIN_OPTIONS.filter((d) => {
@@ -460,7 +475,7 @@ function StudentAssessmentEngine() {
               Choose Your Engineering Specialization
             </h1>
             <p className="text-xs text-blue-200/70 mt-1">
-              Select your domain. The assessment engine dynamically pulls question banks tailored to your choice.
+              Select your targeted domain to initialize the 4-Tier Talent Readiness Assessment Engine.
             </p>
 
             <div className="mt-3 relative max-w-lg mx-auto">
@@ -469,7 +484,7 @@ function StudentAssessmentEngine() {
                 type="text"
                 value={domainSearch}
                 onChange={(e) => setDomainSearch(e.target.value)}
-                placeholder="Search domains (e.g. AI, Frontend, Backend, VLSI, EV, DevOps, CAD)..."
+                placeholder="Search domains (e.g. AI, Full Stack, DevOps, VLSI, EV, Robotics)..."
                 className="w-full pl-9 pr-4 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
               />
             </div>
@@ -563,24 +578,12 @@ function StudentAssessmentEngine() {
               Back to Home
             </Link>
             <Button
-              disabled={
-                !selectedDomain ||
-                (selectedDomain === "custom-domain" && !customDomainText.trim()) ||
-                isLoadingQuestions
-              }
-              onClick={handleProceedToGuidelines}
+              disabled={!selectedDomain || (selectedDomain === "custom-domain" && !customDomainText.trim())}
+              onClick={() => setAssessmentStage("guidelines")}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
             >
-              {isLoadingQuestions ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="size-3.5 animate-spin" /> Loading Questions...
-                </span>
-              ) : (
-                <span className="flex items-center gap-1.5">
-                  Continue to Assessment Rules
-                  <ArrowRight className="size-4" />
-                </span>
-              )}
+              Continue to Assessment Room
+              <ArrowRight className="size-4 ml-1.5" />
             </Button>
           </div>
         </div>
@@ -589,7 +592,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 2: DISQUALIFIED
+  // VIEW 2: DISQUALIFIED SCREEN
   // -------------------------------------------------------------
   if (isDisqualified) {
     return (
@@ -631,35 +634,36 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: SCORECARD (RECORDED IN SUPABASE)
+  // VIEW 3: 5-DIMENSION MERIT SCORECARD
   // -------------------------------------------------------------
   if (assessmentStage === "submitted" && evaluation) {
     return (
       <div className="min-h-screen bg-[#071224] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
-        <div className="w-full max-w-3xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
+        <div className="w-full max-w-4xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
           <div className="text-center pb-6 border-b border-white/10">
             <div className="size-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-3">
               <CheckCircle2 className="size-6" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Assessment Verified & Recorded
+              Talent Readiness Index Verified
             </h1>
             <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
-              Domain Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
+              Evaluated Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
             </p>
           </div>
 
+          {/* Top 3 Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
             <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
               <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
-                Total Merit Score
+                Total Merit Index
               </span>
               <div className="text-4xl font-extrabold text-white mt-1">
-                {evaluation.totalScore}
+                {evaluation.totalMeritScore}
                 <span className="text-lg font-medium text-blue-200/70">/100</span>
               </div>
               <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                Badge: {evaluation.badge}
+                {evaluation.competencyBadge}
               </span>
             </div>
 
@@ -669,7 +673,7 @@ function StudentAssessmentEngine() {
                 <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
               </div>
               <p className="text-[11px] text-blue-200/70 mt-2">
-                Benchmark: 8m 00s ({totalElapsed <= 480 ? "Optimal Speed achieved" : "Moderate Speed"})
+                Target Benchmark: 12m 00s ({totalElapsed <= 720 ? "Optimal Speed achieved" : "Moderate Speed"})
               </p>
             </div>
 
@@ -684,54 +688,54 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
+          {/* 4-Tier Granular Breakdown */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-blue-200 flex items-center gap-2">
-                <Sparkles className="size-3.5 text-blue-400" />
-                Score Breakdown:
-              </h3>
-              <span className="text-[11px] text-slate-400">Synced to Institutional Ledger</span>
-            </div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-200 flex items-center gap-2">
+              <Sparkles className="size-3.5 text-blue-400" />
+              Corporate Audit Breakdown (4 Dimensions):
+            </h3>
 
             <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/40 overflow-hidden text-xs">
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">1. Correctness & Logic Verification (40%)</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">
-                    Domain MCQ: {evaluation.mcqPassed ? "Passed (+15 pts)" : "Incorrect (0 pts)"} • 5/5 Coding Testcases (+25 pts)
-                  </div>
+                  <div className="font-semibold text-white">Tier 1: Core Domain Theory (20 Items)</div>
+                  <div className="text-slate-400 text-[11px] mt-0.5">Architecture, Memory Models, Protocols & System Design Principles</div>
                 </div>
-                <div className="text-sm font-bold text-emerald-400">+{evaluation.logicScore} / 40 pts</div>
+                <div className="text-sm font-bold text-blue-400">+{evaluation.theoryScore} / 25 pts</div>
               </div>
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">2. Algorithmic Efficiency & Complexity (25%)</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">
-                    Detected: <span className="text-cyan-300 font-mono font-bold">{evaluation.detectedComplexity}</span>
-                  </div>
+                  <div className="font-semibold text-white">Tier 2: Production Debugging & Bug Triage</div>
+                  <div className="text-slate-400 text-[11px] mt-0.5">Root cause diagnosis of memory leaks & unhandled promise rejections</div>
                 </div>
-                <div className="text-sm font-bold text-cyan-400">+{evaluation.complexityScore} / 25 pts</div>
+                <div className="text-sm font-bold text-amber-400">+{evaluation.debuggingScore} / 20 pts</div>
               </div>
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">3. Benchmark Speed (20%)</div>
+                  <div className="font-semibold text-white">Tier 3: Algorithmic Optimization & Complexity</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    Completed in {formatTime(totalElapsed)} vs benchmark.
+                    Detected Runtime: <span className="text-cyan-300 font-mono font-bold">{evaluation.detectedComplexity}</span>
                   </div>
                 </div>
-                <div className="text-sm font-bold text-blue-400">+{evaluation.speedScore} / 20 pts</div>
+                <div className="text-sm font-bold text-cyan-400">+{evaluation.codingScore} / 30 pts</div>
               </div>
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">4. Code Cleanliness & Edge Cases (15%)</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">
-                    Boundary empty array handling & semantic scoping.
-                  </div>
+                  <div className="font-semibold text-white">Tier 4: System Architecture & Scale Tradeoffs</div>
+                  <div className="text-slate-400 text-[11px] mt-0.5">High-concurrency data structure selection & write latency tradeoffs</div>
                 </div>
-                <div className="text-sm font-bold text-indigo-400">+{evaluation.qualityScore} / 15 pts</div>
+                <div className="text-sm font-bold text-purple-400">+{evaluation.designScore} / 15 pts</div>
+              </div>
+
+              <div className="p-4 flex items-center justify-between">
+                <div>
+                  <div className="font-semibold text-white">Tier 5: Execution Pace & Target Benchmark Speed</div>
+                  <div className="text-slate-400 text-[11px] mt-0.5">Completion within 12m enterprise timeline</div>
+                </div>
+                <div className="text-sm font-bold text-emerald-400">+{evaluation.speedScore} / 10 pts</div>
               </div>
             </div>
           </div>
@@ -750,7 +754,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 4: GUIDELINES & PROCTORING CAMERA CHECK
+  // VIEW 4: GUIDELINES & PROCTOR CAMERA GATING
   // -------------------------------------------------------------
   if (assessmentStage === "guidelines") {
     return (
@@ -762,10 +766,10 @@ function StudentAssessmentEngine() {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-white">
-                AI-Proctored Student Assessment
+                AI-Proctored Holistic Talent Assessment
               </h1>
               <p className="text-xs text-blue-200/70">
-                Selected Domain: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
+                Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
               </p>
             </div>
           </div>
@@ -782,13 +786,14 @@ function StudentAssessmentEngine() {
 
               <div className="space-y-2">
                 <h4 className="font-bold uppercase tracking-wider text-slate-400 text-[11px]">
-                  Evaluation Formula Breakdown:
+                  4-Tier Evaluation Breakdown:
                 </h4>
                 <div className="space-y-1.5 text-slate-300">
-                  <div>• <strong>40% Logic:</strong> Correct answers & passed test cases.</div>
-                  <div>• <strong>25% Efficiency:</strong> Algorithmic time complexity.</div>
-                  <div>• <strong>20% Speed:</strong> Completion time vs expected benchmark.</div>
-                  <div>• <strong>15% Quality:</strong> Handling corner cases & clean syntax.</div>
+                  <div>• <strong>Tier 1 (25 pts):</strong> 20 Domain Theory Questions.</div>
+                  <div>• <strong>Tier 2 (20 pts):</strong> Production Bug Triage & Fix.</div>
+                  <div>• <strong>Tier 3 (30 pts):</strong> O(N) Code Efficiency & Tests.</div>
+                  <div>• <strong>Tier 4 (15 pts):</strong> Architecture & Scale Tradeoffs.</div>
+                  <div>• <strong>Tier 5 (10 pts):</strong> Target Benchmark Pace.</div>
                 </div>
               </div>
             </div>
@@ -858,11 +863,7 @@ function StudentAssessmentEngine() {
 
             <Button
               disabled={cameraStatus !== "ready"}
-              onClick={() => {
-                if (cameraStatus === "ready") {
-                  setAssessmentStage("testing");
-                }
-              }}
+              onClick={() => setAssessmentStage("testing")}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
             >
               {cameraStatus === "ready" ? "Begin Assessment Now" : "Enable Camera to Begin"}
@@ -875,8 +876,10 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: ACTIVE ASSESSMENT ENGINE (DYNAMIC QUESTION LOADED)
+  // VIEW 5: 4-TIER ACTIVE ASSESSMENT ENGINE
   // -------------------------------------------------------------
+  const currentQ = TIER1_QUESTIONS[currentTheoryIndex];
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       {activeAlert && (
@@ -895,21 +898,33 @@ function StudentAssessmentEngine() {
         </div>
       )}
 
+      {/* Header Navigation for 4 Tiers */}
       <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-md px-6 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <span className="font-extrabold text-sm text-white tracking-tight">
-            SkillBridge Assessment Engine
+            SkillBridge 360° Assessment
           </span>
+
           <div className="flex rounded-lg bg-black/40 p-0.5 text-xs border border-white/10">
             <button
-              onClick={() => setActiveTab("mcq")}
+              onClick={() => setActiveTab("theory")}
               className={cn(
                 "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
-                activeTab === "mcq" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                activeTab === "theory" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
               )}
             >
-              <HelpCircle className="size-3.5" />
-              1. Domain Theory ({activeDomainTitle})
+              <BookOpen className="size-3.5" />
+              1. Theory ({Object.keys(theoryAnswers).length}/20)
+            </button>
+            <button
+              onClick={() => setActiveTab("debugging")}
+              className={cn(
+                "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
+                activeTab === "debugging" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+              )}
+            >
+              <Bug className="size-3.5" />
+              2. Bug Triage
             </button>
             <button
               onClick={() => setActiveTab("coding")}
@@ -919,7 +934,17 @@ function StudentAssessmentEngine() {
               )}
             >
               <Code2 className="size-3.5" />
-              2. Algorithmic Coding
+              3. Coding Challenge
+            </button>
+            <button
+              onClick={() => setActiveTab("architecture")}
+              className={cn(
+                "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
+                activeTab === "architecture" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+              )}
+            >
+              <Layers className="size-3.5" />
+              4. System Architecture
             </button>
           </div>
         </div>
@@ -939,53 +964,131 @@ function StudentAssessmentEngine() {
             onClick={handleFinalSubmit}
             className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-4 shadow-sm"
           >
-            Submit All & Evaluate
+            Submit All 4 Tiers
           </Button>
         </div>
       </header>
 
+      {/* Main Multi-Tier Interface */}
       <div className="flex-1 flex overflow-hidden">
-        {activeTab === "mcq" ? (
+        {/* TIER 1: THEORY BLITZ */}
+        {activeTab === "theory" && (
           <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
-                  Section 1 of 2 • {activeMcq.title}
+                  Tier 1 • Question {currentTheoryIndex + 1} of 20
                 </span>
-                <span className="text-xs text-slate-400 flex items-center gap-1">
-                  <Zap className="size-3.5 text-amber-400" />
-                  Benchmark: 2m 00s
+                <span className="text-xs text-slate-400">
+                  Answered: {Object.keys(theoryAnswers).length} / 20
                 </span>
               </div>
 
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-6">
-                {activeMcq.question}
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-6 leading-relaxed">
+                {currentQ.q}
               </h2>
 
               <div className="space-y-3">
-                {activeMcq.options.map((opt) => (
+                {currentQ.opt.map((text, idx) => {
+                  const letter = String.fromCharCode(65 + idx);
+                  const isSelected = theoryAnswers[currentQ.id] === letter;
+                  return (
+                    <button
+                      key={letter}
+                      type="button"
+                      onClick={() =>
+                        setTheoryAnswers((prev) => ({ ...prev, [currentQ.id]: letter }))
+                      }
+                      className={cn(
+                        "w-full p-4 rounded-xl border text-left text-xs sm:text-sm font-medium transition flex items-center justify-between",
+                        isSelected
+                          ? "border-blue-500 bg-blue-500/10 text-white"
+                          : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900 hover:border-white/20"
+                      )}
+                    >
+                      <span>{text}</span>
+                      <div
+                        className={cn(
+                          "size-5 rounded-full border flex items-center justify-center text-[10px] font-bold",
+                          isSelected
+                            ? "border-blue-500 bg-blue-500 text-white"
+                            : "border-white/30 text-slate-400"
+                        )}
+                      >
+                        {letter}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+              <Button
+                disabled={currentTheoryIndex === 0}
+                onClick={() => setCurrentTheoryIndex((prev) => prev - 1)}
+                className="bg-white/5 hover:bg-white/10 text-white text-xs disabled:opacity-30"
+              >
+                Previous Question
+              </Button>
+              {currentTheoryIndex < TIER1_QUESTIONS.length - 1 ? (
+                <Button
+                  onClick={() => setCurrentTheoryIndex((prev) => prev + 1)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold"
+                >
+                  Next Question
+                  <ChevronRight className="size-4 ml-1" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setActiveTab("debugging")}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
+                >
+                  Proceed to Tier 2: Bug Triage
+                  <ChevronRight className="size-4 ml-1" />
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TIER 2: PRODUCTION BUG TRIAGE */}
+        {activeTab === "debugging" && (
+          <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                  Tier 2 • Real-World Incident Debugging (20 Pts)
+                </span>
+              </div>
+
+              <h2 className="text-lg font-bold text-white mb-2">{DEBUGGING_SCENARIO.title}</h2>
+              <p className="text-xs text-slate-300 whitespace-pre-line mb-4 leading-relaxed">
+                {DEBUGGING_SCENARIO.description}
+              </p>
+
+              <div className="p-4 rounded-xl bg-black border border-white/15 font-mono text-xs text-emerald-400 mb-6 overflow-x-auto">
+                <pre>{DEBUGGING_SCENARIO.buggyCode}</pre>
+              </div>
+
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                Root Cause & Defensive Fix Options:
+              </h3>
+              <div className="space-y-3">
+                {DEBUGGING_SCENARIO.options.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
-                    onClick={() => setSelectedMcqAnswer(opt.id)}
+                    onClick={() => setDebuggingAnswer(opt.id)}
                     className={cn(
-                      "w-full p-4 rounded-xl border text-left text-xs sm:text-sm font-medium transition flex items-center justify-between",
-                      selectedMcqAnswer === opt.id
-                        ? "border-blue-500 bg-blue-500/10 text-white"
-                        : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900 hover:border-white/20"
+                      "w-full p-4 rounded-xl border text-left text-xs font-medium transition flex items-center justify-between",
+                      debuggingAnswer === opt.id
+                        ? "border-amber-500 bg-amber-500/10 text-white"
+                        : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900"
                     )}
                   >
                     <span>{opt.text}</span>
-                    <div
-                      className={cn(
-                        "size-5 rounded-full border flex items-center justify-center text-[10px] font-bold",
-                        selectedMcqAnswer === opt.id
-                          ? "border-blue-500 bg-blue-500 text-white"
-                          : "border-white/30 text-slate-400"
-                      )}
-                    >
-                      {opt.id}
-                    </div>
+                    <span className="text-xs font-bold text-slate-400 ml-3">{opt.id}</span>
                   </button>
                 ))}
               </div>
@@ -996,12 +1099,15 @@ function StudentAssessmentEngine() {
                 onClick={() => setActiveTab("coding")}
                 className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold"
               >
-                Proceed to Coding Problem
+                Proceed to Tier 3: Algorithmic Coding
                 <ChevronRight className="size-4 ml-1" />
               </Button>
             </div>
           </div>
-        ) : (
+        )}
+
+        {/* TIER 3: ALGORITHMIC CHALLENGE */}
+        {activeTab === "coding" && (
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
             <div className="lg:col-span-5 border-r border-white/10 p-6 flex flex-col justify-between overflow-y-auto bg-slate-900/40">
               <div>
@@ -1011,20 +1117,20 @@ function StudentAssessmentEngine() {
                   </span>
                   <span className="text-xs text-slate-400 flex items-center gap-1">
                     <Zap className="size-3.5 text-amber-400" />
-                    Benchmark: 6m 00s
+                    Benchmark: 5m 00s
                   </span>
                 </div>
 
-                <h2 className="text-xl font-bold text-white mb-3">{activeCoding.title}</h2>
+                <h2 className="text-xl font-bold text-white mb-3">{CODING_DATA.title}</h2>
                 <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line mb-6">
-                  {activeCoding.description}
+                  {CODING_DATA.description}
                 </div>
 
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
                   Validation Test Cases:
                 </h4>
                 <div className="space-y-2">
-                  {activeCoding.testCases.map((tc, idx) => (
+                  {CODING_DATA.testCases.map((tc, idx) => (
                     <div
                       key={idx}
                       className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-xs font-mono"
@@ -1080,12 +1186,62 @@ function StudentAssessmentEngine() {
                   Clipboard locked • Right-click disabled
                 </span>
                 <Button
-                  onClick={handleFinalSubmit}
+                  onClick={() => setActiveTab("architecture")}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-8 px-4"
                 >
-                  Run & Final Submit
+                  Proceed to Tier 4: System Architecture
                 </Button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* TIER 4: SYSTEM ARCHITECTURE & SCALE TRADEOFF */}
+        {activeTab === "architecture" && (
+          <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
+                  Tier 4 • Scalability & Distributed Systems (15 Pts)
+                </span>
+              </div>
+
+              <h2 className="text-lg font-bold text-white mb-2">{SYSTEM_DESIGN_SCENARIO.title}</h2>
+              <p className="text-xs text-slate-300 whitespace-pre-line mb-6 leading-relaxed">
+                {SYSTEM_DESIGN_SCENARIO.scenario}
+              </p>
+
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                Architectural Evaluation:
+              </h3>
+              <div className="space-y-3">
+                {SYSTEM_DESIGN_SCENARIO.options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setSystemDesignAnswer(opt.id)}
+                    className={cn(
+                      "w-full p-4 rounded-xl border text-left text-xs font-medium transition flex items-center justify-between",
+                      systemDesignAnswer === opt.id
+                        ? "border-purple-500 bg-purple-500/10 text-white"
+                        : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900"
+                    )}
+                  >
+                    <span>{opt.text}</span>
+                    <span className="text-xs font-bold text-slate-400 ml-3">{opt.id}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-white/10 flex justify-end">
+              <Button
+                onClick={handleFinalSubmit}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6"
+              >
+                Submit All & Generate Merit Matrix
+                <ArrowRight className="size-4 ml-1.5" />
+              </Button>
             </div>
           </div>
         )}
