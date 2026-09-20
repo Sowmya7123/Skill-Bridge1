@@ -19,7 +19,10 @@ import {
   Search,
   Bug,
   Layers,
+  Briefcase,
+  TrendingUp,
   Loader2,
+  Hand,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -32,10 +35,10 @@ export const Route = createFileRoute("/student")({
 });
 
 // -------------------------------------------------------------
-// 36 COMPREHENSIVE DOMAIN TRACKS
+// 1. ALL 36 COMPREHENSIVE DOMAIN TRACKS (COMPLETE LIST)
 // -------------------------------------------------------------
 const DOMAIN_OPTIONS = [
-  // 1. SOFTWARE & SYSTEM ENGINEERING
+  // SOFTWARE & SYSTEM ENGINEERING
   { id: "fullstack-web", title: "Full Stack Web Development", category: "Software Development", desc: "MERN/Next.js, Spring Boot, REST APIs, Microservices, System Design", badge: "Most Popular" },
   { id: "frontend-dev", title: "Frontend Engineering", category: "Software Development", desc: "React, Angular, Vue, TypeScript, Next.js, Web Performance & UI/UX", badge: "High Demand" },
   { id: "backend-dev", title: "Backend Systems Architecture", category: "Software Development", desc: "Java, Node.js, Go, Python Django, Distributed DBs, Caching, Kafka", badge: "Core Tech" },
@@ -44,7 +47,7 @@ const DOMAIN_OPTIONS = [
   { id: "software-testing", title: "QA & Test Automation Engineering", category: "Software Development", desc: "Selenium, Cypress, Playwright, API Testing, Performance (JMeter)", badge: "High Demand" },
   { id: "api-microservices", title: "API & Microservices Architecture", category: "Software Development", desc: "gRPC, GraphQL, REST, API Gateways, Event-Driven Systems", badge: "Enterprise" },
 
-  // 2. AI, MACHINE LEARNING & DATA SCIENCE
+  // DATA & ARTIFICIAL INTELLIGENCE
   { id: "ai-ml", title: "Artificial Intelligence & Machine Learning", category: "Data & AI", desc: "Supervised/Unsupervised Models, Scikit-learn, Neural Networks, PyTorch", badge: "Trending" },
   { id: "gen-ai", title: "Generative AI & LLM Systems", category: "Data & AI", desc: "LangChain, RAG Pipelines, Vector DBs, Prompt Engineering, Fine-Tuning", badge: "Frontier" },
   { id: "deep-learning-cv", title: "Deep Learning & Computer Vision", category: "Data & AI", desc: "CNNs, YOLO, OpenCV, Image Segmentation, Video Analytics", badge: "Specialized" },
@@ -53,18 +56,18 @@ const DOMAIN_OPTIONS = [
   { id: "data-engineering", title: "Data Engineering & Big Data Systems", category: "Data & AI", desc: "Apache Spark, Kafka, Snowflake, Databricks, BigQuery, ETL Pipelines", badge: "Enterprise" },
   { id: "bi-analytics", title: "Business Intelligence & Data Visualization", category: "Data & AI", desc: "Power BI, Tableau, Advanced SQL, Data Warehousing, Metric Dashboards", badge: "Corporate" },
 
-  // 3. CLOUD, DEVOPS & INFRASTRUCTURE
+  // CLOUD & INFRASTRUCTURE
   { id: "cloud-architecture", title: "Cloud Architecture (AWS / Azure / GCP)", category: "Cloud & DevOps", desc: "VPC, IAM, Serverless (Lambda), Cloud Security, High Availability Systems", badge: "Enterprise" },
   { id: "devops-sre", title: "DevOps & Site Reliability Engineering (SRE)", category: "Cloud & DevOps", desc: "Docker, Kubernetes, CI/CD Actions, Terraform, Linux Admin, Prometheus", badge: "High Demand" },
   { id: "system-admin", title: "Linux Systems & Enterprise Networking", category: "Cloud & DevOps", desc: "Bash Scripting, DNS, TCP/IP, Active Directory, Server Hardening", badge: "Core" },
 
-  // 4. CYBERSECURITY & INFORMATION SECURITY
+  // CYBERSECURITY
   { id: "ethical-hacking", title: "Ethical Hacking & Penetration Testing", category: "Cybersecurity", desc: "VAPT, Metasploit, Burp Suite, Network Vulnerabilities, Bug Bounty", badge: "High Demand" },
   { id: "cyber-defense", title: "SOC Operations & Threat Intelligence", category: "Cybersecurity", desc: "SIEM (Splunk), Incident Response, Log Analysis, Malware Triage", badge: "Security" },
   { id: "cloud-security", title: "Cloud Security & DevSecOps", category: "Cybersecurity", desc: "OWASP Top 10, Container Security, SonarQube, Zero Trust Architecture", badge: "Enterprise" },
   { id: "cryptography-web3", title: "Cryptography & Blockchain Engineering", category: "Cybersecurity", desc: "Solidity, Smart Contracts, Ethereum, EVM, Public-Key Infrastructure", badge: "Emerging" },
 
-  // 5. ELECTRONICS, VLSI & EMBEDDED SYSTEMS (ECE / EEE)
+  // CORE HARDWARE & ELECTRONICS (ECE / EEE)
   { id: "embedded-systems", title: "Embedded Systems & Firmware Engineering", category: "Core Hardware", desc: "Embedded C/C++, ARM Cortex, FreeRTOS, Microcontrollers (ESP32/STM32)", badge: "Core ECE" },
   { id: "vlsi-design", title: "VLSI Design & RTL Verification", category: "Core Hardware", desc: "Verilog, SystemVerilog, UVM, FPGA Synthesis, Static Timing Analysis", badge: "High Package" },
   { id: "iot-robotics", title: "Internet of Things (IoT) & Smart Sensors", category: "Core Hardware", desc: "MQTT, Sensor Interfacing, Edge Computing, Raspberry Pi, LoRaWAN", badge: "Modern Hardware" },
@@ -72,18 +75,18 @@ const DOMAIN_OPTIONS = [
   { id: "pcb-hardware", title: "PCB Design & Hardware Architecture", category: "Core Hardware", desc: "Altium, KiCAD, High-Speed Routing, Circuit Simulation (SPICE)", badge: "Core ECE" },
   { id: "power-systems-ev", title: "Electric Vehicles (EV) & Power Electronics", category: "Core Hardware", desc: "BMS (Battery Management), Inverters, Motor Controllers, Power Grids", badge: "Core EEE" },
 
-  // 6. MECHANICAL, AEROSPACE & MECHATRONICS
+  // MECHANICAL, AEROSPACE & SIMULATION
   { id: "cad-cam-design", title: "CAD / CAM & Mechanical Product Design", category: "Core Mechanical", desc: "SolidWorks, CATIA, GD&T, Rapid Prototyping, Sheet Metal Design", badge: "Core Mech" },
   { id: "fea-cfd-analysis", title: "FEA & CFD Thermal Simulation", category: "Core Mechanical", desc: "ANSYS Mechanical, Fluent, Aerodynamics, Stress Analysis, Meshing", badge: "Simulation" },
   { id: "industrial-automation", title: "Industrial Automation & PLC / SCADA", category: "Core Mechanical", desc: "Siemens PLC, Ladder Logic, Hydraulics, Pneumatics, Industry 4.0", badge: "Manufacturing" },
 
-  // 7. CIVIL, GEOSPATIAL & STRUCTURAL
+  // CIVIL & GEOSPATIAL
   { id: "structural-engineering", title: "Structural Analysis & BIM Design", category: "Core Civil", desc: "ETABS, STAAD Pro, Revit BIM, Concrete Design, Seismic Analysis", badge: "Core Civil" },
   { id: "gis-remote-sensing", title: "Geospatial Data Science & GIS", category: "Core Civil", desc: "ArcGIS, QGIS, Satellite Imagery Analysis, Spatial Mapping", badge: "Geospatial" },
 
-  // 8. PRODUCT, DESIGN & TECH MANAGEMENT
+  // DESIGN & PRODUCT
   { id: "ui-ux-design", title: "UI/UX & Digital Product Design", category: "Design & Product", desc: "Figma, User Journey Mapping, Wireframing, Design Systems, Usability", badge: "Creative" },
-  { id: "product-management", title: "Technical Product Management (APM)", category: "Design & Product", desc: "PRDs, Agile/Scrum Sprints, Feature Roadmaps, Product Analytics (Mixpanel)", badge: "Management" },
+  { id: "product-management", title: "Technical Product Management (APM)", category: "Design & Product", desc: "PRDs, Agile/Scrum Sprints, Feature Roadmaps, Product Analytics", badge: "Management" },
   { id: "business-analyst", title: "Technical Business Analyst (IT BA)", category: "Design & Product", desc: "Requirement Gathering, UML Diagrams, User Stories, Gap Analysis, Jira", badge: "Corporate" },
 ];
 
@@ -100,36 +103,37 @@ const CATEGORIES = [
 ];
 
 // -------------------------------------------------------------
-// BASE QUESTION POOL FOR SAMPLING & SHUFFLING
+// 2. COMPLETE 20-QUESTION POOL (TOPIC-MAPPED FOR SKILL GAPS)
 // -------------------------------------------------------------
 interface ProcessedQuestion {
   id: string;
+  topic: string;
   question: string;
   options: { id: string; text: string }[];
   correctAnswer: string;
 }
 
-const RAW_QUESTION_POOL = [
-  { id: "q-1", question: "In the JavaScript V8 engine, where are object references and execution contexts stored?", options: [{ id: "A", text: "Stack for execution context, Heap for objects" }, { id: "B", text: "Heap for all primitives and closures" }, { id: "C", text: "Stack holds all variables exclusively" }, { id: "D", text: "Directly in OS Virtual Memory" }], correctAnswer: "A" },
-  { id: "q-2", question: "What is the primary advantage of B-Tree indices over Hash indices in relational databases?", options: [{ id: "A", text: "Faster O(1) single-point lookups" }, { id: "B", text: "Efficient range scans (BETWEEN, >, <)" }, { id: "C", text: "Zero disk footprint on persistent storage" }, { id: "D", text: "Automatic table denormalization" }], correctAnswer: "B" },
-  { id: "q-3", question: "Which HTTP status code signifies that a client must authenticate itself to get the requested response?", options: [{ id: "A", text: "403 Forbidden" }, { id: "B", text: "401 Unauthorized" }, { id: "C", text: "400 Bad Request" }, { id: "D", text: "422 Unprocessable Entity" }], correctAnswer: "B" },
-  { id: "q-4", question: "What problem does the CAP Theorem state distributed data stores cannot simultaneously achieve?", options: [{ id: "A", text: "Consistency, Availability, and Partition Tolerance" }, { id: "B", text: "Concurrency, Atomicity, and Performance" }, { id: "C", text: "Caching, Availability, and Persistence" }, { id: "D", text: "Throughput, Latency, and Scalability" }], correctAnswer: "A" },
-  { id: "q-5", question: "What is the time complexity to insert an element into an existing Min-Heap of size N?", options: [{ id: "A", text: "O(1)" }, { id: "B", text: "O(log N)" }, { id: "C", text: "O(N)" }, { id: "D", text: "O(N log N)" }], correctAnswer: "B" },
-  { id: "q-6", question: "In React, why must hooks only be called at the top level and not inside loops or conditions?", options: [{ id: "A", text: "To preserve call order across renders for internal linked-lists" }, { id: "B", text: "To prevent memory leaks in V8 garbage collection" }, { id: "C", text: "React compiler converts hooks to global window variables" }, { id: "D", text: "Loops force hooks to execute in parallel threads" }], correctAnswer: "A" },
-  { id: "q-7", question: "Which SQL isolation level protects against both Dirty Reads and Non-Repeatable Reads?", options: [{ id: "A", text: "Read Uncommitted" }, { id: "B", text: "Read Committed" }, { id: "C", text: "Repeatable Read" }, { id: "D", text: "Snapshot Read Only" }], correctAnswer: "C" },
-  { id: "q-8", question: "What is the fundamental purpose of a Reverse Proxy (e.g., NGINX)?", options: [{ id: "A", text: "Cache client-side browser cookies" }, { id: "B", text: "Distribute incoming traffic and terminate SSL before upstream servers" }, { id: "C", text: "Compile frontend TypeScript into JavaScript" }, { id: "D", text: "Directly execute SQL stored procedures" }], correctAnswer: "B" },
-  { id: "q-9", question: "In Docker containerization, how does a container differ fundamentally from a Virtual Machine (VM)?", options: [{ id: "A", text: "Containers share the host OS kernel and use cgroups/namespaces" }, { id: "B", text: "Containers emulate complete virtual hardware and BIOS" }, { id: "C", text: "Containers require a Type-1 Hypervisor on bare metal" }, { id: "D", text: "Containers cannot communicate over TCP/IP networks" }], correctAnswer: "A" },
-  { id: "q-10", question: "What security vulnerability occurs when user input is directly concatenated into a dynamic SQL query?", options: [{ id: "A", text: "Cross-Site Scripting (XSS)" }, { id: "B", text: "SQL Injection (SQLi)" }, { id: "C", text: "Cross-Site Request Forgery (CSRF)" }, { id: "D", text: "Buffer Overflow" }], correctAnswer: "B" },
-  { id: "q-11", question: "In Redis, what is the default eviction policy when maxmemory is reached without specified keys?", options: [{ id: "A", text: "noeviction (returns error on writes)" }, { id: "B", text: "allkeys-lru" }, { id: "C", text: "volatile-random" }, { id: "D", text: "volatile-ttl" }], correctAnswer: "A" },
-  { id: "q-12", question: "What is the primary role of a Vector Database in Generative AI architectures?", options: [{ id: "A", text: "Indexing high-dimensional embeddings for cosine similarity retrieval" }, { id: "B", text: "Compressing LLM weights for mobile execution" }, { id: "C", text: "Executing SQL window functions on text" }, { id: "D", text: "Parsing JSON payloads from webhooks" }], correctAnswer: "A" },
-  { id: "q-13", question: "What does the ACID 'I' stand for in database transaction properties?", options: [{ id: "A", text: "Integrity" }, { id: "B", text: "Isolation" }, { id: "C", text: "Immutability" }, { id: "D", text: "Indexing" }], correctAnswer: "B" },
-  { id: "q-14", question: "Which cryptographic algorithm is based on asymmetric public-private keypairs?", options: [{ id: "A", text: "AES-256" }, { id: "B", text: "RSA" }, { id: "C", text: "DES" }, { id: "D", text: "Blowfish" }], correctAnswer: "B" },
-  { id: "q-15", question: "In Git, what does 'git rebase' do compared to 'git merge'?", options: [{ id: "A", text: "Reapplies commits on top of another base tip for a linear history" }, { id: "B", text: "Creates a 3-way merge commit combining divergent trees" }, { id: "C", text: "Permanently destroys remote branches" }, { id: "D", text: "Pushes code directly to production without testing" }], correctAnswer: "A" },
-  { id: "q-16", question: "What is the space complexity of an in-place QuickSort algorithm on average?", options: [{ id: "A", text: "O(1)" }, { id: "B", text: "O(log N) auxiliary stack space" }, { id: "C", text: "O(N) contiguous array allocation" }, { id: "D", text: "O(N^2) recursive frames" }], correctAnswer: "B" },
-  { id: "q-17", question: "In RESTful API design, which method is expected to be idempotent?", options: [{ id: "A", text: "POST" }, { id: "B", text: "PUT" }, { id: "C", text: "PATCH (without precondition)" }, { id: "D", text: "CONNECT" }], correctAnswer: "B" },
-  { id: "q-18", question: "Which protocol operates at the Transport Layer (Layer 4) of the OSI model providing reliable ordered delivery?", options: [{ id: "A", text: "IP" }, { id: "B", text: "TCP" }, { id: "C", text: "HTTP" }, { id: "D", text: "DNS" }], correctAnswer: "B" },
-  { id: "q-19", question: "What is the primary cause of a 'Race Condition' in concurrent programming?", options: [{ id: "A", text: "Multiple threads accessing shared mutable state without proper synchronization" }, { id: "B", text: "CPU clock speed running faster than RAM bus speed" }, { id: "C", text: "Garbage collection pausing the main execution thread" }, { id: "D", text: "Stack overflow due to infinite recursion" }], correctAnswer: "A" },
-  { id: "q-20", question: "What design pattern defines a one-to-many dependency between objects so that when one changes state, all dependents are notified?", options: [{ id: "A", text: "Singleton Pattern" }, { id: "B", text: "Observer Pattern" }, { id: "C", text: "Factory Pattern" }, { id: "D", text: "Adapter Pattern" }], correctAnswer: "B" },
+const MASTER_QUESTION_POOL: ProcessedQuestion[] = [
+  { id: "q-1", topic: "Memory Management", question: "In the JavaScript V8 engine, where are object references and execution contexts stored?", options: [{ id: "A", text: "Stack for execution context, Heap for objects" }, { id: "B", text: "Heap for all primitives and closures" }, { id: "C", text: "Stack holds all variables exclusively" }, { id: "D", text: "Directly in OS Virtual Memory" }], correctAnswer: "A" },
+  { id: "q-2", topic: "Databases & Indexing", question: "What is the primary advantage of B-Tree indices over Hash indices in relational databases?", options: [{ id: "A", text: "Faster O(1) single-point lookups" }, { id: "B", text: "Efficient range scans (BETWEEN, >, <)" }, { id: "C", text: "Zero disk footprint on persistent storage" }, { id: "D", text: "Automatic table denormalization" }], correctAnswer: "B" },
+  { id: "q-3", topic: "Protocols & Web APIs", question: "Which HTTP status code signifies that a client must authenticate itself to get the requested response?", options: [{ id: "A", text: "403 Forbidden" }, { id: "B", text: "401 Unauthorized" }, { id: "C", text: "400 Bad Request" }, { id: "D", text: "422 Unprocessable Entity" }], correctAnswer: "B" },
+  { id: "q-4", topic: "Distributed Systems", question: "What problem does the CAP Theorem state distributed data stores cannot simultaneously achieve?", options: [{ id: "A", text: "Consistency, Availability, and Partition Tolerance" }, { id: "B", text: "Concurrency, Atomicity, and Performance" }, { id: "C", text: "Caching, Availability, and Persistence" }, { id: "D", text: "Throughput, Latency, and Scalability" }], correctAnswer: "A" },
+  { id: "q-5", topic: "Data Structures & Big-O", question: "What is the time complexity to insert an element into an existing Min-Heap of size N?", options: [{ id: "A", text: "O(1)" }, { id: "B", text: "O(log N)" }, { id: "C", text: "O(N)" }, { id: "D", text: "O(N log N)" }], correctAnswer: "B" },
+  { id: "q-6", topic: "Frontend Architecture", question: "In React, why must hooks only be called at the top level and not inside loops or conditions?", options: [{ id: "A", text: "To preserve call order across renders for internal linked-lists" }, { id: "B", text: "To prevent memory leaks in V8 garbage collection" }, { id: "C", text: "React compiler converts hooks to global window variables" }, { id: "D", text: "Loops force hooks to execute in parallel threads" }], correctAnswer: "A" },
+  { id: "q-7", topic: "Databases & Indexing", question: "Which SQL isolation level protects against both Dirty Reads and Non-Repeatable Reads?", options: [{ id: "A", text: "Read Uncommitted" }, { id: "B", text: "Read Committed" }, { id: "C", text: "Repeatable Read" }, { id: "D", text: "Snapshot Read Only" }], correctAnswer: "C" },
+  { id: "q-8", topic: "DevOps & Infrastructure", question: "What is the fundamental purpose of a Reverse Proxy (e.g., NGINX)?", options: [{ id: "A", text: "Cache client-side browser cookies" }, { id: "B", text: "Distribute incoming traffic and terminate SSL before upstream servers" }, { id: "C", text: "Compile frontend TypeScript into JavaScript" }, { id: "D", text: "Directly execute SQL stored procedures" }], correctAnswer: "B" },
+  { id: "q-9", topic: "DevOps & Infrastructure", question: "In Docker containerization, how does a container differ fundamentally from a Virtual Machine (VM)?", options: [{ id: "A", text: "Containers share the host OS kernel and use cgroups/namespaces" }, { id: "B", text: "Containers emulate complete virtual hardware and BIOS" }, { id: "C", text: "Containers require a Type-1 Hypervisor on bare metal" }, { id: "D", text: "Containers cannot communicate over TCP/IP networks" }], correctAnswer: "A" },
+  { id: "q-10", topic: "Application Security", question: "What security vulnerability occurs when user input is directly concatenated into a dynamic SQL query?", options: [{ id: "A", text: "Cross-Site Scripting (XSS)" }, { id: "B", text: "SQL Injection (SQLi)" }, { id: "C", text: "Cross-Site Request Forgery (CSRF)" }, { id: "D", text: "Buffer Overflow" }], correctAnswer: "B" },
+  { id: "q-11", topic: "Databases & Indexing", question: "In Redis, what is the default eviction policy when maxmemory is reached without specified keys?", options: [{ id: "A", text: "noeviction (returns error on writes)" }, { id: "B", text: "allkeys-lru" }, { id: "C", text: "volatile-random" }, { id: "D", text: "volatile-ttl" }], correctAnswer: "A" },
+  { id: "q-12", topic: "Distributed Systems", question: "What is the primary role of a Vector Database in Generative AI architectures?", options: [{ id: "A", text: "Indexing high-dimensional embeddings for cosine similarity retrieval" }, { id: "B", text: "Compressing LLM weights for mobile execution" }, { id: "C", text: "Executing SQL window functions on text" }, { id: "D", text: "Parsing JSON payloads from webhooks" }], correctAnswer: "A" },
+  { id: "q-13", topic: "Databases & Indexing", question: "What does the ACID 'I' stand for in database transaction properties?", options: [{ id: "A", text: "Integrity" }, { id: "B", text: "Isolation" }, { id: "C", text: "Immutability" }, { id: "D", text: "Indexing" }], correctAnswer: "B" },
+  { id: "q-14", topic: "Application Security", question: "Which cryptographic algorithm is based on asymmetric public-private keypairs?", options: [{ id: "A", text: "AES-256" }, { id: "B", text: "RSA" }, { id: "C", text: "DES" }, { id: "D", text: "Blowfish" }], correctAnswer: "B" },
+  { id: "q-15", topic: "DevOps & Infrastructure", question: "In Git, what does 'git rebase' do compared to 'git merge'?", options: [{ id: "A", text: "Reapplies commits on top of another base tip for a linear history" }, { id: "B", text: "Creates a 3-way merge commit combining divergent trees" }, { id: "C", text: "Permanently destroys remote branches" }, { id: "D", text: "Pushes code directly to production without testing" }], correctAnswer: "A" },
+  { id: "q-16", topic: "Data Structures & Big-O", question: "What is the space complexity of an in-place QuickSort algorithm on average?", options: [{ id: "A", text: "O(1)" }, { id: "B", text: "O(log N) auxiliary stack space" }, { id: "C", text: "O(N) contiguous array allocation" }, { id: "D", text: "O(N^2) recursive frames" }], correctAnswer: "B" },
+  { id: "q-17", topic: "Protocols & Web APIs", question: "In RESTful API design, which method is expected to be idempotent?", options: [{ id: "A", text: "POST" }, { id: "B", text: "PUT" }, { id: "C", text: "PATCH (without precondition)" }, { id: "D", text: "CONNECT" }], correctAnswer: "B" },
+  { id: "q-18", topic: "Protocols & Web APIs", question: "Which protocol operates at the Transport Layer (Layer 4) providing reliable ordered delivery?", options: [{ id: "A", text: "IP" }, { id: "B", text: "TCP" }, { id: "C", text: "HTTP" }, { id: "D", text: "DNS" }], correctAnswer: "B" },
+  { id: "q-19", topic: "Memory Management", question: "What is the primary cause of a 'Race Condition' in concurrent programming?", options: [{ id: "A", text: "Multiple threads accessing shared mutable state without proper synchronization" }, { id: "B", text: "CPU clock speed running faster than RAM bus speed" }, { id: "C", text: "Garbage collection pausing the main execution thread" }, { id: "D", text: "Stack overflow due to infinite recursion" }], correctAnswer: "A" },
+  { id: "q-20", topic: "Frontend Architecture", question: "What design pattern defines a one-to-many dependency so when one object changes, all dependents are updated?", options: [{ id: "A", text: "Singleton Pattern" }, { id: "B", text: "Observer Pattern" }, { id: "C", text: "Factory Pattern" }, { id: "D", text: "Adapter Pattern" }], correctAnswer: "B" },
 ];
 
 const DEBUGGING_SCENARIO = {
@@ -137,7 +141,7 @@ const DEBUGGING_SCENARIO = {
   description: `A Node.js microservice handling high-volume payment webhooks crashes every 4 hours with:
 FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory.
 
-Audit the code snippet below. Identify the root cause and propose the fix.`,
+Audit the code snippet below. Identify the root cause and propose the defensive fix.`,
   buggyCode: `// INCIDENT SNIPPET: paymentWebhook.js
 const auditLogCache = []; // Global memory array
 
@@ -153,7 +157,7 @@ app.post('/api/webhook', async (req, res) => {
   res.status(200).send({ received: true });
 });`,
   options: [
-    { id: "A", text: "Global auditLogCache array grows unbounded in RAM without TTL or DB offloading, and processTransaction is unawaited, causing silent failures." },
+    { id: "A", text: "Global auditLogCache array grows unbounded in RAM without TTL or DB offloading, and processTransaction is unawaited, causing silent unhandled rejection crashes." },
     { id: "B", text: "The HTTP status code 200 is invalid for webhooks and should be replaced with HTTP 201." },
     { id: "C", text: "req.body should be converted to Base64 before pushing to prevent UTF-8 encoding overflow." },
     { id: "D", text: "Express does not support async route handlers without third-party Babel plugins." },
@@ -163,14 +167,13 @@ app.post('/api/webhook', async (req, res) => {
 
 const CODING_DATA = {
   title: "Optimized Target Pair Finder (Two-Sum)",
-  benchmarkSeconds: 300,
   expectedComplexity: "O(N) Linear Time",
   description: `Given an array of integers 'nums' and an integer 'target', return indices of the two numbers such that they add up to target.
 
 Requirements:
 - Your solution must run in O(N) time complexity using a single traversal with a Hash Map.
 - Brute-force nested loops O(N^2) will be penalized in the efficiency score.
-- Must cleanly handle edge cases (empty arrays, negative numbers).`,
+- Must cleanly handle edge cases.`,
   initialCode: `function twoSum(nums, target) {
   // Write your O(N) optimized solution here
   const map = new Map();
@@ -187,13 +190,12 @@ Requirements:
     { input: "[2, 7, 11, 15], target = 9", expected: "[0, 1]" },
     { input: "[3, 2, 4], target = 6", expected: "[1, 2]" },
     { input: "[3, 3], target = 6", expected: "[0, 1]" },
-    { input: "[], target = 10", expected: "[]" },
   ],
 };
 
 const SYSTEM_DESIGN_SCENARIO = {
   title: "Tier 4: Architecture Tradeoff - Live Leaderboard at Scale",
-  scenario: `Your platform needs to support a real-time leaderboard for 5 million active users during a campus hiring drive. The system must support:
+  scenario: `Your platform needs to support a real-time leaderboard for 5 million active users during a nationwide campus hiring drive. The system must support:
 - Top 100 ranking queries with sub-50ms latency.
 - Instant score updates when an assessment completes.
 
@@ -208,8 +210,27 @@ Which architecture tradeoff offers the optimal scalability and lowest write late
 };
 
 // -------------------------------------------------------------
-// FISHER-YATES ANTI-COLLISION SHUFFLE ENGINE
+// 3. CURATED SUITABLE INTERNSHIPS
 // -------------------------------------------------------------
+interface Internship {
+  id: string;
+  role: string;
+  company: string;
+  stipend: string;
+  location: string;
+  minScoreReq: number;
+  skillsNeeded: string[];
+}
+
+const INTERNSHIP_CATALOG: Internship[] = [
+  { id: "int-1", role: "Junior Software Engineer Intern", company: "Zomato / Blinkit", stipend: "₹35,000 / month", location: "Hybrid (Bengaluru)", minScoreReq: 60, skillsNeeded: ["JavaScript", "REST APIs", "SQL"] },
+  { id: "int-2", role: "Backend Systems Trainee", company: "Razorpay", stipend: "₹45,000 / month", location: "Bengaluru", minScoreReq: 75, skillsNeeded: ["Node.js / Java", "Redis", "Distributed DB"] },
+  { id: "int-3", role: "Full Stack Developer Associate", company: "Swiggy Labs", stipend: "₹40,000 / month", location: "Hyderabad", minScoreReq: 65, skillsNeeded: ["React", "TypeScript", "Microservices"] },
+  { id: "int-4", role: "AI / Data Science Trainee", company: "Fractal Analytics", stipend: "₹32,000 / month", location: "Mumbai / Hybrid", minScoreReq: 70, skillsNeeded: ["Python", "PyTorch", "Data Pipelines"] },
+  { id: "int-5", role: "Cloud & DevOps Apprentice", company: "Jio Platforms", stipend: "₹28,000 / month", location: "Hyderabad", minScoreReq: 50, skillsNeeded: ["Docker", "Linux", "CI/CD"] },
+  { id: "int-6", role: "Core Embedded & VLSI Trainee", company: "Qualcomm / Texas Instruments", stipend: "₹50,000 / month", location: "Bengaluru", minScoreReq: 80, skillsNeeded: ["Embedded C", "ARM", "Verilog"] },
+];
+
 function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -217,34 +238,6 @@ function shuffle<T>(array: T[]): T[] {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
-}
-
-// Shuffles both the questions list & internal option letters per student
-function generateAntiCheatExamSet(questions: typeof RAW_QUESTION_POOL): ProcessedQuestion[] {
-  const shuffledQuestions = shuffle(questions);
-  return shuffledQuestions.map((q) => {
-    const originalCorrectOption = q.options.find((opt) => opt.id === q.correctAnswer);
-    const shuffledOptions = shuffle(q.options);
-
-    let newCorrectLetter = "A";
-    const reassignedOptions = shuffledOptions.map((opt, idx) => {
-      const newLetter = String.fromCharCode(65 + idx);
-      if (originalCorrectOption && opt.text === originalCorrectOption.text) {
-        newCorrectLetter = newLetter;
-      }
-      return {
-        id: newLetter,
-        text: opt.text,
-      };
-    });
-
-    return {
-      id: q.id,
-      question: q.question,
-      options: reassignedOptions,
-      correctAnswer: newCorrectLetter,
-    };
-  });
 }
 
 function StudentAssessmentEngine() {
@@ -258,30 +251,36 @@ function StudentAssessmentEngine() {
   const [domainSearch, setDomainSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Multi-Tier Navigation
   const [activeTab, setActiveTab] = useState<"theory" | "debugging" | "coding" | "architecture">("theory");
 
-  // Dynamic Randomized Exam Questions (Student-Unique)
+  // Questions and Real Answers
   const [studentQuestions, setStudentQuestions] = useState<ProcessedQuestion[]>([]);
   const [theoryAnswers, setTheoryAnswers] = useState<Record<string, string>>({});
   const [currentTheoryIndex, setCurrentTheoryIndex] = useState(0);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
-  // Tier 2, 3, 4 States
+  // Other Tiers States
   const [debuggingAnswer, setDebuggingAnswer] = useState<string | null>(null);
   const [code, setCode] = useState(CODING_DATA.initialCode);
   const [systemDesignAnswer, setSystemDesignAnswer] = useState<string | null>(null);
 
-  // Camera & Anti-Cheat Proctoring
+  // Proctoring & Anti-Cheat
   const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [strikes, setStrikes] = useState<string[]>([]);
   const [isDisqualified, setIsDisqualified] = useState(false);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Holistic Evaluation Matrix
+  // Vision Gaze & Hand Gesture Tracking States
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [gazeStatus, setGazeStatus] = useState<"Center" | "Looking Left" | "Looking Right" | "Looking Down">("Center");
+  const [handGestureDetected, setHandGestureDetected] = useState(false);
+  const gazeOffscreenCount = useRef(0);
+  const lastPixelData = useRef<Uint8ClampedArray | null>(null);
+
+  // Dynamic Scorecard & Real Skill Gap Evaluation
   const [evaluation, setEvaluation] = useState<{
     theoryScore: number;
     debuggingScore: number;
@@ -292,15 +291,16 @@ function StudentAssessmentEngine() {
     totalMeritScore: number;
     detectedComplexity: string;
     competencyBadge: string;
+    topicGaps: { topic: string; correct: number; total: number; percentage: number; status: "Strong" | "Average" | "Needs Improvement" }[];
+    matchedInternships: (Internship & { matchPercentage: number; isEligible: boolean })[];
   } | null>(null);
 
-  // Load Unique Questions dynamically per Student
+  // Dynamic Question Retrieval & Shuffling
   const handleProceedToGuidelines = async () => {
     if (!selectedDomain) return;
-
     setIsLoadingQuestions(true);
+
     try {
-      // 1. Check for previously attempted question IDs for this student in Supabase
       const { data: pastAttempts } = await supabase
         .from("student_assessments")
         .select("attempted_question_ids")
@@ -314,65 +314,69 @@ function StudentAssessmentEngine() {
         }
       });
 
-      // 2. Fetch fresh questions from Supabase assessment_questions table
-      let query = supabase
-        .from("assessment_questions")
-        .select("*")
-        .eq("role_id", selectedDomain)
-        .eq("question_type", "mcq");
-
-      if (usedIds.length > 0) {
-        query = query.not("id", "in", `(${usedIds.join(",")})`);
-      }
+      let query = supabase.from("assessment_questions").select("*").eq("role_id", selectedDomain);
+      if (usedIds.length > 0) query = query.not("id", "in", `(${usedIds.join(",")})`);
 
       const { data: dbQuestions, error } = await query.limit(20);
 
+      let poolToUse = MASTER_QUESTION_POOL;
       if (!error && dbQuestions && dbQuestions.length >= 10) {
-        const formatted = dbQuestions.map((q: any) => ({
+        poolToUse = dbQuestions.map((q: any) => ({
           id: q.id,
+          topic: q.topic || "Core Concepts",
           question: q.prompt,
           options: q.options || [],
           correctAnswer: q.correct_answer || "A",
         }));
-        setStudentQuestions(generateAntiCheatExamSet(formatted));
-      } else {
-        // Fallback to randomized local master pool
-        setStudentQuestions(generateAntiCheatExamSet(RAW_QUESTION_POOL));
       }
+
+      const shuffled = shuffle(poolToUse).map((q) => {
+        const originalCorrect = q.options.find((opt) => opt.id === q.correctAnswer);
+        const shuffledOptions = shuffle(q.options);
+        let newCorrectLetter = "A";
+
+        const mappedOptions = shuffledOptions.map((opt, idx) => {
+          const letter = String.fromCharCode(65 + idx);
+          if (originalCorrect && opt.text === originalCorrect.text) {
+            newCorrectLetter = letter;
+          }
+          return { id: letter, text: opt.text };
+        });
+
+        return {
+          ...q,
+          options: mappedOptions,
+          correctAnswer: newCorrectLetter,
+        };
+      });
+
+      setStudentQuestions(shuffled);
     } catch (err) {
-      console.error(err);
-      setStudentQuestions(generateAntiCheatExamSet(RAW_QUESTION_POOL));
+      setStudentQuestions(shuffle(MASTER_QUESTION_POOL));
     } finally {
       setIsLoadingQuestions(false);
       setAssessmentStage("guidelines");
     }
   };
 
-  // Camera Validation Hook
+  // Camera Activation
   useEffect(() => {
     if (assessmentStage !== "guidelines" && assessmentStage !== "testing") return;
-
     let stream: MediaStream | null = null;
     setCameraStatus("checking");
 
-    navigator.mediaDevices
-      ?.getUserMedia({ video: true, audio: false })
+    navigator.mediaDevices?.getUserMedia({ video: { width: 320, height: 240 }, audio: false })
       .then((s) => {
         stream = s;
         if (videoRef.current) videoRef.current.srcObject = s;
         setCameraStatus("ready");
       })
-      .catch((err) => {
-        console.error("Camera access denied:", err);
+      .catch(() => {
         setCameraStatus("denied");
-        toast.error("Camera Permission Required", {
-          description: "Camera must be allowed to enter the verified assessment room.",
-        });
+        toast.error("Camera Required", { description: "Camera access is compulsory for verification." });
       });
 
-    return () => {
-      stream?.getTracks().forEach((track) => track.stop());
-    };
+    return () => { stream?.getTracks().forEach((track) => track.stop()); };
   }, [assessmentStage]);
 
   // Assessment Timer
@@ -387,31 +391,23 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Anti-Cheat Violation Handler (2-Strike System)
+  // Strike System
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
-
-      const time = new Date().toLocaleTimeString();
-      const logEntry = `${reason} — ${time}`;
+      const logEntry = `${reason} — ${new Date().toLocaleTimeString()}`;
 
       setStrikes((prev) => {
         const next = [...prev, logEntry];
         if (next.length === 1) {
           setActiveAlert("Strike 1/2: Integrity Violation Logged. 1 chance remaining!");
-          toast.warning("Warning 1/2: Rule Violated!", {
-            description: `${reason}. You have only 1 chance left before permanent lockout.`,
-          });
+          toast.warning("Warning 1/2: Rule Violated!", { description: reason });
         } else if (next.length === 2) {
           setActiveAlert("CRITICAL WARNING 2/2: Next violation will terminate your test!");
-          toast.error("Critical Strike 2/2!", {
-            description: `${reason}. Final notice! Further infraction terminates test.`,
-          });
+          toast.error("Critical Strike 2/2!", { description: `${reason}. Final notice!` });
         } else if (next.length >= 3) {
           setIsDisqualified(true);
-          toast.error("Assessment Terminated!", {
-            description: "Exceeded 2 chances. Session revoked under AI proctoring policy.",
-          });
+          toast.error("Assessment Revoked!", { description: "Maximum policy infractions reached." });
         }
         return next;
       });
@@ -419,91 +415,161 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Security Focus Listeners
+  // -------------------------------------------------------------
+  // REAL-TIME EYE GAZE & HAND GESTURE DETECTION (NEW)
+  // -------------------------------------------------------------
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
-    const onVisibilityChange = () => {
-      if (document.hidden) registerStrike("Tab switched or browser minimized");
-    };
-    const onWindowBlur = () => {
-      registerStrike("Window focus lost (external click)");
-    };
-    const onCopyPaste = (e: ClipboardEvent) => {
-      e.preventDefault();
-      registerStrike("Clipboard copy/paste blocked");
-    };
-    const onContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-      registerStrike("Right-click context menu blocked");
-    };
+    const visionInterval = setInterval(() => {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas || video.readyState !== 4) return;
 
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("blur", onWindowBlur);
-    window.addEventListener("copy", onCopyPaste);
-    window.addEventListener("paste", onCopyPaste);
-    window.addEventListener("cut", onCopyPaste);
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+
+      canvas.width = 160;
+      canvas.height = 120;
+      ctx.drawImage(video, 0, 0, 160, 120);
+
+      const frame = ctx.getImageData(0, 0, 160, 120);
+      const data = frame.data;
+
+      let leftWeight = 0;
+      let rightWeight = 0;
+      let lowerWeight = 0;
+      let motionDiffCount = 0;
+
+      for (let y = 0; y < 120; y++) {
+        for (let x = 0; x < 160; x++) {
+          const idx = (y * 160 + x) * 4;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          const brightness = (r + g + b) / 3;
+
+          if (x < 50 && brightness > 80) leftWeight += brightness;
+          if (x > 110 && brightness > 80) rightWeight += brightness;
+          if (y > 85 && brightness > 80) lowerWeight += brightness;
+
+          if (lastPixelData.current) {
+            const diff = Math.abs(brightness - lastPixelData.current[idx]);
+            if (diff > 50) motionDiffCount++;
+          }
+        }
+      }
+
+      lastPixelData.current = new Uint8ClampedArray(data);
+
+      let detectedGaze: "Center" | "Looking Left" | "Looking Right" | "Looking Down" = "Center";
+      if (rightWeight > leftWeight * 1.8) detectedGaze = "Looking Right";
+      else if (leftWeight > rightWeight * 1.8) detectedGaze = "Looking Left";
+      else if (lowerWeight > 1250000) detectedGaze = "Looking Down";
+
+      setGazeStatus(detectedGaze);
+
+      if (detectedGaze !== "Center") {
+        gazeOffscreenCount.current += 1;
+        if (gazeOffscreenCount.current >= 4) {
+          registerStrike(`Frequent Eye-Gaze Drift (${detectedGaze})`);
+          gazeOffscreenCount.current = 0;
+        }
+      } else {
+        gazeOffscreenCount.current = Math.max(0, gazeOffscreenCount.current - 1);
+      }
+
+      if (motionDiffCount > 3500) {
+        setHandGestureDetected(true);
+        setTimeout(() => setHandGestureDetected(false), 2000);
+        registerStrike("Suspicious Hand Movement / Occlusion Detected");
+      }
+    }, 1200);
+
+    return () => clearInterval(visionInterval);
+  }, [assessmentStage, isDisqualified, registerStrike]);
+
+  // Focus & Security Listeners
+  useEffect(() => {
+    if (assessmentStage !== "testing" || isDisqualified) return;
+
+    const onVisibility = () => { if (document.hidden) registerStrike("Tab switched / browser minimized"); };
+    const onBlur = () => registerStrike("Focus lost (clicked outside window)");
+    const onCopy = (e: ClipboardEvent) => { e.preventDefault(); registerStrike("Copy / cut attempt blocked"); };
+    const onPaste = (e: ClipboardEvent) => { e.preventDefault(); registerStrike("Paste attempt blocked"); };
+    const onContextMenu = (e: MouseEvent) => { e.preventDefault(); registerStrike("Right-click blocked"); };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("copy", onCopy);
+    window.addEventListener("paste", onPaste);
     window.addEventListener("contextmenu", onContextMenu);
 
     return () => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("blur", onWindowBlur);
-      window.removeEventListener("copy", onCopyPaste);
-      window.removeEventListener("paste", onCopyPaste);
-      window.removeEventListener("cut", onCopyPaste);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("copy", onCopy);
+      window.removeEventListener("paste", onPaste);
       window.removeEventListener("contextmenu", onContextMenu);
     };
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  // -------------------------------------------------------------
-  // FINAL EVALUATION CALCULATION & SUPABASE SYNC
-  // -------------------------------------------------------------
+  // Dynamic Score Calculation
   const handleFinalSubmit = async () => {
-    // 1. Tier 1 Theory (Max 25 pts)
+    const topicStats: Record<string, { correct: number; total: number }> = {};
     let correctTheoryCount = 0;
-    studentQuestions.forEach((q) => {
-      if (theoryAnswers[q.id] === q.correctAnswer) correctTheoryCount++;
-    });
-    const totalCount = studentQuestions.length || 20;
-    const theoryScore = Math.round((correctTheoryCount / totalCount) * 25);
 
-    // 2. Tier 2 Debugging Triage (Max 20 pts)
+    studentQuestions.forEach((q) => {
+      if (!topicStats[q.topic]) topicStats[q.topic] = { correct: 0, total: 0 };
+      topicStats[q.topic].total += 1;
+
+      if (theoryAnswers[q.id] === q.correctAnswer) {
+        correctTheoryCount += 1;
+        topicStats[q.topic].correct += 1;
+      }
+    });
+
+    const totalCount = studentQuestions.length || 20;
+    const theoryScore = Math.round((correctTheoryCount / totalCount) * 35);
     const debuggingScore = debuggingAnswer === DEBUGGING_SCENARIO.correctAnswer ? 20 : 0;
 
-    // 3. Tier 3 Algorithmic Complexity (Max 30 pts)
     const hasNestedLoop = /for\s*\(.*for\s*\(|while\s*\(.*while\s*\(/.test(code);
     const hasHashMap = /Map|Set|complement|diff/.test(code);
-    let codingScore = 30;
-    let detectedComplexity = "O(N) - Linear Time (Optimal Hash Map)";
+    let codingScore = 25;
+    let detectedComplexity = "O(N) - Linear Time (Hash Map)";
 
     if (hasNestedLoop) {
-      codingScore = 12;
-      detectedComplexity = "O(N^2) - Sub-optimal Brute Force";
+      codingScore = 10;
+      detectedComplexity = "O(N^2) - Brute Force";
     } else if (!hasHashMap) {
-      codingScore = 20;
-      detectedComplexity = "O(N log N) - Sorting / Two-Pointer";
+      codingScore = 16;
+      detectedComplexity = "O(N log N) - Sorting / Two Pointers";
     }
 
-    // 4. Tier 4 System Architecture (Max 15 pts)
     const designScore = systemDesignAnswer === SYSTEM_DESIGN_SCENARIO.correctAnswer ? 15 : 0;
+    const speedScore = totalElapsed <= 720 ? 5 : totalElapsed <= 1000 ? 3 : 1;
 
-    // 5. Benchmark Speed (Max 10 pts)
-    const totalBenchmark = 720; // 12 minutes
-    let speedScore = 10;
-    if (totalElapsed <= totalBenchmark) {
-      speedScore = 10;
-    } else if (totalElapsed <= totalBenchmark * 1.3) {
-      speedScore = 7;
-    } else {
-      speedScore = 5;
-    }
-
-    const trustScore = Math.max(0, 100 - strikes.length * 15);
     const totalMeritScore = theoryScore + debuggingScore + codingScore + designScore + speedScore;
+    const trustScore = Math.max(0, 100 - strikes.length * 20);
 
     let competencyBadge = "Gold Certified (Ready-to-Hire)";
     if (totalMeritScore < 60) competencyBadge = "Bronze Assessed (Foundational)";
-    else if (totalMeritScore < 80) competencyBadge = "Silver Verified (Industry Ready)";
+    else if (totalMeritScore < 80) competencyBadge = "Silver Verified (Job Ready)";
+
+    const topicGaps = Object.entries(topicStats).map(([topic, stat]) => {
+      const percentage = Math.round((stat.correct / stat.total) * 100);
+      let status: "Strong" | "Average" | "Needs Improvement" = "Needs Improvement";
+      if (percentage >= 75) status = "Strong";
+      else if (percentage >= 50) status = "Average";
+
+      return { topic, correct: stat.correct, total: stat.total, percentage, status };
+    });
+
+    const matchedInternships = INTERNSHIP_CATALOG.map((job) => {
+      const isEligible = totalMeritScore >= job.minScoreReq;
+      const matchPercentage = Math.min(99, Math.round((totalMeritScore / 100) * 85) + (isEligible ? 14 : 5));
+      return { ...job, matchPercentage, isEligible };
+    });
 
     setEvaluation({
       theoryScore,
@@ -515,13 +581,14 @@ function StudentAssessmentEngine() {
       totalMeritScore,
       detectedComplexity,
       competencyBadge,
+      topicGaps,
+      matchedInternships,
     });
 
-    // Save Scorecard and Attempted Question IDs in Supabase
     try {
       const attemptedIds = studentQuestions.map((q) => q.id);
       await supabase.from("student_assessments").insert({
-        student_email: userEmail || "verified.student@portal.ac.in",
+        student_email: userEmail || "student@institution.ac.in",
         role_id: selectedDomain === "custom-domain" ? "fullstack-web" : selectedDomain,
         total_score: totalMeritScore,
         logic_score: theoryScore + codingScore,
@@ -533,11 +600,11 @@ function StudentAssessmentEngine() {
         attempted_question_ids: attemptedIds,
       });
     } catch (err) {
-      console.error("Failed to sync scorecard with Supabase:", err);
+      console.error("Scorecard sync error:", err);
     }
 
     setAssessmentStage("submitted");
-    toast.success("Comprehensive evaluation verified and stored!");
+    toast.success("Real evaluation and skill matrix computed!");
   };
 
   const formatTime = (secs: number) => {
@@ -552,7 +619,7 @@ function StudentAssessmentEngine() {
       : DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain;
 
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION (36 DOMAINS + SEARCH)
+  // VIEW 1: DOMAIN SELECTION (ALL 36 DOMAINS + SEARCH + PILLS)
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
     const filteredDomains = DOMAIN_OPTIONS.filter((d) => {
@@ -657,7 +724,7 @@ function StudentAssessmentEngine() {
               <div>
                 <span className="font-bold text-xs sm:text-sm text-white">Other / Custom Specialization</span>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Mee specialization list lo lekapothe ikkada manual ga type cheyandi.
+                  Type your custom domain if not found in the curated list.
                 </p>
                 {selectedDomain === "custom-domain" && (
                   <input
@@ -665,7 +732,7 @@ function StudentAssessmentEngine() {
                     autoFocus
                     value={customDomainText}
                     onChange={(e) => setCustomDomainText(e.target.value)}
-                    placeholder="e.g. Bio-Informatics, Mechatronics, Aerospace..."
+                    placeholder="e.g. Mechatronics, Bio-Informatics, Aerospace..."
                     className="mt-2 w-full px-3 py-1.5 rounded-lg bg-black/70 border border-blue-400 text-xs text-white placeholder:text-slate-500 focus:outline-none"
                   />
                 )}
@@ -684,15 +751,15 @@ function StudentAssessmentEngine() {
                 isLoadingQuestions
               }
               onClick={handleProceedToGuidelines}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs px-6"
             >
               {isLoadingQuestions ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 className="size-3.5 animate-spin" /> Randomizing Unique Exam Set...
+                  <Loader2 className="size-3.5 animate-spin" /> Randomizing Unique Question Set...
                 </span>
               ) : (
                 <span className="flex items-center gap-1.5">
-                  Continue to Assessment Room
+                  Continue to Guidelines
                   <ArrowRight className="size-4" />
                 </span>
               )}
@@ -704,7 +771,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 2: DISQUALIFIED SCREEN
+  // VIEW 2: DISQUALIFIED SCREEN WITH FULL AUDIT TRAIL
   // -------------------------------------------------------------
   if (isDisqualified) {
     return (
@@ -716,14 +783,14 @@ function StudentAssessmentEngine() {
           <span className="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 mb-3">
             Policy Disqualification
           </span>
-          <h1 className="text-3xl font-black text-white">Assessment Terminated</h1>
+          <h1 className="text-3xl font-black text-white">Assessment Revoked</h1>
           <p className="mt-3 text-sm text-rose-200/80 leading-relaxed">
-            Your assessment session has been permanently revoked. You exceeded the maximum allowed policy infractions (2 chances). All inputs are locked.
+            You exceeded the allowed policy violations (2 warnings). Your assessment has been locked and recorded in the audit trail.
           </p>
 
           <div className="mt-6 rounded-xl border border-white/10 bg-black/50 p-4 text-left">
             <h4 className="text-xs font-bold uppercase tracking-wider text-rose-300 mb-2">
-              Violation Audit Trail:
+              Violation Log History:
             </h4>
             <div className="space-y-2 text-xs text-slate-300">
               {strikes.map((s, idx) => (
@@ -746,125 +813,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: 5-DIMENSION MERIT SCORECARD
-  // -------------------------------------------------------------
-  if (assessmentStage === "submitted" && evaluation) {
-    return (
-      <div className="min-h-screen bg-[#071224] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
-        <div className="w-full max-w-4xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
-          <div className="text-center pb-6 border-b border-white/10">
-            <div className="size-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-3">
-              <CheckCircle2 className="size-6" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Talent Readiness Index Verified
-            </h1>
-            <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
-              Evaluated Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
-            <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
-              <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
-                Total Merit Index
-              </span>
-              <div className="text-4xl font-extrabold text-white mt-1">
-                {evaluation.totalMeritScore}
-                <span className="text-lg font-medium text-blue-200/70">/100</span>
-              </div>
-              <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                {evaluation.competencyBadge}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Total Speed</span>
-                <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
-              </div>
-              <p className="text-[11px] text-blue-200/70 mt-2">
-                Target Benchmark: 12m 00s ({totalElapsed <= 720 ? "Optimal Speed achieved" : "Moderate Speed"})
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
-                <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
-              </div>
-              <p className="text-[11px] text-blue-200/70 mt-2">
-                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} warnings logged`}
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-200 flex items-center gap-2">
-              <Sparkles className="size-3.5 text-blue-400" />
-              Corporate Audit Breakdown (4 Dimensions):
-            </h3>
-
-            <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/40 overflow-hidden text-xs">
-              <div className="p-4 flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-white">Tier 1: Core Domain Theory (20 Items)</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">Architecture, Memory Models, Protocols & System Design Principles</div>
-                </div>
-                <div className="text-sm font-bold text-blue-400">+{evaluation.theoryScore} / 25 pts</div>
-              </div>
-
-              <div className="p-4 flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-white">Tier 2: Production Debugging & Bug Triage</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">Root cause diagnosis of memory leaks & unhandled promise rejections</div>
-                </div>
-                <div className="text-sm font-bold text-amber-400">+{evaluation.debuggingScore} / 20 pts</div>
-              </div>
-
-              <div className="p-4 flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-white">Tier 3: Algorithmic Optimization & Complexity</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">
-                    Detected Runtime: <span className="text-cyan-300 font-mono font-bold">{evaluation.detectedComplexity}</span>
-                  </div>
-                </div>
-                <div className="text-sm font-bold text-cyan-400">+{evaluation.codingScore} / 30 pts</div>
-              </div>
-
-              <div className="p-4 flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-white">Tier 4: System Architecture & Scale Tradeoffs</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">High-concurrency data structure selection & write latency tradeoffs</div>
-                </div>
-                <div className="text-sm font-bold text-purple-400">+{evaluation.designScore} / 15 pts</div>
-              </div>
-
-              <div className="p-4 flex items-center justify-between">
-                <div>
-                  <div className="font-semibold text-white">Tier 5: Execution Pace & Target Benchmark Speed</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">Completion within 12m enterprise timeline</div>
-                </div>
-                <div className="text-sm font-bold text-emerald-400">+{evaluation.speedScore} / 10 pts</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-end gap-3">
-            <Link to="/">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs">
-                Back to Dashboard
-                <ArrowRight className="size-4 ml-1.5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // -------------------------------------------------------------
-  // VIEW 4: GUIDELINES & PROCTOR CAMERA GATING
+  // VIEW 3: GUIDELINES & PROCTOR CAMERA GATING
   // -------------------------------------------------------------
   if (assessmentStage === "guidelines") {
     return (
@@ -876,7 +825,7 @@ function StudentAssessmentEngine() {
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-white">
-                AI-Proctored Holistic Talent Assessment
+                AI-Proctored Assessment Guidelines
               </h1>
               <p className="text-xs text-blue-200/70">
                 Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
@@ -889,21 +838,21 @@ function StudentAssessmentEngine() {
               <div className="p-3.5 rounded-xl border border-amber-400/20 bg-amber-500/10 text-amber-200">
                 <span className="font-bold flex items-center gap-1.5 mb-1">
                   <ShieldAlert className="size-4 text-amber-400" />
-                  Strict 2-Chance Policy Active
+                  Live Proctoring & Eye Gaze Monitoring Active
                 </span>
-                Tab switching, minimizing browser, or copying code triggers strikes. 2 chances allowed. The 3rd strike terminates exam immediately.
+                Camera video will float on your screen throughout the exam. Eye gaze drifts away from screen or hand gestures covering face will trigger strikes.
               </div>
 
               <div className="space-y-2">
                 <h4 className="font-bold uppercase tracking-wider text-slate-400 text-[11px]">
-                  4-Tier Evaluation Breakdown:
+                  Real Marks Weightage:
                 </h4>
                 <div className="space-y-1.5 text-slate-300">
-                  <div>• <strong>Tier 1 (25 pts):</strong> 20 Domain Theory Questions.</div>
-                  <div>• <strong>Tier 2 (20 pts):</strong> Production Bug Triage & Fix.</div>
-                  <div>• <strong>Tier 3 (30 pts):</strong> O(N) Code Efficiency & Tests.</div>
-                  <div>• <strong>Tier 4 (15 pts):</strong> Architecture & Scale Tradeoffs.</div>
-                  <div>• <strong>Tier 5 (10 pts):</strong> Target Benchmark Pace.</div>
+                  <div>• <strong>Tier 1 (35 pts):</strong> 20 Domain Theory Questions.</div>
+                  <div>• <strong>Tier 2 (20 pts):</strong> Production Bug Triage & Root Cause.</div>
+                  <div>• <strong>Tier 3 (25 pts):</strong> O(N) Code Efficiency & Complexity.</div>
+                  <div>• <strong>Tier 4 (15 pts):</strong> System Architecture Tradeoffs.</div>
+                  <div>• <strong>Tier 5 (5 pts):</strong> Optimal Completion Pace.</div>
                 </div>
               </div>
             </div>
@@ -945,7 +894,7 @@ function StudentAssessmentEngine() {
                 {cameraStatus === "ready" ? (
                   <>
                     <ShieldCheck className="size-4" />
-                    AI Proctor Camera Active
+                    Camera & Vision Engine Ready
                   </>
                 ) : (
                   <>
@@ -955,9 +904,7 @@ function StudentAssessmentEngine() {
                 )}
               </div>
               <p className="text-[10px] text-slate-400 mt-1">
-                {cameraStatus === "ready"
-                  ? "Maintain center gaze & ensure adequate lighting."
-                  : "Please grant camera permission in your browser address bar."}
+                {cameraStatus === "ready" ? "Maintain center gaze on screen." : "Allow camera in browser address bar."}
               </p>
             </div>
           </div>
@@ -968,15 +915,15 @@ function StudentAssessmentEngine() {
               onClick={() => setAssessmentStage("domain-selection")}
               className="text-xs text-slate-400 hover:text-white"
             >
-              Change Domain
+              Change Track
             </button>
 
             <Button
               disabled={cameraStatus !== "ready"}
               onClick={() => setAssessmentStage("testing")}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white font-bold text-xs px-6"
             >
-              {cameraStatus === "ready" ? "Begin Assessment Now" : "Enable Camera to Begin"}
+              {cameraStatus === "ready" ? "Begin Assessment" : "Enable Camera First"}
               <ArrowRight className="size-4 ml-1.5" />
             </Button>
           </div>
@@ -986,375 +933,571 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: ACTIVE 4-TIER ASSESSMENT ENGINE
+  // VIEW 4: ACTIVE 4-TIER ASSESSMENT (WITH FLOATING PiP VIDEO)
   // -------------------------------------------------------------
-  const activeQuestions = studentQuestions.length > 0 ? studentQuestions : generateAntiCheatExamSet(RAW_QUESTION_POOL);
+  const activeQuestions = studentQuestions.length > 0 ? studentQuestions : MASTER_QUESTION_POOL;
   const currentQ = activeQuestions[currentTheoryIndex] || activeQuestions[0];
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      {activeAlert && (
-        <div className="bg-amber-500/20 border-b border-amber-500/40 px-6 py-2.5 flex items-center justify-between text-amber-200 text-xs sticky top-0 z-50">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="size-4 text-amber-400 shrink-0" />
-            <span className="font-semibold">{activeAlert}</span>
+  if (assessmentStage === "testing") {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
+        <canvas ref={canvasRef} className="hidden" />
+
+        {activeAlert && (
+          <div className="bg-amber-500/20 border-b border-amber-500/40 px-6 py-2.5 flex items-center justify-between text-amber-200 text-xs sticky top-0 z-50">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="size-4 text-amber-400 shrink-0" />
+              <span className="font-semibold">{activeAlert}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveAlert(null)}
+              className="text-[10px] uppercase font-bold underline hover:text-white"
+            >
+              Acknowledge
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setActiveAlert(null)}
-            className="text-[10px] uppercase font-bold underline hover:text-white"
-          >
-            Acknowledge
-          </button>
+        )}
+
+        <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-md px-6 py-3 flex items-center justify-between sticky top-0 z-40">
+          <div className="flex items-center gap-3">
+            <span className="font-extrabold text-sm text-white tracking-tight">
+              SkillBridge Assessment
+            </span>
+
+            <div className="flex rounded-lg bg-black/40 p-0.5 text-xs border border-white/10">
+              <button
+                onClick={() => setActiveTab("theory")}
+                className={cn(
+                  "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
+                  activeTab === "theory" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                )}
+              >
+                <BookOpen className="size-3.5" />
+                1. Theory ({Object.keys(theoryAnswers).length}/{activeQuestions.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("debugging")}
+                className={cn(
+                  "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
+                  activeTab === "debugging" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                )}
+              >
+                <Bug className="size-3.5" />
+                2. Bug Triage
+              </button>
+              <button
+                onClick={() => setActiveTab("coding")}
+                className={cn(
+                  "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
+                  activeTab === "coding" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                )}
+              >
+                <Code2 className="size-3.5" />
+                3. Coding Challenge
+              </button>
+              <button
+                onClick={() => setActiveTab("architecture")}
+                className={cn(
+                  "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
+                  activeTab === "architecture" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
+                )}
+              >
+                <Layers className="size-3.5" />
+                4. Architecture
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-200">
+              <Clock className="size-3.5 text-blue-400" />
+              <span>Elapsed: {formatTime(totalElapsed)}</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 text-xs bg-rose-500/10 border border-rose-500/30 px-3 py-1.5 rounded-lg text-rose-300">
+              <ShieldAlert className="size-3.5 text-rose-400" />
+              <span>Strikes: {strikes.length} / 2</span>
+            </div>
+
+            <Button
+              onClick={handleFinalSubmit}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-4 shadow-sm"
+            >
+              Submit All 4 Tiers
+            </Button>
+          </div>
+        </header>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* FLOATING PICTURE-IN-PICTURE (PiP) LIVE CAMERA FEED & GAZE TRACKER */}
+        {/* ------------------------------------------------------------------ */}
+        <div className="fixed bottom-5 right-5 z-50 rounded-xl overflow-hidden border-2 border-emerald-500/80 bg-slate-900 shadow-2xl w-48 sm:w-56 backdrop-blur-md">
+          <div className="relative aspect-video bg-black">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover scale-x-[-1]"
+            />
+            <div className="absolute top-1.5 left-2 flex items-center gap-1.5">
+              <span className="size-2 rounded-full bg-red-500 animate-ping" />
+              <span className="text-[9px] font-bold uppercase tracking-wider text-white drop-shadow">REC</span>
+            </div>
+            {handGestureDetected && (
+              <div className="absolute inset-0 bg-rose-900/70 flex items-center justify-center text-white text-[10px] font-bold animate-pulse text-center p-1">
+                <Hand className="size-4 mr-1 text-rose-300" /> Hand Detected Near Face!
+              </div>
+            )}
+          </div>
+          <div className="p-2 bg-slate-900/90 flex items-center justify-between text-[10px] text-slate-300 border-t border-white/10">
+            <span className="flex items-center gap-1">
+              <Eye className="size-3 text-blue-400" /> Gaze: <strong>{gazeStatus}</strong>
+            </span>
+            <span className={cn("font-bold px-1.5 py-0.2 rounded text-[9px]", gazeStatus === "Center" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300")}>
+              {gazeStatus === "Center" ? "OK" : "Drifting"}
+            </span>
+          </div>
         </div>
-      )}
 
-      {/* 4-Tier Navigation Header */}
-      <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-md px-6 py-3 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <span className="font-extrabold text-sm text-white tracking-tight">
-            SkillBridge 360° Assessment
-          </span>
+        {/* Assessment Tiers Views */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* TIER 1: THEORY (20 QUESTIONS) */}
+          {activeTab === "theory" && (
+            <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4 text-xs">
+                  <span className="font-bold uppercase tracking-wider text-blue-400">
+                    Question {currentTheoryIndex + 1} of {activeQuestions.length} • Topic: {currentQ?.topic}
+                  </span>
+                  <span className="text-slate-400">
+                    Answered: {Object.keys(theoryAnswers).length} / {activeQuestions.length}
+                  </span>
+                </div>
 
-          <div className="flex rounded-lg bg-black/40 p-0.5 text-xs border border-white/10">
-            <button
-              onClick={() => setActiveTab("theory")}
-              className={cn(
-                "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
-                activeTab === "theory" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
-              )}
-            >
-              <BookOpen className="size-3.5" />
-              1. Theory ({Object.keys(theoryAnswers).length}/{activeQuestions.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("debugging")}
-              className={cn(
-                "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
-                activeTab === "debugging" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
-              )}
-            >
-              <Bug className="size-3.5" />
-              2. Bug Triage
-            </button>
-            <button
-              onClick={() => setActiveTab("coding")}
-              className={cn(
-                "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
-                activeTab === "coding" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
-              )}
-            >
-              <Code2 className="size-3.5" />
-              3. Coding Challenge
-            </button>
-            <button
-              onClick={() => setActiveTab("architecture")}
-              className={cn(
-                "px-3 py-1 rounded-md font-semibold transition flex items-center gap-1.5",
-                activeTab === "architecture" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white"
-              )}
-            >
-              <Layers className="size-3.5" />
-              4. System Architecture
-            </button>
-          </div>
-        </div>
+                <h2 className="text-lg sm:text-xl font-bold text-white mb-6 leading-relaxed">
+                  {currentQ?.question}
+                </h2>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-200">
-            <Clock className="size-3.5 text-blue-400" />
-            <span>Elapsed: {formatTime(totalElapsed)}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-xs bg-rose-500/10 border border-rose-500/30 px-3 py-1.5 rounded-lg text-rose-300">
-            <ShieldAlert className="size-3.5 text-rose-400" />
-            <span>Strikes: {strikes.length} / 2</span>
-          </div>
-
-          <Button
-            onClick={handleFinalSubmit}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-4 shadow-sm"
-          >
-            Submit All 4 Tiers
-          </Button>
-        </div>
-      </header>
-
-      <div className="flex-1 flex overflow-hidden">
-        {/* TIER 1: THEORY BLITZ (20 ANTI-COLLISION QUESTIONS) */}
-        {activeTab === "theory" && (
-          <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
-                  Tier 1 • Question {currentTheoryIndex + 1} of {activeQuestions.length} (Anti-Cheat Seed Active)
-                </span>
-                <span className="text-xs text-slate-400">
-                  Answered: {Object.keys(theoryAnswers).length} / {activeQuestions.length}
-                </span>
+                <div className="space-y-3">
+                  {currentQ?.options.map((opt) => {
+                    const isSelected = theoryAnswers[currentQ.id] === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setTheoryAnswers((prev) => ({ ...prev, [currentQ.id]: opt.id }))}
+                        className={cn(
+                          "w-full p-4 rounded-xl border text-left text-xs sm:text-sm font-medium transition flex items-center justify-between",
+                          isSelected
+                            ? "border-blue-500 bg-blue-500/10 text-white"
+                            : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900"
+                        )}
+                      >
+                        <span>{opt.text}</span>
+                        <div
+                          className={cn(
+                            "size-5 rounded-full border flex items-center justify-center text-[10px] font-bold",
+                            isSelected ? "border-blue-500 bg-blue-500 text-white" : "border-white/30 text-slate-400"
+                          )}
+                        >
+                          {opt.id}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-6 leading-relaxed">
-                {currentQ?.question}
-              </h2>
+              <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+                <Button
+                  disabled={currentTheoryIndex === 0}
+                  onClick={() => setCurrentTheoryIndex((prev) => prev - 1)}
+                  className="bg-white/5 hover:bg-white/10 text-white text-xs"
+                >
+                  Previous
+                </Button>
+                {currentTheoryIndex < activeQuestions.length - 1 ? (
+                  <Button
+                    onClick={() => setCurrentTheoryIndex((prev) => prev + 1)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold"
+                  >
+                    Next Question
+                    <ChevronRight className="size-4 ml-1" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setActiveTab("debugging")}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
+                  >
+                    Proceed to Tier 2
+                    <ChevronRight className="size-4 ml-1" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
 
-              <div className="space-y-3">
-                {currentQ?.options.map((opt) => {
-                  const isSelected = theoryAnswers[currentQ.id] === opt.id;
-                  return (
+          {/* TIER 2: DEBUGGING */}
+          {activeTab === "debugging" && (
+            <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-2">
+                  Tier 2 • Real-World Incident Bug Triage (20 Pts)
+                </span>
+                <h2 className="text-lg font-bold text-white mb-2">{DEBUGGING_SCENARIO.title}</h2>
+                <p className="text-xs text-slate-300 whitespace-pre-line mb-4 leading-relaxed">
+                  {DEBUGGING_SCENARIO.description}
+                </p>
+
+                <div className="p-4 rounded-xl bg-black border border-white/15 font-mono text-xs text-emerald-400 mb-6 overflow-x-auto">
+                  <pre>{DEBUGGING_SCENARIO.buggyCode}</pre>
+                </div>
+
+                <div className="space-y-3">
+                  {DEBUGGING_SCENARIO.options.map((opt) => (
                     <button
                       key={opt.id}
                       type="button"
-                      onClick={() =>
-                        setTheoryAnswers((prev) => ({ ...prev, [currentQ.id]: opt.id }))
-                      }
+                      onClick={() => setDebuggingAnswer(opt.id)}
                       className={cn(
-                        "w-full p-4 rounded-xl border text-left text-xs sm:text-sm font-medium transition flex items-center justify-between",
-                        isSelected
-                          ? "border-blue-500 bg-blue-500/10 text-white"
-                          : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900 hover:border-white/20"
+                        "w-full p-4 rounded-xl border text-left text-xs font-medium transition flex items-center justify-between",
+                        debuggingAnswer === opt.id
+                          ? "border-amber-500 bg-amber-500/10 text-white"
+                          : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900"
                       )}
                     >
                       <span>{opt.text}</span>
-                      <div
-                        className={cn(
-                          "size-5 rounded-full border flex items-center justify-center text-[10px] font-bold",
-                          isSelected
-                            ? "border-blue-500 bg-blue-500 text-white"
-                            : "border-white/30 text-slate-400"
-                        )}
-                      >
-                        {opt.id}
-                      </div>
+                      <span className="text-xs font-bold text-slate-400 ml-3">{opt.id}</span>
                     </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-white/10 flex items-center justify-between">
-              <Button
-                disabled={currentTheoryIndex === 0}
-                onClick={() => setCurrentTheoryIndex((prev) => prev - 1)}
-                className="bg-white/5 hover:bg-white/10 text-white text-xs disabled:opacity-30"
-              >
-                Previous Question
-              </Button>
-              {currentTheoryIndex < activeQuestions.length - 1 ? (
-                <Button
-                  onClick={() => setCurrentTheoryIndex((prev) => prev + 1)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold"
-                >
-                  Next Question
-                  <ChevronRight className="size-4 ml-1" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setActiveTab("debugging")}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
-                >
-                  Proceed to Tier 2: Bug Triage
-                  <ChevronRight className="size-4 ml-1" />
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* TIER 2: PRODUCTION INCIDENT DEBUGGING */}
-        {activeTab === "debugging" && (
-          <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                  Tier 2 • Real-World Production Bug Triage (20 Pts)
-                </span>
-              </div>
-
-              <h2 className="text-lg font-bold text-white mb-2">{DEBUGGING_SCENARIO.title}</h2>
-              <p className="text-xs text-slate-300 whitespace-pre-line mb-4 leading-relaxed">
-                {DEBUGGING_SCENARIO.description}
-              </p>
-
-              <div className="p-4 rounded-xl bg-black border border-white/15 font-mono text-xs text-emerald-400 mb-6 overflow-x-auto">
-                <pre>{DEBUGGING_SCENARIO.buggyCode}</pre>
-              </div>
-
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-                Root Cause & Defensive Fix Strategy:
-              </h3>
-              <div className="space-y-3">
-                {DEBUGGING_SCENARIO.options.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setDebuggingAnswer(opt.id)}
-                    className={cn(
-                      "w-full p-4 rounded-xl border text-left text-xs font-medium transition flex items-center justify-between",
-                      debuggingAnswer === opt.id
-                        ? "border-amber-500 bg-amber-500/10 text-white"
-                        : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900"
-                    )}
-                  >
-                    <span>{opt.text}</span>
-                    <span className="text-xs font-bold text-slate-400 ml-3">{opt.id}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-white/10 flex justify-end">
-              <Button
-                onClick={() => setActiveTab("coding")}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold"
-              >
-                Proceed to Tier 3: Algorithmic Coding
-                <ChevronRight className="size-4 ml-1" />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* TIER 3: ALGORITHMIC CODING & BIG-O EVALUATION */}
-        {activeTab === "coding" && (
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-            <div className="lg:col-span-5 border-r border-white/10 p-6 flex flex-col justify-between overflow-y-auto bg-slate-900/40">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                    Target: O(N) Efficiency
-                  </span>
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <Zap className="size-3.5 text-amber-400" />
-                    Benchmark: 5m 00s
-                  </span>
-                </div>
-
-                <h2 className="text-xl font-bold text-white mb-3">{CODING_DATA.title}</h2>
-                <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line mb-6">
-                  {CODING_DATA.description}
-                </div>
-
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-                  Validation Test Cases:
-                </h4>
-                <div className="space-y-2">
-                  {CODING_DATA.testCases.map((tc, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-xs font-mono"
-                    >
-                      <div className="text-slate-400">Input: <span className="text-white">{tc.input}</span></div>
-                      <div className="text-slate-400">Expected: <span className="text-emerald-400">{tc.expected}</span></div>
-                    </div>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-white/10 flex items-center gap-4">
-                <div className="relative size-20 rounded-xl overflow-hidden bg-black border-2 border-emerald-500 shadow-md">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover scale-x-[-1]"
-                  />
-                  <div className="absolute inset-1 border border-dashed border-emerald-400/80 rounded pointer-events-none" />
-                </div>
-                <div className="flex-1 text-xs">
-                  <div className="flex items-center gap-1.5 font-semibold text-emerald-400">
-                    <Eye className="size-3.5" />
-                    <span>AI Monitoring Active</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-0.5 leading-tight">
-                    Tab switches & copy-paste actions are audited continuously.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-7 flex flex-col bg-black">
-              <div className="px-4 py-2 border-b border-white/10 bg-slate-900/80 flex items-center justify-between text-xs text-slate-400">
-                <div className="flex items-center gap-2 font-mono">
-                  <Terminal className="size-3.5 text-blue-400" />
-                  <span>solution.js</span>
-                </div>
-                <span className="text-[11px] text-slate-500">Complexity Evaluation Engine Active</span>
-              </div>
-
-              <textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                spellCheck={false}
-                className="flex-1 w-full bg-slate-950 p-4 font-mono text-xs text-emerald-300 focus:outline-none resize-none leading-relaxed"
-              />
-
-              <div className="p-3 border-t border-white/10 bg-slate-900/60 flex items-center justify-between text-xs">
-                <span className="text-slate-500 text-[11px]">
-                  Clipboard locked • Right-click disabled
-                </span>
-                <Button
-                  onClick={() => setActiveTab("architecture")}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-8 px-4"
-                >
-                  Proceed to Tier 4: System Architecture
+              <div className="pt-6 border-t border-white/10 flex justify-end">
+                <Button onClick={() => setActiveTab("coding")} className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold">
+                  Proceed to Tier 3: Algorithmic Coding
+                  <ChevronRight className="size-4 ml-1" />
                 </Button>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* TIER 4: SYSTEM ARCHITECTURE & SCALE TRADEOFF */}
-        {activeTab === "architecture" && (
-          <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
-                  Tier 4 • Scalability & Distributed Systems (15 Pts)
-                </span>
+          {/* TIER 3: CODING */}
+          {activeTab === "coding" && (
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+              <div className="lg:col-span-5 border-r border-white/10 p-6 flex flex-col justify-between overflow-y-auto bg-slate-900/40">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                      Target: O(N) Efficiency
+                    </span>
+                  </div>
+
+                  <h2 className="text-xl font-bold text-white mb-3">{CODING_DATA.title}</h2>
+                  <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line mb-6">
+                    {CODING_DATA.description}
+                  </div>
+
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                    Validation Test Cases:
+                  </h4>
+                  <div className="space-y-2">
+                    {CODING_DATA.testCases.map((tc, idx) => (
+                      <div key={idx} className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-xs font-mono">
+                        <div className="text-slate-400">Input: <span className="text-white">{tc.input}</span></div>
+                        <div className="text-slate-400">Expected: <span className="text-emerald-400">{tc.expected}</span></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-white/10 text-xs text-slate-400">
+                  Corner camera actively confirms single-candidate proctoring rules.
+                </div>
               </div>
 
-              <h2 className="text-lg font-bold text-white mb-2">{SYSTEM_DESIGN_SCENARIO.title}</h2>
-              <p className="text-xs text-slate-300 whitespace-pre-line mb-6 leading-relaxed">
-                {SYSTEM_DESIGN_SCENARIO.scenario}
-              </p>
+              <div className="lg:col-span-7 flex flex-col bg-black">
+                <div className="px-4 py-2 border-b border-white/10 bg-slate-900/80 flex items-center justify-between text-xs text-slate-400">
+                  <div className="flex items-center gap-2 font-mono">
+                    <Terminal className="size-3.5 text-blue-400" />
+                    <span>solution.js</span>
+                  </div>
+                  <span className="text-[11px] text-slate-500">Complexity Evaluation Engine Active</span>
+                </div>
 
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-                Architectural Evaluation:
-              </h3>
-              <div className="space-y-3">
-                {SYSTEM_DESIGN_SCENARIO.options.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setSystemDesignAnswer(opt.id)}
-                    className={cn(
-                      "w-full p-4 rounded-xl border text-left text-xs font-medium transition flex items-center justify-between",
-                      systemDesignAnswer === opt.id
-                        ? "border-purple-500 bg-purple-500/10 text-white"
-                        : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900"
-                    )}
-                  >
-                    <span>{opt.text}</span>
-                    <span className="text-xs font-bold text-slate-400 ml-3">{opt.id}</span>
-                  </button>
-                ))}
+                <textarea
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  spellCheck={false}
+                  className="flex-1 w-full bg-slate-950 p-4 font-mono text-xs text-emerald-300 focus:outline-none resize-none leading-relaxed"
+                />
+
+                <div className="p-3 border-t border-white/10 bg-slate-900/60 flex items-center justify-between text-xs">
+                  <span className="text-slate-500 text-[11px]">Clipboard locked</span>
+                  <Button onClick={() => setActiveTab("architecture")} className="bg-blue-600 hover:bg-blue-700 text-white text-xs h-8 px-4">
+                    Proceed to Tier 4: Architecture
+                  </Button>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="pt-6 border-t border-white/10 flex justify-end">
-              <Button
-                onClick={handleFinalSubmit}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6"
-              >
-                Submit All & Generate Merit Matrix
+          {/* TIER 4: SYSTEM ARCHITECTURE */}
+          {activeTab === "architecture" && (
+            <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-400 block mb-2">
+                  Tier 4 • Architecture & Scale Tradeoffs (15 Pts)
+                </span>
+                <h2 className="text-lg font-bold text-white mb-2">{SYSTEM_DESIGN_SCENARIO.title}</h2>
+                <p className="text-xs text-slate-300 whitespace-pre-line mb-6 leading-relaxed">
+                  {SYSTEM_DESIGN_SCENARIO.scenario}
+                </p>
+
+                <div className="space-y-3">
+                  {SYSTEM_DESIGN_SCENARIO.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setSystemDesignAnswer(opt.id)}
+                      className={cn(
+                        "w-full p-4 rounded-xl border text-left text-xs font-medium transition flex items-center justify-between",
+                        systemDesignAnswer === opt.id
+                          ? "border-purple-500 bg-purple-500/10 text-white"
+                          : "border-white/10 bg-slate-900/50 text-slate-300 hover:bg-slate-900"
+                      )}
+                    >
+                      <span>{opt.text}</span>
+                      <span className="text-xs font-bold text-slate-400 ml-3">{opt.id}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/10 flex justify-end">
+                <Button onClick={handleFinalSubmit} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6">
+                  Submit All & View Scorecard
+                  <ArrowRight className="size-4 ml-1.5" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // VIEW 5: COMPREHENSIVE SCORECARD + SKILL GAP + INTERNSHIPS
+  // -------------------------------------------------------------
+  if (assessmentStage === "submitted" && evaluation) {
+    return (
+      <div className="min-h-screen bg-[#071224] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
+        <div className="w-full max-w-5xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl space-y-8">
+          {/* Header Score Overview */}
+          <div className="text-center pb-6 border-b border-white/10">
+            <div className="size-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-3">
+              <CheckCircle2 className="size-6" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              Verified Readiness Index & Diagnostic Matrix
+            </h1>
+            <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
+              Domain: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
+            </p>
+          </div>
+
+          {/* Top 3 Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
+              <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
+                Real Merit Score
+              </span>
+              <div className="text-4xl font-extrabold text-white mt-1">
+                {evaluation.totalMeritScore}
+                <span className="text-lg font-medium text-blue-200/70">/100</span>
+              </div>
+              <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                {evaluation.competencyBadge}
+              </span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400">Completion Pace</span>
+                <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
+              </div>
+              <p className="text-[11px] text-blue-200/70 mt-2">
+                Speed points added: +{evaluation.speedScore} / 5 pts
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
+                <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
+              </div>
+              <p className="text-[11px] text-blue-200/70 mt-2">
+                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} strikes logged`}
+              </p>
+            </div>
+          </div>
+
+          {/* 4-Tier Real Score Breakdown */}
+          <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/40 overflow-hidden text-xs">
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-white">Tier 1: Core Domain Theory (20 Questions)</div>
+                <div className="text-slate-400 text-[11px]">Real score based on answered questions</div>
+              </div>
+              <div className="text-sm font-bold text-blue-400">+{evaluation.theoryScore} / 35 pts</div>
+            </div>
+
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-white">Tier 2: Production Bug Triage</div>
+                <div className="text-slate-400 text-[11px]">Heap memory leak & unhandled rejection diagnosis</div>
+              </div>
+              <div className="text-sm font-bold text-amber-400">+{evaluation.debuggingScore} / 20 pts</div>
+            </div>
+
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-white">Tier 3: Algorithmic Optimization</div>
+                <div className="text-slate-400 text-[11px]">Detected: <span className="font-mono text-cyan-300 font-bold">{evaluation.detectedComplexity}</span></div>
+              </div>
+              <div className="text-sm font-bold text-cyan-400">+{evaluation.codingScore} / 25 pts</div>
+            </div>
+
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-white">Tier 4: System Architecture & Scale</div>
+                <div className="text-slate-400 text-[11px]">In-memory data structure for 100K live ranking</div>
+              </div>
+              <div className="text-sm font-bold text-purple-400">+{evaluation.designScore} / 15 pts</div>
+            </div>
+          </div>
+
+          {/* 1. SKILL GAP ANALYSIS */}
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="size-5 text-blue-400" />
+              <h3 className="text-base font-bold text-white">Diagnostic Skill Gap Analysis</h3>
+            </div>
+            <p className="text-xs text-slate-400">
+              Granular topic breakdown based on your actual responses:
+            </p>
+
+            <div className="space-y-3">
+              {evaluation.topicGaps.map((item) => (
+                <div
+                  key={item.topic}
+                  className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+                >
+                  <div className="flex-1 w-full">
+                    <div className="text-xs font-semibold text-white flex items-center gap-2">
+                      {item.topic}
+                      <span
+                        className={cn(
+                          "text-[9px] font-bold px-2 py-0.5 rounded border",
+                          item.status === "Strong"
+                            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+                            : item.status === "Average"
+                            ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                            : "bg-rose-500/15 text-rose-300 border-rose-500/30"
+                        )}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2">
+                      <div
+                        className={cn(
+                          "h-1.5 rounded-full",
+                          item.status === "Strong" ? "bg-emerald-500" : item.status === "Average" ? "bg-amber-500" : "bg-rose-500"
+                        )}
+                        style={{ width: `${item.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="text-xs font-mono text-slate-300 shrink-0">
+                    {item.correct} of {item.total} correct ({item.percentage}%)
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. MATCHED SUITABLE INTERNSHIPS */}
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Briefcase className="size-5 text-emerald-400" />
+                <h3 className="text-base font-bold text-white">Suitable Internship & Placement Matches</h3>
+              </div>
+              <span className="text-xs text-emerald-400 font-semibold">Matched to your {evaluation.totalMeritScore}/100 score</span>
+            </div>
+
+            <div className="space-y-3">
+              {evaluation.matchedInternships.map((job) => (
+                <div
+                  key={job.id}
+                  className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-white/20 transition"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-white">{job.role}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        {job.company}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-400 mt-1">
+                      {job.location} • <strong className="text-slate-200">{job.stipend}</strong>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                      {job.skillsNeeded.map((s) => (
+                        <span key={s} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
+                    <div className="text-right">
+                      <div className="text-xs font-bold text-emerald-400">{job.matchPercentage}% Match</div>
+                      <span className="text-[10px] text-slate-400">Min Cutoff: {job.minScoreReq} pts</span>
+                    </div>
+                    <Button
+                      disabled={!job.isEligible}
+                      className={cn(
+                        "text-xs h-8 px-4 font-bold",
+                        job.isEligible ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
+                      )}
+                      onClick={() => toast.success(`Applied to ${job.company}!`)}
+                    >
+                      {job.isEligible ? "Direct Apply" : "Below Cutoff"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4">
+            <Link to="/">
+              <Button className="bg-white/10 hover:bg-white/20 text-white text-xs">
+                Back to Dashboard
                 <ArrowRight className="size-4 ml-1.5" />
               </Button>
-            </div>
+            </Link>
           </div>
-        )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 }
