@@ -23,12 +23,19 @@ import {
   TrendingUp,
   Loader2,
   Hand,
+  UserCheck,
+  FolderGit2,
+  Award,
+  RefreshCw,
+  Compass,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useAppState } from "@/lib/app-state";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export const Route = createFileRoute("/student")({
   component: StudentAssessmentEngine,
@@ -210,7 +217,104 @@ Which architecture tradeoff offers the optimal scalability and lowest write late
 };
 
 // -------------------------------------------------------------
-// 3. CURATED SUITABLE INTERNSHIPS
+// 3. TARGETED ACTION GUIDES, CAPSTONES & INDUSTRY MENTORS
+// -------------------------------------------------------------
+const TOPIC_ACTION_GUIDES: Record<string, { actionSteps: string[]; recommendedProjectTitle: string; projectDetails: string }> = {
+  "Memory Management": {
+    actionSteps: [
+      "Deep dive into V8 Garbage Collection phases (Scavenge nursery vs Mark-Sweep-Compact tenured space)",
+      "Profile real-time memory leaks using Chrome DevTools Memory Inspector & Heap Snapshots",
+      "Avoid memory retention anti-patterns (unbounded global arrays, detached DOM trees, uncleared intervals)",
+    ],
+    recommendedProjectTitle: "Production Heap Profiler & Event Listener Leak Sentinel",
+    projectDetails: "Construct an autonomous Node.js service monitoring process.memoryUsage() that dumps heap snapshots upon 85% RAM saturation.",
+  },
+  "Databases & Indexing": {
+    actionSteps: [
+      "Understand B-Tree node branching factors vs Hash index point lookup constraints",
+      "Analyze query execution plans with EXPLAIN (ANALYZE, BUFFERS) to eliminate sequential table scans",
+      "Design multi-column composite indexes following the Leftmost Prefix Indexing rule",
+    ],
+    recommendedProjectTitle: "High-Throughput Relational Query Index Optimizer",
+    projectDetails: "Optimize a 2-million record PostgreSQL transactional database from 940ms query execution down to sub-10ms with composite indexes.",
+  },
+  "Distributed Systems": {
+    actionSteps: [
+      "Master CAP Theorem latency-consistency trade-offs (CP vs AP distributed configurations)",
+      "Implement Redis Sorted Sets (ZSET) SkipList mechanics for O(log N) leaderboard indexing",
+      "Decouple stateful operations through distributed commit logs (Apache Kafka / RabbitMQ)",
+    ],
+    recommendedProjectTitle: "Real-Time Distributed Leaderboard Engine with WebSockets & Redis",
+    projectDetails: "Architect an in-memory ranking service supporting 100,000 active concurrent connections with sub-30ms rank retrieval latency.",
+  },
+  "Protocols & Web APIs": {
+    actionSteps: [
+      "Understand HTTP/2 multiplexed streams vs HTTP/1.1 Head-of-Line blocking",
+      "Build truly idempotent REST APIs using unique client idempotency keys stored in Redis",
+      "Configure Reverse Proxy SSL termination, HTTP keep-alive, and connection pooling on NGINX",
+    ],
+    recommendedProjectTitle: "High-Concurrency Layer-7 API Gateway & Rate Limiter",
+    projectDetails: "Build an edge reverse proxy in Go or Node.js implementing Token Bucket rate limiting and upstream failover circuit breakers.",
+  },
+  "Data Structures & Big-O": {
+    actionSteps: [
+      "Master Hash Map collision resolution (Separate Chaining vs Open Addressing)",
+      "Implement Priority Queues with Min-Heaps for top-K streaming elements in O(N log K)",
+      "Apply Two-Pointer and Sliding Window paradigms to eliminate nested quadratic O(N^2) loops",
+    ],
+    recommendedProjectTitle: "In-Memory Sliding Window Log Rate Limiter",
+    projectDetails: "Implement an algorithmic sliding-window rate limiter handling 30,000 requests/sec with exact time-window compliance.",
+  },
+  "Application Security": {
+    actionSteps: [
+      "Prevent SQL Injection via strict parameterized queries and ORM prepared statements",
+      "Implement asymmetric RSA / ECC cryptography for digital credential verification",
+      "Harden web endpoints with CSP headers, sanitized inputs, and Zero Trust Token architecture",
+    ],
+    recommendedProjectTitle: "Zero-Trust Web Security & Vulnerability Auditing Gateway",
+    projectDetails: "Develop an automated security middleware that scans API payloads for SQLi, XSS vectors, and enforce cryptographic request signatures.",
+  },
+  "DevOps & Infrastructure": {
+    actionSteps: [
+      "Master Linux cgroups and namespaces governing Docker container process isolation",
+      "Construct multi-stage Dockerfiles minimizing production container images by 70%",
+      "Automate end-to-end CI/CD testing pipelines with GitHub Actions and container registries",
+    ],
+    recommendedProjectTitle: "Self-Healing Container Deployment Pipeline & Metrics Exporter",
+    projectDetails: "Build a GitHub Actions CI/CD deployment pipeline with Docker containerization, automated testing, and Prometheus health telemetry.",
+  },
+  "Frontend Architecture": {
+    actionSteps: [
+      "Study React fiber reconciliation, render passes, and hook linked-list indices",
+      "Optimize web vital metrics (LCP, FID, CLS) using code splitting and lazy asset loading",
+      "Structure enterprise global state using clean unidirectional data flow patterns",
+    ],
+    recommendedProjectTitle: "High-Performance Interactive Virtualized Data Grid",
+    projectDetails: "Develop a virtualized DOM table handling 50,000 live streaming rows with 60 FPS scrolling and zero frame drops.",
+  },
+};
+
+interface Mentor {
+  name: string;
+  role: string;
+  company: string;
+  avatar: string;
+  focusDomain: string;
+}
+
+const MENTOR_ROSTER: Record<string, Mentor> = {
+  "Memory Management": { name: "Arjun Venkat", role: "Staff Backend Architect", company: "Razorpay / ex-Amazon", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80", focusDomain: "V8 Engine & Distributed Architecture" },
+  "Databases & Indexing": { name: "Pooja Sundaram", role: "Principal Data Systems Architect", company: "Swiggy Labs", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80", focusDomain: "PostgreSQL, LSM Trees & DB Sharding" },
+  "Distributed Systems": { name: "Siddharth Verma", role: "Cloud Systems Lead", company: "Microsoft Azure", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80", focusDomain: "Redis, Kafka & High-Scale Systems" },
+  "Protocols & Web APIs": { name: "Meera Krishnan", role: "Lead API Infrastructure Engineer", company: "Razorpay", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80", focusDomain: "Microservices & NGINX Infrastructure" },
+  "Data Structures & Big-O": { name: "Vikram Malhotra", role: "Senior Algorithms Engineer", company: "Google / ex-Flipkart", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80", focusDomain: "DSA Mastery & Scalable Code" },
+  "Application Security": { name: "Rohan Kulkarni", role: "Principal DevSecOps Architect", company: "Palo Alto Networks", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80", focusDomain: "Cloud Security & Zero-Trust Systems" },
+  "DevOps & Infrastructure": { name: "Ananya Deshmukh", role: "Staff SRE & Platform Architect", company: "PhonePe", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80", focusDomain: "Kubernetes, Linux & Infrastructure as Code" },
+  "Frontend Architecture": { name: "Karthik Subramanian", role: "Principal UI Systems Engineer", company: "Uber Engineering", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80", focusDomain: "V8 Internals & High-Performance Web Apps" },
+};
+
+// -------------------------------------------------------------
+// 4. VERIFIED INTERNSHIP CATALOG
 // -------------------------------------------------------------
 interface Internship {
   id: string;
@@ -218,17 +322,17 @@ interface Internship {
   company: string;
   stipend: string;
   location: string;
-  minScoreReq: number;
+  minCutoff: number;
   skillsNeeded: string[];
 }
 
 const INTERNSHIP_CATALOG: Internship[] = [
-  { id: "int-1", role: "Junior Software Engineer Intern", company: "Zomato / Blinkit", stipend: "₹35,000 / month", location: "Hybrid (Bengaluru)", minScoreReq: 60, skillsNeeded: ["JavaScript", "REST APIs", "SQL"] },
-  { id: "int-2", role: "Backend Systems Trainee", company: "Razorpay", stipend: "₹45,000 / month", location: "Bengaluru", minScoreReq: 75, skillsNeeded: ["Node.js / Java", "Redis", "Distributed DB"] },
-  { id: "int-3", role: "Full Stack Developer Associate", company: "Swiggy Labs", stipend: "₹40,000 / month", location: "Hyderabad", minScoreReq: 65, skillsNeeded: ["React", "TypeScript", "Microservices"] },
-  { id: "int-4", role: "AI / Data Science Trainee", company: "Fractal Analytics", stipend: "₹32,000 / month", location: "Mumbai / Hybrid", minScoreReq: 70, skillsNeeded: ["Python", "PyTorch", "Data Pipelines"] },
-  { id: "int-5", role: "Cloud & DevOps Apprentice", company: "Jio Platforms", stipend: "₹28,000 / month", location: "Hyderabad", minScoreReq: 50, skillsNeeded: ["Docker", "Linux", "CI/CD"] },
-  { id: "int-6", role: "Core Embedded & VLSI Trainee", company: "Qualcomm / Texas Instruments", stipend: "₹50,000 / month", location: "Bengaluru", minScoreReq: 80, skillsNeeded: ["Embedded C", "ARM", "Verilog"] },
+  { id: "int-1", role: "Junior Software Engineer Intern", company: "Zomato / Blinkit", stipend: "₹35,000 / month", location: "Hybrid (Bengaluru)", minCutoff: 60, skillsNeeded: ["JavaScript", "REST APIs", "SQL"] },
+  { id: "int-2", role: "Backend Systems Trainee", company: "Razorpay", stipend: "₹45,000 / month", location: "Bengaluru", minCutoff: 75, skillsNeeded: ["Node.js / Java", "Redis", "Distributed DB"] },
+  { id: "int-3", role: "Full Stack Developer Associate", company: "Swiggy Labs", stipend: "₹40,000 / month", location: "Hyderabad", minCutoff: 65, skillsNeeded: ["React", "TypeScript", "Microservices"] },
+  { id: "int-4", role: "AI / Data Science Trainee", company: "Fractal Analytics", stipend: "₹32,000 / month", location: "Mumbai / Hybrid", minCutoff: 70, skillsNeeded: ["Python", "PyTorch", "Data Pipelines"] },
+  { id: "int-5", role: "Cloud & DevOps Apprentice", company: "Jio Platforms", stipend: "₹28,000 / month", location: "Hyderabad", minCutoff: 50, skillsNeeded: ["Docker", "Linux", "CI/CD"] },
+  { id: "int-6", role: "Core Embedded & VLSI Trainee", company: "Qualcomm / Texas Instruments", stipend: "₹50,000 / month", location: "Bengaluru", minCutoff: 80, skillsNeeded: ["Embedded C", "ARM", "Verilog"] },
 ];
 
 function shuffle<T>(array: T[]): T[] {
@@ -244,7 +348,7 @@ function StudentAssessmentEngine() {
   const { userEmail } = useAppState();
 
   const [assessmentStage, setAssessmentStage] = useState<
-    "domain-selection" | "guidelines" | "testing" | "submitted"
+    "domain-selection" | "guidelines" | "testing" | "profile-hub"
   >("domain-selection");
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [customDomainText, setCustomDomainText] = useState("");
@@ -280,19 +384,24 @@ function StudentAssessmentEngine() {
   const gazeOffscreenCount = useRef(0);
   const lastPixelData = useRef<Uint8ClampedArray | null>(null);
 
-  // Dynamic Scorecard & Real Skill Gap Evaluation
-  const [evaluation, setEvaluation] = useState<{
+  // -------------------------------------------------------------
+  // STUDENT VERIFIED SKILL PROFILE STATE (PERSISTED)
+  // -------------------------------------------------------------
+  const [skillProfile, setSkillProfile] = useState<{
+    attemptNumber: number;
+    totalMeritScore: number;
+    competencyBadge: string;
+    isQualified: boolean;
     theoryScore: number;
     debuggingScore: number;
     codingScore: number;
     designScore: number;
     speedScore: number;
     trustScore: number;
-    totalMeritScore: number;
     detectedComplexity: string;
-    competencyBadge: string;
     topicGaps: { topic: string; correct: number; total: number; percentage: number; status: "Strong" | "Average" | "Needs Improvement" }[];
-    matchedInternships: (Internship & { matchPercentage: number; isEligible: boolean })[];
+    assignedProject: { title: string; details: string; targetTopic: string };
+    assignedMentor: Mentor;
   } | null>(null);
 
   // Dynamic Question Retrieval & Shuffling
@@ -351,6 +460,12 @@ function StudentAssessmentEngine() {
       });
 
       setStudentQuestions(shuffled);
+      setTheoryAnswers({});
+      setDebuggingAnswer(null);
+      setSystemDesignAnswer(null);
+      setTotalElapsed(0);
+      setStrikes([]);
+      setCurrentTheoryIndex(0);
     } catch (err) {
       setStudentQuestions(shuffle(MASTER_QUESTION_POOL));
     } finally {
@@ -415,9 +530,7 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // -------------------------------------------------------------
-  // REAL-TIME EYE GAZE & HAND GESTURE DETECTION (NEW)
-  // -------------------------------------------------------------
+  // Real-Time Eye Gaze & Hand Gesture Detection Loop
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -514,8 +627,10 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  // Dynamic Score Calculation
-  const handleFinalSubmit = async () => {
+  // -------------------------------------------------------------
+  // REAL SCORE CALCULATION & STUDENT PROFILE UPGRADE ENGINE
+  // -------------------------------------------------------------
+  const submitAssessmentAndGenerateProfile = async () => {
     const topicStats: Record<string, { correct: number; total: number }> = {};
     let correctTheoryCount = 0;
 
@@ -551,9 +666,10 @@ function StudentAssessmentEngine() {
 
     const totalMeritScore = theoryScore + debuggingScore + codingScore + designScore + speedScore;
     const trustScore = Math.max(0, 100 - strikes.length * 20);
+    const isQualified = totalMeritScore >= 60;
 
     let competencyBadge = "Gold Certified (Ready-to-Hire)";
-    if (totalMeritScore < 60) competencyBadge = "Bronze Assessed (Foundational)";
+    if (totalMeritScore < 60) competencyBadge = "Bronze Assessed (Needs Upskilling)";
     else if (totalMeritScore < 80) competencyBadge = "Silver Verified (Job Ready)";
 
     const topicGaps = Object.entries(topicStats).map(([topic, stat]) => {
@@ -565,26 +681,36 @@ function StudentAssessmentEngine() {
       return { topic, correct: stat.correct, total: stat.total, percentage, status };
     });
 
-    const matchedInternships = INTERNSHIP_CATALOG.map((job) => {
-      const isEligible = totalMeritScore >= job.minScoreReq;
-      const matchPercentage = Math.min(99, Math.round((totalMeritScore / 100) * 85) + (isEligible ? 14 : 5));
-      return { ...job, matchPercentage, isEligible };
-    });
+    // Identify student's weakest topic to assign Project & 1:1 Mentor
+    const weakestTopicObj = [...topicGaps].sort((a, b) => a.percentage - b.percentage)[0] || { topic: "Memory Management" };
+    const guide = TOPIC_ACTION_GUIDES[weakestTopicObj.topic] || TOPIC_ACTION_GUIDES["Memory Management"];
+    const mentor = MENTOR_ROSTER[weakestTopicObj.topic] || MENTOR_ROSTER["Memory Management"];
 
-    setEvaluation({
+    const currentAttempt = (skillProfile?.attemptNumber || 0) + 1;
+    const updatedProfile = {
+      attemptNumber: currentAttempt,
+      totalMeritScore,
+      competencyBadge,
+      isQualified,
       theoryScore,
       debuggingScore,
       codingScore,
       designScore,
       speedScore,
       trustScore,
-      totalMeritScore,
       detectedComplexity,
-      competencyBadge,
       topicGaps,
-      matchedInternships,
-    });
+      assignedProject: {
+        title: guide.recommendedProjectTitle,
+        details: guide.projectDetails,
+        targetTopic: weakestTopicObj.topic,
+      },
+      assignedMentor: mentor,
+    };
 
+    setSkillProfile(updatedProfile);
+
+    // Save strictly to Supabase Ledger
     try {
       const attemptedIds = studentQuestions.map((q) => q.id);
       await supabase.from("student_assessments").insert({
@@ -603,8 +729,14 @@ function StudentAssessmentEngine() {
       console.error("Scorecard sync error:", err);
     }
 
-    setAssessmentStage("submitted");
-    toast.success("Real evaluation and skill matrix computed!");
+    if (currentAttempt > 1) {
+      if (isQualified) toast.success(`Profile Upgraded! You achieved ${competencyBadge} on Attempt #${currentAttempt} 🎉`);
+      else toast.info(`Re-assessment recorded (${totalMeritScore}/100). Review your gaps to qualify.`);
+    } else {
+      toast.success("Skill Profile Generated! Review your Gaps & Roadmap below.");
+    }
+
+    setAssessmentStage("profile-hub");
   };
 
   const formatTime = (secs: number) => {
@@ -634,6 +766,12 @@ function StudentAssessmentEngine() {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
         <div className="w-full max-w-6xl rounded-2xl border border-white/15 bg-slate-900/95 backdrop-blur-xl p-5 sm:p-8 shadow-2xl flex flex-col max-h-[92vh]">
+          {/* Top Row with 22-Language Selector */}
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold text-slate-400">Language Preference:</span>
+            <LanguageSelector />
+          </div>
+
           <div className="text-center max-w-2xl mx-auto mb-4 shrink-0">
             <div className="size-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto mb-2">
               <Sparkles className="size-5" />
@@ -819,18 +957,21 @@ function StudentAssessmentEngine() {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
         <div className="w-full max-w-3xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="size-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-              SB
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="size-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                SB
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-black text-white">
+                  AI-Proctored Assessment & Career Lifecycle
+                </h1>
+                <p className="text-xs text-blue-200/70">
+                  Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-black text-white">
-                AI-Proctored Assessment Guidelines
-              </h1>
-              <p className="text-xs text-blue-200/70">
-                Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
-              </p>
-            </div>
+            <LanguageSelector />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 my-6">
@@ -845,14 +986,14 @@ function StudentAssessmentEngine() {
 
               <div className="space-y-2">
                 <h4 className="font-bold uppercase tracking-wider text-slate-400 text-[11px]">
-                  Real Marks Weightage:
+                  Student Growth Lifecycle:
                 </h4>
                 <div className="space-y-1.5 text-slate-300">
-                  <div>• <strong>Tier 1 (35 pts):</strong> 20 Domain Theory Questions.</div>
-                  <div>• <strong>Tier 2 (20 pts):</strong> Production Bug Triage & Root Cause.</div>
-                  <div>• <strong>Tier 3 (25 pts):</strong> O(N) Code Efficiency & Complexity.</div>
-                  <div>• <strong>Tier 4 (15 pts):</strong> System Architecture Tradeoffs.</div>
-                  <div>• <strong>Tier 5 (5 pts):</strong> Optimal Completion Pace.</div>
+                  <div>• <strong>1. First Attempt:</strong> Creates your baseline Verified Skill Profile.</div>
+                  <div>• <strong>2. Skill Gaps:</strong> Identifies where you lag with a targeted action plan.</div>
+                  <div>• <strong>3. Re-Assessment:</strong> Learn concepts and retake test to qualify.</div>
+                  <div>• <strong>4. Capstone Project:</strong> Get assigned real-world projects & dedicated 1:1 mentor.</div>
+                  <div>• <strong>5. Internships:</strong> Unlocks direct applications once you reach score cutoff.</div>
                 </div>
               </div>
             </div>
@@ -1009,7 +1150,9 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <LanguageSelector />
+
             <div className="flex items-center gap-1.5 text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-200">
               <Clock className="size-3.5 text-blue-400" />
               <span>Elapsed: {formatTime(totalElapsed)}</span>
@@ -1021,17 +1164,15 @@ function StudentAssessmentEngine() {
             </div>
 
             <Button
-              onClick={handleFinalSubmit}
+              onClick={submitAssessmentAndGenerateProfile}
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-4 shadow-sm"
             >
-              Submit All 4 Tiers
+              Submit & Update Profile
             </Button>
           </div>
         </header>
 
-        {/* ------------------------------------------------------------------ */}
-        {/* FLOATING PICTURE-IN-PICTURE (PiP) LIVE CAMERA FEED & GAZE TRACKER */}
-        {/* ------------------------------------------------------------------ */}
+        {/* Floating Picture-in-Picture (PiP) Live Camera Feed */}
         <div className="fixed bottom-5 right-5 z-50 rounded-xl overflow-hidden border-2 border-emerald-500/80 bg-slate-900 shadow-2xl w-48 sm:w-56 backdrop-blur-md">
           <div className="relative aspect-video bg-black">
             <video
@@ -1277,8 +1418,8 @@ function StudentAssessmentEngine() {
               </div>
 
               <div className="pt-6 border-t border-white/10 flex justify-end">
-                <Button onClick={handleFinalSubmit} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6">
-                  Submit All & View Scorecard
+                <Button onClick={submitAssessmentAndGenerateProfile} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6">
+                  Submit All & View Profile
                   <ArrowRight className="size-4 ml-1.5" />
                 </Button>
               </div>
@@ -1290,58 +1431,60 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: COMPREHENSIVE SCORECARD + SKILL GAP + INTERNSHIPS
+  // VIEW 5: STUDENT VERIFIED PROFILE & CAREER GROWTH HUB
   // -------------------------------------------------------------
-  if (assessmentStage === "submitted" && evaluation) {
+  if (assessmentStage === "profile-hub" && skillProfile) {
     return (
       <div className="min-h-screen bg-[#071224] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
         <div className="w-full max-w-5xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl space-y-8">
-          {/* Header Score Overview */}
-          <div className="text-center pb-6 border-b border-white/10">
-            <div className="size-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-3">
-              <CheckCircle2 className="size-6" />
+          {/* Top Profile Header */}
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="size-14 rounded-2xl bg-blue-600/20 border border-blue-400/30 flex items-center justify-center text-blue-400 font-black text-xl">
+                <UserCheck className="size-7" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl sm:text-2xl font-black text-white">Student Verified Skill Profile</h1>
+                  <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-white/10 text-slate-300">
+                    Attempt #{skillProfile.attemptNumber}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Institutional ID: <strong className="text-slate-200">{userEmail || "student@institution.ac.in"}</strong> • Domain: <span className="text-blue-400 uppercase font-semibold">{activeDomainTitle}</span>
+                </p>
+              </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Verified Readiness Index & Diagnostic Matrix
-            </h1>
-            <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
-              Domain: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
-            </p>
+
+            {/* Score & Re-Assessment Action */}
+            <div className="flex items-center gap-4 text-center">
+              <div className="p-3.5 rounded-xl bg-blue-600/20 border border-blue-400/30 px-5">
+                <div className="text-3xl font-extrabold text-white">{skillProfile.totalMeritScore}<span className="text-sm text-slate-400">/100</span></div>
+                <span className="text-[10px] uppercase font-bold text-blue-300">{skillProfile.competencyBadge}</span>
+              </div>
+              <Button onClick={handleProceedToGuidelines} className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold h-10 px-4 flex items-center gap-1.5 shadow-lg">
+                <RefreshCw className="size-3.5" /> Retake & Qualify
+              </Button>
+            </div>
           </div>
 
-          {/* Top 3 Cards */}
+          {/* 3 Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
-              <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
-                Real Merit Score
-              </span>
-              <div className="text-4xl font-extrabold text-white mt-1">
-                {evaluation.totalMeritScore}
-                <span className="text-lg font-medium text-blue-200/70">/100</span>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col justify-center">
+              <span className="text-[10px] uppercase font-bold text-slate-400">Qualification Status</span>
+              <div className={cn("text-xl font-black mt-1", skillProfile.isQualified ? "text-emerald-400" : "text-amber-400")}>
+                {skillProfile.isQualified ? "Qualified for Placements" : "Level Up Required (Cutoff: 60)"}
               </div>
-              <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                {evaluation.competencyBadge}
-              </span>
             </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">Completion Pace</span>
-                <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
-              </div>
-              <p className="text-[11px] text-blue-200/70 mt-2">
-                Speed points added: +{evaluation.speedScore} / 5 pts
-              </p>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col justify-center">
+              <span className="text-[10px] uppercase font-bold text-slate-400">Completion Pace</span>
+              <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
+              <span className="text-[10px] text-slate-400 mt-0.5">Pace Points: +{skillProfile.speedScore}/5</span>
             </div>
-
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
-                <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
-              </div>
-              <p className="text-[11px] text-blue-200/70 mt-2">
-                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} strikes logged`}
-              </p>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col justify-center">
+              <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
+              <div className="text-xl font-bold text-white mt-1">{skillProfile.trustScore}%</div>
+              <span className="text-[10px] text-slate-400 mt-0.5">{strikes.length} strikes recorded</span>
             </div>
           </div>
 
@@ -1352,7 +1495,7 @@ function StudentAssessmentEngine() {
                 <div className="font-semibold text-white">Tier 1: Core Domain Theory (20 Questions)</div>
                 <div className="text-slate-400 text-[11px]">Real score based on answered questions</div>
               </div>
-              <div className="text-sm font-bold text-blue-400">+{evaluation.theoryScore} / 35 pts</div>
+              <div className="text-sm font-bold text-blue-400">+{skillProfile.theoryScore} / 35 pts</div>
             </div>
 
             <div className="p-4 flex items-center justify-between">
@@ -1360,15 +1503,15 @@ function StudentAssessmentEngine() {
                 <div className="font-semibold text-white">Tier 2: Production Bug Triage</div>
                 <div className="text-slate-400 text-[11px]">Heap memory leak & unhandled rejection diagnosis</div>
               </div>
-              <div className="text-sm font-bold text-amber-400">+{evaluation.debuggingScore} / 20 pts</div>
+              <div className="text-sm font-bold text-amber-400">+{skillProfile.debuggingScore} / 20 pts</div>
             </div>
 
             <div className="p-4 flex items-center justify-between">
               <div>
                 <div className="font-semibold text-white">Tier 3: Algorithmic Optimization</div>
-                <div className="text-slate-400 text-[11px]">Detected: <span className="font-mono text-cyan-300 font-bold">{evaluation.detectedComplexity}</span></div>
+                <div className="text-slate-400 text-[11px]">Detected: <span className="font-mono text-cyan-300 font-bold">{skillProfile.detectedComplexity}</span></div>
               </div>
-              <div className="text-sm font-bold text-cyan-400">+{evaluation.codingScore} / 25 pts</div>
+              <div className="text-sm font-bold text-cyan-400">+{skillProfile.codingScore} / 25 pts</div>
             </div>
 
             <div className="p-4 flex items-center justify-between">
@@ -1376,28 +1519,28 @@ function StudentAssessmentEngine() {
                 <div className="font-semibold text-white">Tier 4: System Architecture & Scale</div>
                 <div className="text-slate-400 text-[11px]">In-memory data structure for 100K live ranking</div>
               </div>
-              <div className="text-sm font-bold text-purple-400">+{evaluation.designScore} / 15 pts</div>
+              <div className="text-sm font-bold text-purple-400">+{skillProfile.designScore} / 15 pts</div>
             </div>
           </div>
 
-          {/* 1. SKILL GAP ANALYSIS */}
-          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="size-5 text-blue-400" />
-              <h3 className="text-base font-bold text-white">Diagnostic Skill Gap Analysis</h3>
+          {/* 1. SKILL GAP ANALYSIS (EKKADA LAG UNNARU) */}
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="size-5 text-blue-400" />
+                <h3 className="text-base font-bold text-white">Diagnostic Skill Gaps (Identify Where You Lag)</h3>
+              </div>
+              <span className="text-xs text-slate-400">Calculated from your attempted answers</span>
             </div>
-            <p className="text-xs text-slate-400">
-              Granular topic breakdown based on your actual responses:
-            </p>
 
             <div className="space-y-3">
-              {evaluation.topicGaps.map((item) => (
+              {skillProfile.topicGaps.map((item) => (
                 <div
                   key={item.topic}
-                  className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
+                  className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
                 >
                   <div className="flex-1 w-full">
-                    <div className="text-xs font-semibold text-white flex items-center gap-2">
+                    <div className="text-xs font-semibold text-white flex items-center justify-between sm:justify-start gap-2">
                       {item.topic}
                       <span
                         className={cn(
@@ -1430,59 +1573,152 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* 2. MATCHED SUITABLE INTERNSHIPS */}
+          {/* 2. HOW TO LEARN (ELA NERCHUKOVALI) */}
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
+            <div className="flex items-center gap-2">
+              <BookOpen className="size-5 text-amber-400" />
+              <h3 className="text-base font-bold text-white">Targeted Action Plan (How to Bridge Your Gaps)</h3>
+            </div>
+            <p className="text-xs text-slate-400">
+              Study these key architectural concepts before retaking the assessment to qualify for placements:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {skillProfile.topicGaps
+                .filter((t) => t.status !== "Strong")
+                .map((gap) => {
+                  const guide = TOPIC_ACTION_GUIDES[gap.topic] || TOPIC_ACTION_GUIDES["Memory Management"];
+                  return (
+                    <div key={gap.topic} className="p-4 rounded-xl bg-black/40 border border-amber-500/20">
+                      <span className="text-xs font-bold text-amber-300">{gap.topic} (Needs Study)</span>
+                      <ul className="mt-2 space-y-1 text-xs text-slate-400">
+                        {guide.actionSteps.map((step, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <span className="text-amber-400">▸</span> {step}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* 3. ASSIGNED PROJECT & DEDICATED MENTOR */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Recommended Project */}
+            <div className="lg:col-span-7 p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-2 text-cyan-400">
+                  <FolderGit2 className="size-5" />
+                  <h3 className="text-base font-bold text-white">Assigned Capstone Project</h3>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  Target Topic: {skillProfile.assignedProject.targetTopic}
+                </span>
+                <h4 className="text-sm font-bold text-white mt-3">{skillProfile.assignedProject.title}</h4>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">{skillProfile.assignedProject.details}</p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-xs">
+                <span className="text-slate-400">Build & submit repository for verification</span>
+                <Button
+                  onClick={() => toast.success("Project repository template cloned to your dashboard!")}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold h-8"
+                >
+                  Start Project
+                </Button>
+              </div>
+            </div>
+
+            {/* Assigned Industry Mentor */}
+            <div className="lg:col-span-5 p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-3 text-emerald-400">
+                  <Compass className="size-5" />
+                  <h3 className="text-base font-bold text-white">Assigned Industry Mentor</h3>
+                </div>
+                <div className="flex items-center gap-3">
+                  <img
+                    src={skillProfile.assignedMentor.avatar}
+                    alt="Mentor"
+                    className="size-12 rounded-full object-cover border-2 border-emerald-400/40"
+                  />
+                  <div>
+                    <div className="text-sm font-bold text-white">{skillProfile.assignedMentor.name}</div>
+                    <div className="text-xs text-slate-400">{skillProfile.assignedMentor.role}</div>
+                    <div className="text-[10px] text-emerald-400 font-semibold">{skillProfile.assignedMentor.company}</div>
+                  </div>
+                </div>
+                <div className="mt-3 p-2.5 rounded-lg bg-black/40 border border-white/10 text-[11px] text-slate-300">
+                  <span className="text-[10px] font-bold text-slate-400 block">Assigned Mentor Specialization:</span>
+                  {skillProfile.assignedMentor.focusDomain}
+                </div>
+              </div>
+              <Button
+                onClick={() => toast.success(`1:1 Mentorship channel opened with ${skillProfile.assignedMentor.name}!`)}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-8 mt-4 flex items-center justify-center gap-1.5"
+              >
+                <MessageSquare className="size-3.5" /> Connect with Mentor
+              </Button>
+            </div>
+          </div>
+
+          {/* 4. UNLOCKED SUITABLE INTERNSHIPS */}
           <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Briefcase className="size-5 text-emerald-400" />
                 <h3 className="text-base font-bold text-white">Suitable Internship & Placement Matches</h3>
               </div>
-              <span className="text-xs text-emerald-400 font-semibold">Matched to your {evaluation.totalMeritScore}/100 score</span>
+              <span className="text-xs text-emerald-400 font-semibold">Matched to your {skillProfile.totalMeritScore}/100 score</span>
             </div>
 
             <div className="space-y-3">
-              {evaluation.matchedInternships.map((job) => (
-                <div
-                  key={job.id}
-                  className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-white/20 transition"
-                >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-white">{job.role}</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        {job.company}
-                      </span>
-                    </div>
-                    <div className="text-xs text-slate-400 mt-1">
-                      {job.location} • <strong className="text-slate-200">{job.stipend}</strong>
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                      {job.skillsNeeded.map((s) => (
-                        <span key={s} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
-                          {s}
+              {INTERNSHIP_CATALOG.map((job) => {
+                const isEligible = skillProfile.totalMeritScore >= job.minCutoff;
+                const matchPercentage = Math.min(99, Math.round((skillProfile.totalMeritScore / 100) * 85) + (isEligible ? 14 : 5));
+                return (
+                  <div
+                    key={job.id}
+                    className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-white/20 transition"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm text-white">{job.role}</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          {job.company}
                         </span>
-                      ))}
+                      </div>
+                      <div className="text-xs text-slate-400 mt-1">
+                        {job.location} • <strong className="text-slate-200">{job.stipend}</strong>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                        {job.skillsNeeded.map((s) => (
+                          <span key={s} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
-                    <div className="text-right">
-                      <div className="text-xs font-bold text-emerald-400">{job.matchPercentage}% Match</div>
-                      <span className="text-[10px] text-slate-400">Min Cutoff: {job.minScoreReq} pts</span>
+                    <div className="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
+                      <div className="text-right">
+                        <div className="text-xs font-bold text-emerald-400">{matchPercentage}% Match</div>
+                        <span className="text-[10px] text-slate-400">Min Cutoff: {job.minCutoff} pts</span>
+                      </div>
+                      <Button
+                        disabled={!isEligible}
+                        className={cn(
+                          "text-xs h-8 px-4 font-bold",
+                          isEligible ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
+                        )}
+                        onClick={() => toast.success(`Applied to ${job.company}!`)}
+                      >
+                        {isEligible ? "Direct Apply" : "Below Cutoff"}
+                      </Button>
                     </div>
-                    <Button
-                      disabled={!job.isEligible}
-                      className={cn(
-                        "text-xs h-8 px-4 font-bold",
-                        job.isEligible ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
-                      )}
-                      onClick={() => toast.success(`Applied to ${job.company}!`)}
-                    >
-                      {job.isEligible ? "Direct Apply" : "Below Cutoff"}
-                    </Button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
