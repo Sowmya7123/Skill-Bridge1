@@ -149,12 +149,14 @@ Requirements:
 };
 
 function StudentAssessmentEngine() {
-  // Starts with domain selection before rules or exam
   const [assessmentStage, setAssessmentStage] = useState<
     "domain-selection" | "guidelines" | "testing" | "submitted"
   >("domain-selection");
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"mcq" | "coding">("mcq");
+
+  // Camera Validation State: "checking" | "ready" | "denied"
+  const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
 
   // Answers & Code
   const [selectedMcqAnswer, setSelectedMcqAnswer] = useState<string | null>(null);
@@ -164,7 +166,7 @@ function StudentAssessmentEngine() {
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // AI Proctoring & Strikes
+  // Proctoring Strikes
   const [strikes, setStrikes] = useState<string[]>([]);
   const [isDisqualified, setIsDisqualified] = useState(false);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
@@ -182,10 +184,13 @@ function StudentAssessmentEngine() {
     mcqPassed: boolean;
   } | null>(null);
 
-  // Activate Camera only when past domain selection
+  // Camera Activation & Mandatory Check
   useEffect(() => {
     if (assessmentStage !== "guidelines" && assessmentStage !== "testing") return;
+
     let stream: MediaStream | null = null;
+    setCameraStatus("checking");
+
     navigator.mediaDevices
       ?.getUserMedia({ video: true, audio: false })
       .then((s) => {
@@ -193,8 +198,15 @@ function StudentAssessmentEngine() {
         if (videoRef.current) {
           videoRef.current.srcObject = s;
         }
+        setCameraStatus("ready");
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Camera access denied:", err);
+        setCameraStatus("denied");
+        toast.error("Camera Permission Tappanisari!", {
+          description: "Ee proctored assessment rayalante camera access allow cheyali.",
+        });
+      });
 
     return () => {
       stream?.getTracks().forEach((track) => track.stop());
@@ -213,7 +225,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Strike handler
+  // Proctoring Violations
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
@@ -226,17 +238,17 @@ function StudentAssessmentEngine() {
         if (next.length === 1) {
           setActiveAlert("Strike 1/2: Integrity Violation Logged. 1 chance remaining!");
           toast.warning("Warning 1/2: Rule Violated!", {
-            description: `${reason}. You have only 1 strike left before permanent lockout.`,
+            description: `${reason}. Inko okka chance mathrame migili undi.`,
           });
         } else if (next.length === 2) {
-          setActiveAlert("CRITICAL WARNING 2/2: Next violation will terminate your exam!");
+          setActiveAlert("CRITICAL WARNING 2/2: Next violation tho exam terminate avthundi!");
           toast.error("Critical Strike 2/2!", {
-            description: `${reason}. Final notice! Any further violation will terminate test.`,
+            description: `${reason}. Final warning! Maro sari violate chesthe session aagipothundi.`,
           });
         } else if (next.length >= 3) {
           setIsDisqualified(true);
           toast.error("Assessment Terminated!", {
-            description: "Exceeded 2 chances. Session locked under proctoring policy.",
+            description: "2 chances datipoyayi. Proctoring rules prakaram test lock aindi.",
           });
         }
         return next;
@@ -245,7 +257,7 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Proctoring listeners
+  // Security Listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -256,17 +268,17 @@ function StudentAssessmentEngine() {
     };
 
     const onWindowBlur = () => {
-      registerStrike("Window focus lost (external application clicked)");
+      registerStrike("Window focus lost (external click)");
     };
 
     const onCopyPaste = (e: ClipboardEvent) => {
       e.preventDefault();
-      registerStrike("Clipboard operation (Copy/Paste) blocked");
+      registerStrike("Clipboard copy/paste blocked");
     };
 
     const onContextMenu = (e: MouseEvent) => {
       e.preventDefault();
-      registerStrike("Right-click context menu blocked");
+      registerStrike("Right-click blocked");
     };
 
     document.addEventListener("visibilitychange", onVisibilityChange);
@@ -335,7 +347,7 @@ function StudentAssessmentEngine() {
     });
 
     setAssessmentStage("submitted");
-    toast.success("Assessment submitted & evaluated successfully!");
+    toast.success("Assessment vijayavanthamga evaluate aindi!");
   };
 
   const formatTime = (secs: number) => {
@@ -345,7 +357,7 @@ function StudentAssessmentEngine() {
   };
 
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION SCREEN (NEW STEP)
+  // VIEW 1: DOMAIN SELECTION
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
     return (
@@ -359,7 +371,7 @@ function StudentAssessmentEngine() {
               Select Your Assessment Track
             </h1>
             <p className="text-xs sm:text-sm text-blue-200/70 mt-2">
-              Choose the domain/interest you want to be evaluated for before starting the proctored test.
+              Assessment start chese mundhu meeru prepare ayye domain ni choose chesukondi.
             </p>
           </div>
 
@@ -425,7 +437,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 2: DISQUALIFIED SCREEN
+  // VIEW 2: DISQUALIFIED
   // -------------------------------------------------------------
   if (isDisqualified) {
     return (
@@ -439,8 +451,8 @@ function StudentAssessmentEngine() {
           </span>
           <h1 className="text-3xl font-black text-white">Assessment Terminated</h1>
           <p className="mt-3 text-sm text-rose-200/80 leading-relaxed">
-            Your evaluation session has been permanently revoked. You exceeded the maximum allowed
-            policy infractions (2 chances). All inputs and codes have been locked.
+            Mee test session cancel aindi. Max allowed strikes (2 chances) cross chesaru. Code
+            mariyu answers lock aipoyayi.
           </p>
 
           <div className="mt-6 rounded-xl border border-white/10 bg-black/50 p-4 text-left">
@@ -468,7 +480,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: FINAL RESULTS SCORECARD
+  // VIEW 3: SCORECARD
   // -------------------------------------------------------------
   if (assessmentStage === "submitted" && evaluation) {
     return (
@@ -616,7 +628,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 4: GUIDELINES & PROCTOR CAMERA CHECK
+  // VIEW 4: GUIDELINES & MANDATORY CAMERA CHECK (LOCKED BUTTON)
   // -------------------------------------------------------------
   if (assessmentStage === "guidelines") {
     return (
@@ -646,8 +658,8 @@ function StudentAssessmentEngine() {
                   <ShieldAlert className="size-4 text-amber-400" />
                   Strict 2-Chance Policy Active
                 </span>
-                Tab switching, minimizing the browser, or copying code will trigger strikes. You
-                have 2 chances. The 3rd strike will terminate and lock your exam immediately.
+                Tab switching, minimizing browser, leda copy-paste chesthe strikes padathayi. 2
+                chances tharvatha 3rd strike padithe assessment ventane cancel aipothundi.
               </div>
 
               <div className="space-y-2">
@@ -663,23 +675,57 @@ function StudentAssessmentEngine() {
               </div>
             </div>
 
+            {/* Live Camera Validation Box */}
             <div className="md:col-span-5 flex flex-col items-center justify-center p-4 rounded-xl border border-white/10 bg-black/40 text-center">
-              <div className="relative size-32 rounded-xl overflow-hidden bg-slate-900 border-2 border-emerald-500 shadow-md mb-3">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover scale-x-[-1]"
-                />
-                <div className="absolute inset-1 border border-dashed border-emerald-400/80 rounded pointer-events-none" />
+              <div
+                className={cn(
+                  "relative size-32 rounded-xl overflow-hidden bg-slate-900 border-2 shadow-md mb-3 flex items-center justify-center",
+                  cameraStatus === "ready" ? "border-emerald-500" : "border-rose-500"
+                )}
+              >
+                {cameraStatus === "ready" ? (
+                  <>
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full h-full object-cover scale-x-[-1]"
+                    />
+                    <div className="absolute inset-1 border border-dashed border-emerald-400/80 rounded pointer-events-none" />
+                  </>
+                ) : cameraStatus === "denied" ? (
+                  <div className="p-2 text-center text-rose-400">
+                    <Camera className="size-6 mx-auto mb-1 opacity-60" />
+                    <span className="text-[10px] font-bold block leading-tight">Camera Blocked</span>
+                  </div>
+                ) : (
+                  <div className="text-[10px] text-slate-400 animate-pulse">Checking feed...</div>
+                )}
               </div>
-              <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                <ShieldCheck className="size-4" />
-                AI Proctor Camera Active
+
+              <div
+                className={cn(
+                  "text-xs font-bold flex items-center gap-1.5",
+                  cameraStatus === "ready" ? "text-emerald-400" : "text-rose-400"
+                )}
+              >
+                {cameraStatus === "ready" ? (
+                  <>
+                    <ShieldCheck className="size-4" />
+                    AI Proctor Camera Active
+                  </>
+                ) : (
+                  <>
+                    <ShieldAlert className="size-4" />
+                    Camera Access Required
+                  </>
+                )}
               </div>
               <p className="text-[10px] text-slate-400 mt-1">
-                Maintain center gaze & ensure adequate lighting.
+                {cameraStatus === "ready"
+                  ? "Face ni screen madhyalo petti test continue cheyandi."
+                  : "Browser address bar lo camera permission allow cheyali."}
               </p>
             </div>
           </div>
@@ -692,11 +738,18 @@ function StudentAssessmentEngine() {
             >
               Change Domain
             </button>
+
+            {/* CAMERA ON KAKAPOTHE BUTTON WORK AVVADHU */}
             <Button
-              onClick={() => setAssessmentStage("testing")}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6"
+              disabled={cameraStatus !== "ready"}
+              onClick={() => {
+                if (cameraStatus === "ready") {
+                  setAssessmentStage("testing");
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
             >
-              Begin Assessment Now
+              {cameraStatus === "ready" ? "Begin Assessment Now" : "Enable Camera to Begin"}
               <ArrowRight className="size-4 ml-1.5" />
             </Button>
           </div>
@@ -706,7 +759,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: ACTIVE ASSESSMENT (MCQ + CODING + PROCTORING)
+  // VIEW 5: ACTIVE ASSESSMENT (EXAM ENGINE)
   // -------------------------------------------------------------
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
