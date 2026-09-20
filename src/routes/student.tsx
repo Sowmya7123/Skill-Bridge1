@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Sparkles,
   ArrowRight,
+  ArrowLeft,
   BookOpen,
   Code2,
   ShieldCheck,
@@ -29,6 +30,14 @@ import {
   RefreshCw,
   Compass,
   MessageSquare,
+  Lock,
+  Unlock,
+  Target,
+  CheckSquare,
+  Square,
+  Star,
+  Calendar,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -217,7 +226,7 @@ Which architecture tradeoff offers the optimal scalability and lowest write late
 };
 
 // -------------------------------------------------------------
-// 3. TARGETED ACTION GUIDES, CAPSTONES & INDUSTRY MENTORS
+// 3. TARGETED ACTION GUIDES, CAPSTONES & MENTORS
 // -------------------------------------------------------------
 const TOPIC_ACTION_GUIDES: Record<string, { actionSteps: string[]; recommendedProjectTitle: string; projectDetails: string }> = {
   "Memory Management": {
@@ -295,27 +304,133 @@ const TOPIC_ACTION_GUIDES: Record<string, { actionSteps: string[]; recommendedPr
 };
 
 interface Mentor {
+  id: string;
   name: string;
   role: string;
   company: string;
   avatar: string;
-  focusDomain: string;
+  specializationTopic: string;
+  rating: number;
+  activeMentees: number;
+  matchScore: number;
+  bio: string;
+  availableDays: string;
 }
 
-const MENTOR_ROSTER: Record<string, Mentor> = {
-  "Memory Management": { name: "Arjun Venkat", role: "Staff Backend Architect", company: "Razorpay / ex-Amazon", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80", focusDomain: "V8 Engine & Distributed Architecture" },
-  "Databases & Indexing": { name: "Pooja Sundaram", role: "Principal Data Systems Architect", company: "Swiggy Labs", avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80", focusDomain: "PostgreSQL, LSM Trees & DB Sharding" },
-  "Distributed Systems": { name: "Siddharth Verma", role: "Cloud Systems Lead", company: "Microsoft Azure", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80", focusDomain: "Redis, Kafka & High-Scale Systems" },
-  "Protocols & Web APIs": { name: "Meera Krishnan", role: "Lead API Infrastructure Engineer", company: "Razorpay", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80", focusDomain: "Microservices & NGINX Infrastructure" },
-  "Data Structures & Big-O": { name: "Vikram Malhotra", role: "Senior Algorithms Engineer", company: "Google / ex-Flipkart", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80", focusDomain: "DSA Mastery & Scalable Code" },
-  "Application Security": { name: "Rohan Kulkarni", role: "Principal DevSecOps Architect", company: "Palo Alto Networks", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80", focusDomain: "Cloud Security & Zero-Trust Systems" },
-  "DevOps & Infrastructure": { name: "Ananya Deshmukh", role: "Staff SRE & Platform Architect", company: "PhonePe", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80", focusDomain: "Kubernetes, Linux & Infrastructure as Code" },
-  "Frontend Architecture": { name: "Karthik Subramanian", role: "Principal UI Systems Engineer", company: "Uber Engineering", avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80", focusDomain: "V8 Internals & High-Performance Web Apps" },
-};
+const PLATFORM_MENTORS: Mentor[] = [
+  {
+    id: "m-1",
+    name: "Arjun Venkat",
+    role: "Staff Backend Architect",
+    company: "Razorpay / ex-Amazon",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "Memory Management",
+    rating: 4.9,
+    activeMentees: 28,
+    matchScore: 97,
+    bio: "Specializes in high-throughput node runtime bottlenecks, heap dump telemetry, and async execution frames.",
+    availableDays: "Tue, Thu, Sat (Evening)",
+  },
+  {
+    id: "m-2",
+    name: "Pooja Sundaram",
+    role: "Principal Data Systems Architect",
+    company: "Swiggy Labs",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "Databases & Indexing",
+    rating: 4.95,
+    activeMentees: 34,
+    matchScore: 94,
+    bio: "Authority on PostgreSQL query planning, LSM storage trees, partition scaling, and transaction isolation.",
+    availableDays: "Mon, Wed, Fri",
+  },
+  {
+    id: "m-3",
+    name: "Siddharth Verma",
+    role: "Cloud Systems Lead",
+    company: "Microsoft Azure",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "Distributed Systems",
+    rating: 4.88,
+    activeMentees: 19,
+    matchScore: 92,
+    bio: "Deep expertise in consistent hashing, distributed consensus, Redis SkipLists, and event bus infrastructure.",
+    availableDays: "Sat, Sun (Afternoon)",
+  },
+  {
+    id: "m-4",
+    name: "Meera Krishnan",
+    role: "Lead API Infrastructure Engineer",
+    company: "Razorpay",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "Protocols & Web APIs",
+    rating: 4.92,
+    activeMentees: 22,
+    matchScore: 90,
+    bio: "Specialist in idempotent payments infrastructure, HTTP/2 multiplexing, and NGINX reverse-proxy clusters.",
+    availableDays: "Wed, Thu, Sat",
+  },
+  {
+    id: "m-5",
+    name: "Vikram Malhotra",
+    role: "Senior Algorithms Engineer",
+    company: "Google / ex-Flipkart",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "Data Structures & Big-O",
+    rating: 4.96,
+    activeMentees: 45,
+    matchScore: 96,
+    bio: "Focuses on linear algorithmic restructuring, priority heap optimization, and cache-locality data layout.",
+    availableDays: "Tue, Fri, Sun",
+  },
+  {
+    id: "m-6",
+    name: "Rohan Kulkarni",
+    role: "Principal DevSecOps Architect",
+    company: "Palo Alto Networks",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "Application Security",
+    rating: 4.91,
+    activeMentees: 20,
+    matchScore: 91,
+    bio: "Zero Trust architecture, public-key verification algorithms, and container runtime threat analysis.",
+    availableDays: "Mon, Thu, Sat",
+  },
+  {
+    id: "m-7",
+    name: "Ananya Deshmukh",
+    role: "Staff SRE & Platform Architect",
+    company: "PhonePe",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "DevOps & Infrastructure",
+    rating: 4.89,
+    activeMentees: 26,
+    matchScore: 93,
+    bio: "Kubernetes orchestration, automated canary releases, Linux kernel cgroups, and Prometheus alerting.",
+    availableDays: "Tue, Thu, Sun",
+  },
+  {
+    id: "m-8",
+    name: "Karthik Subramanian",
+    role: "Principal UI Systems Engineer",
+    company: "Uber Engineering",
+    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80",
+    specializationTopic: "Frontend Architecture",
+    rating: 4.94,
+    activeMentees: 38,
+    matchScore: 95,
+    bio: "V8 memory models, React concurrency, micro-frontend federation, and high-FPS canvas rendering.",
+    availableDays: "Wed, Fri, Sat",
+  },
+];
 
-// -------------------------------------------------------------
-// 4. VERIFIED INTERNSHIP CATALOG
-// -------------------------------------------------------------
+interface ImprovementWeek {
+  weekNumber: number;
+  title: string;
+  focusTopic: string;
+  milestones: { id: string; text: string; done: boolean }[];
+}
+
 interface Internship {
   id: string;
   role: string;
@@ -327,11 +442,11 @@ interface Internship {
 }
 
 const INTERNSHIP_CATALOG: Internship[] = [
-  { id: "int-1", role: "Junior Software Engineer Intern", company: "Zomato / Blinkit", stipend: "₹35,000 / month", location: "Hybrid (Bengaluru)", minCutoff: 60, skillsNeeded: ["JavaScript", "REST APIs", "SQL"] },
+  { id: "int-1", role: "Junior Software Engineer Intern", company: "Zomato / Blinkit", stipend: "₹35,000 / month", location: "Hybrid (Bengaluru)", minCutoff: 65, skillsNeeded: ["JavaScript", "REST APIs", "SQL"] },
   { id: "int-2", role: "Backend Systems Trainee", company: "Razorpay", stipend: "₹45,000 / month", location: "Bengaluru", minCutoff: 75, skillsNeeded: ["Node.js / Java", "Redis", "Distributed DB"] },
-  { id: "int-3", role: "Full Stack Developer Associate", company: "Swiggy Labs", stipend: "₹40,000 / month", location: "Hyderabad", minCutoff: 65, skillsNeeded: ["React", "TypeScript", "Microservices"] },
+  { id: "int-3", role: "Full Stack Developer Associate", company: "Swiggy Labs", stipend: "₹40,000 / month", location: "Hyderabad", minCutoff: 70, skillsNeeded: ["React", "TypeScript", "Microservices"] },
   { id: "int-4", role: "AI / Data Science Trainee", company: "Fractal Analytics", stipend: "₹32,000 / month", location: "Mumbai / Hybrid", minCutoff: 70, skillsNeeded: ["Python", "PyTorch", "Data Pipelines"] },
-  { id: "int-5", role: "Cloud & DevOps Apprentice", company: "Jio Platforms", stipend: "₹28,000 / month", location: "Hyderabad", minCutoff: 50, skillsNeeded: ["Docker", "Linux", "CI/CD"] },
+  { id: "int-5", role: "Cloud & DevOps Apprentice", company: "Jio Platforms", stipend: "₹28,000 / month", location: "Hyderabad", minCutoff: 60, skillsNeeded: ["Docker", "Linux", "CI/CD"] },
   { id: "int-6", role: "Core Embedded & VLSI Trainee", company: "Qualcomm / Texas Instruments", stipend: "₹50,000 / month", location: "Bengaluru", minCutoff: 80, skillsNeeded: ["Embedded C", "ARM", "Verilog"] },
 ];
 
@@ -347,10 +462,13 @@ function shuffle<T>(array: T[]): T[] {
 function StudentAssessmentEngine() {
   const { userEmail } = useAppState();
 
+  // Workflow Stages:
+  // 1. Domain -> 2. Guidelines -> 3. Testing -> 4. Result/Gaps -> 5. Mentor Hub -> 6. Placements
   const [assessmentStage, setAssessmentStage] = useState<
-    "domain-selection" | "guidelines" | "testing" | "profile-hub"
+    "domain-selection" | "guidelines" | "testing" | "result-gaps" | "mentor-hub" | "placements"
   >("domain-selection");
-  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+
+  const [selectedDomain, setSelectedDomain] = useState<string>("fullstack-web");
   const [customDomainText, setCustomDomainText] = useState("");
   const [domainSearch, setDomainSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -384,14 +502,9 @@ function StudentAssessmentEngine() {
   const gazeOffscreenCount = useRef(0);
   const lastPixelData = useRef<Uint8ClampedArray | null>(null);
 
-  // -------------------------------------------------------------
-  // STUDENT VERIFIED SKILL PROFILE STATE (PERSISTED)
-  // -------------------------------------------------------------
-  const [skillProfile, setSkillProfile] = useState<{
-    attemptNumber: number;
+  // Evaluation & Gaps
+  const [evaluation, setEvaluation] = useState<{
     totalMeritScore: number;
-    competencyBadge: string;
-    isQualified: boolean;
     theoryScore: number;
     debuggingScore: number;
     codingScore: number;
@@ -399,10 +512,17 @@ function StudentAssessmentEngine() {
     speedScore: number;
     trustScore: number;
     detectedComplexity: string;
+    competencyBadge: string;
+    strongSkills: string[];
+    weakSkills: string[];
     topicGaps: { topic: string; correct: number; total: number; percentage: number; status: "Strong" | "Average" | "Needs Improvement" }[];
-    assignedProject: { title: string; details: string; targetTopic: string };
-    assignedMentor: Mentor;
   } | null>(null);
+
+  // Mentor & Improvement Plan Gating
+  const [assignedMentor, setAssignedMentor] = useState<Mentor | null>(null);
+  const [mentorSessionBooked, setMentorSessionBooked] = useState(false);
+  const [improvementPlan, setImprovementPlan] = useState<ImprovementWeek[]>([]);
+  const [readinessScore, setReadinessScore] = useState(35); // Increases as student checks off milestones
 
   // Dynamic Question Retrieval & Shuffling
   const handleProceedToGuidelines = async () => {
@@ -602,7 +722,7 @@ function StudentAssessmentEngine() {
     return () => clearInterval(visionInterval);
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  // Focus & Security Listeners
+  // Full Security & Focus Listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -628,9 +748,9 @@ function StudentAssessmentEngine() {
   }, [assessmentStage, isDisqualified, registerStrike]);
 
   // -------------------------------------------------------------
-  // REAL SCORE CALCULATION & STUDENT PROFILE UPGRADE ENGINE
+  // CALCULATE SCORE & INITIALIZE MENTOR IMPROVEMENT PLAN
   // -------------------------------------------------------------
-  const submitAssessmentAndGenerateProfile = async () => {
+  const submitAssessmentAndEvaluate = async () => {
     const topicStats: Record<string, { correct: number; total: number }> = {};
     let correctTheoryCount = 0;
 
@@ -666,11 +786,10 @@ function StudentAssessmentEngine() {
 
     const totalMeritScore = theoryScore + debuggingScore + codingScore + designScore + speedScore;
     const trustScore = Math.max(0, 100 - strikes.length * 20);
-    const isQualified = totalMeritScore >= 60;
 
     let competencyBadge = "Gold Certified (Ready-to-Hire)";
-    if (totalMeritScore < 60) competencyBadge = "Bronze Assessed (Needs Upskilling)";
-    else if (totalMeritScore < 80) competencyBadge = "Silver Verified (Job Ready)";
+    if (totalMeritScore < 60) competencyBadge = "Bronze Assessed (Needs Mentor Guidance)";
+    else if (totalMeritScore < 80) competencyBadge = "Silver Verified (Job-Ready)";
 
     const topicGaps = Object.entries(topicStats).map(([topic, stat]) => {
       const percentage = Math.round((stat.correct / stat.total) * 100);
@@ -681,17 +800,11 @@ function StudentAssessmentEngine() {
       return { topic, correct: stat.correct, total: stat.total, percentage, status };
     });
 
-    // Identify student's weakest topic to assign Project & 1:1 Mentor
-    const weakestTopicObj = [...topicGaps].sort((a, b) => a.percentage - b.percentage)[0] || { topic: "Memory Management" };
-    const guide = TOPIC_ACTION_GUIDES[weakestTopicObj.topic] || TOPIC_ACTION_GUIDES["Memory Management"];
-    const mentor = MENTOR_ROSTER[weakestTopicObj.topic] || MENTOR_ROSTER["Memory Management"];
+    const strongSkills = topicGaps.filter((t) => t.status === "Strong").map((t) => t.topic);
+    const weakSkills = topicGaps.filter((t) => t.status !== "Strong").map((t) => t.topic);
 
-    const currentAttempt = (skillProfile?.attemptNumber || 0) + 1;
-    const updatedProfile = {
-      attemptNumber: currentAttempt,
+    setEvaluation({
       totalMeritScore,
-      competencyBadge,
-      isQualified,
       theoryScore,
       debuggingScore,
       codingScore,
@@ -699,18 +812,56 @@ function StudentAssessmentEngine() {
       speedScore,
       trustScore,
       detectedComplexity,
+      competencyBadge,
+      strongSkills: strongSkills.length > 0 ? strongSkills : ["Algorithmic Foundation"],
+      weakSkills: weakSkills.length > 0 ? weakSkills : ["Memory Management", "Distributed Architecture"],
       topicGaps,
-      assignedProject: {
-        title: guide.recommendedProjectTitle,
-        details: guide.projectDetails,
-        targetTopic: weakestTopicObj.topic,
+    });
+
+    // Generate tailored 4-week guidance curriculum based on weak topics
+    const primaryWeakness = weakSkills[0] || "Memory Management";
+    const secondaryWeakness = weakSkills[1] || "Databases & Indexing";
+
+    setImprovementPlan([
+      {
+        weekNumber: 1,
+        title: "Deficit Root-Cause & Core Theory Repair",
+        focusTopic: primaryWeakness,
+        milestones: [
+          { id: "m-1-1", text: `Review fundamental architecture and failure modes for ${primaryWeakness}`, done: false },
+          { id: "m-1-2", text: "Complete 1:1 Diagnostic Onboarding session with matched Mentor", done: false },
+        ],
       },
-      assignedMentor: mentor,
-    };
+      {
+        weekNumber: 2,
+        title: "Hands-on Code Remediation & Bug Lab",
+        focusTopic: secondaryWeakness,
+        milestones: [
+          { id: "m-2-1", text: `Solve 4 intermediate verification problems on ${secondaryWeakness}`, done: false },
+          { id: "m-2-2", text: "Submit pull request for defensive code review to mentor desk", done: false },
+        ],
+      },
+      {
+        weekNumber: 3,
+        title: "Production Architecture Capstone",
+        focusTopic: primaryWeakness,
+        milestones: [
+          { id: "m-3-1", text: `Build production milestone system integrating ${primaryWeakness}`, done: false },
+          { id: "m-3-2", text: "Live architectural defense with mentor", done: false },
+        ],
+      },
+      {
+        weekNumber: 4,
+        title: "Placement Readiness Mock & Sign-off",
+        focusTopic: "Interview Ready",
+        milestones: [
+          { id: "m-4-1", text: "Clear mentor-led technical mock interview (minimum 80% score)", done: false },
+          { id: "m-4-2", text: "Obtain Verified Placement Endorsement Badge", done: false },
+        ],
+      },
+    ]);
 
-    setSkillProfile(updatedProfile);
-
-    // Save strictly to Supabase Ledger
+    // Save baseline score to Supabase
     try {
       const attemptedIds = studentQuestions.map((q) => q.id);
       await supabase.from("student_assessments").insert({
@@ -729,14 +880,33 @@ function StudentAssessmentEngine() {
       console.error("Scorecard sync error:", err);
     }
 
-    if (currentAttempt > 1) {
-      if (isQualified) toast.success(`Profile Upgraded! You achieved ${competencyBadge} on Attempt #${currentAttempt} 🎉`);
-      else toast.info(`Re-assessment recorded (${totalMeritScore}/100). Review your gaps to qualify.`);
-    } else {
-      toast.success("Skill Profile Generated! Review your Gaps & Roadmap below.");
-    }
+    toast.success("Assessment Complete! Review your Diagnostic Gap Analysis.");
+    setAssessmentStage("result-gaps");
+  };
 
-    setAssessmentStage("profile-hub");
+  // Toggle milestone completion & recalculate readiness score
+  const toggleMilestone = (weekIdx: number, milestoneId: string) => {
+    setImprovementPlan((prev) => {
+      const updated = prev.map((week, idx) => {
+        if (idx !== weekIdx) return week;
+        return {
+          ...week,
+          milestones: week.milestones.map((m) => (m.id === milestoneId ? { ...m, done: !m.done } : m)),
+        };
+      });
+
+      const allMilestones = updated.flatMap((w) => w.milestones);
+      const completedCount = allMilestones.filter((m) => m.done).length;
+      const basePercentage = 35;
+      const progressBonus = Math.round((completedCount / allMilestones.length) * 65);
+      const newScore = Math.min(100, basePercentage + progressBonus);
+      setReadinessScore(newScore);
+
+      if (newScore >= 75) {
+        toast.success("Placement Threshold Reached! Placements Board Unlocked 🎉");
+      }
+      return updated;
+    });
   };
 
   const formatTime = (secs: number) => {
@@ -989,11 +1159,11 @@ function StudentAssessmentEngine() {
                   Student Growth Lifecycle:
                 </h4>
                 <div className="space-y-1.5 text-slate-300">
-                  <div>• <strong>1. First Attempt:</strong> Creates your baseline Verified Skill Profile.</div>
-                  <div>• <strong>2. Skill Gaps:</strong> Identifies where you lag with a targeted action plan.</div>
-                  <div>• <strong>3. Re-Assessment:</strong> Learn concepts and retake test to qualify.</div>
-                  <div>• <strong>4. Capstone Project:</strong> Get assigned real-world projects & dedicated 1:1 mentor.</div>
-                  <div>• <strong>5. Internships:</strong> Unlocks direct applications once you reach score cutoff.</div>
+                  <div>• <strong>1. Diagnostic Assessment:</strong> Pinpoints exact technical strengths and deficit gaps.</div>
+                  <div>• <strong>2. Skill Gap Review:</strong> Immediate feedback without premature placement pressure.</div>
+                  <div>• <strong>3. Mentor Guidance:</strong> Connect with dedicated staff architects on your weak topics.</div>
+                  <div>• <strong>4. 4-Week Action Plan:</strong> Progress tracking milestone checklist.</div>
+                  <div>• <strong>5. Unlocked Placements:</strong> Corporate hiring tracks unlock once readiness hits 75%.</div>
                 </div>
               </div>
             </div>
@@ -1164,10 +1334,10 @@ function StudentAssessmentEngine() {
             </div>
 
             <Button
-              onClick={submitAssessmentAndGenerateProfile}
+              onClick={submitAssessmentAndEvaluate}
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-8 px-4 shadow-sm"
             >
-              Submit & Update Profile
+              Submit & Analyze
             </Button>
           </div>
         </header>
@@ -1202,7 +1372,7 @@ function StudentAssessmentEngine() {
           </div>
         </div>
 
-        {/* Assessment Tiers Views */}
+        {/* Assessment Tiers Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* TIER 1: THEORY (20 QUESTIONS) */}
           {activeTab === "theory" && (
@@ -1418,8 +1588,8 @@ function StudentAssessmentEngine() {
               </div>
 
               <div className="pt-6 border-t border-white/10 flex justify-end">
-                <Button onClick={submitAssessmentAndGenerateProfile} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6">
-                  Submit All & View Profile
+                <Button onClick={submitAssessmentAndEvaluate} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-6">
+                  Submit All & View Scorecard
                   <ArrowRight className="size-4 ml-1.5" />
                 </Button>
               </div>
@@ -1431,116 +1601,110 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: STUDENT VERIFIED PROFILE & CAREER GROWTH HUB
+  // VIEW 5: SKILL ANALYSIS RESULT PAGE (NO IMMEDIATE PLACEMENTS)
   // -------------------------------------------------------------
-  if (assessmentStage === "profile-hub" && skillProfile) {
+  if (assessmentStage === "result-gaps" && evaluation) {
     return (
       <div className="min-h-screen bg-[#071224] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
         <div className="w-full max-w-5xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl space-y-8">
-          {/* Top Profile Header */}
-          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="size-14 rounded-2xl bg-blue-600/20 border border-blue-400/30 flex items-center justify-center text-blue-400 font-black text-xl">
-                <UserCheck className="size-7" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-black text-white">Student Verified Skill Profile</h1>
-                  <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-white/10 text-slate-300">
-                    Attempt #{skillProfile.attemptNumber}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Institutional ID: <strong className="text-slate-200">{userEmail || "student@institution.ac.in"}</strong> • Domain: <span className="text-blue-400 uppercase font-semibold">{activeDomainTitle}</span>
-                </p>
-              </div>
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-1">
+                <CheckCircle2 className="size-4" /> Assessment Verified
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                Skill Analysis & Diagnostic Breakdown
+              </h1>
+              <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
+                Domain: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
+              </p>
             </div>
-
-            {/* Score & Re-Assessment Action */}
-            <div className="flex items-center gap-4 text-center">
-              <div className="p-3.5 rounded-xl bg-blue-600/20 border border-blue-400/30 px-5">
-                <div className="text-3xl font-extrabold text-white">{skillProfile.totalMeritScore}<span className="text-sm text-slate-400">/100</span></div>
-                <span className="text-[10px] uppercase font-bold text-blue-300">{skillProfile.competencyBadge}</span>
-              </div>
-              <Button onClick={handleProceedToGuidelines} className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold h-10 px-4 flex items-center gap-1.5 shadow-lg">
-                <RefreshCw className="size-3.5" /> Retake & Qualify
-              </Button>
-            </div>
+            <LanguageSelector />
           </div>
 
-          {/* 3 Metric Cards */}
+          {/* Overall Skill Score Header Card */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col justify-center">
-              <span className="text-[10px] uppercase font-bold text-slate-400">Qualification Status</span>
-              <div className={cn("text-xl font-black mt-1", skillProfile.isQualified ? "text-emerald-400" : "text-amber-400")}>
-                {skillProfile.isQualified ? "Qualified for Placements" : "Level Up Required (Cutoff: 60)"}
+            <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
+              <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
+                Overall Skill Score
+              </span>
+              <div className="text-4xl font-extrabold text-white mt-1">
+                {evaluation.totalMeritScore}
+                <span className="text-lg font-medium text-blue-200/70">/100</span>
               </div>
+              <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                {evaluation.competencyBadge}
+              </span>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col justify-center">
-              <span className="text-[10px] uppercase font-bold text-slate-400">Completion Pace</span>
-              <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
-              <span className="text-[10px] text-slate-400 mt-0.5">Pace Points: +{skillProfile.speedScore}/5</span>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400">Completion Pace</span>
+                <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
+              </div>
+              <p className="text-[11px] text-blue-200/70 mt-2">
+                Pace Score: +{evaluation.speedScore} / 5 pts
+              </p>
             </div>
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center flex flex-col justify-center">
-              <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
-              <div className="text-xl font-bold text-white mt-1">{skillProfile.trustScore}%</div>
-              <span className="text-[10px] text-slate-400 mt-0.5">{strikes.length} strikes recorded</span>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between text-center">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
+                <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
+              </div>
+              <p className="text-[11px] text-blue-200/70 mt-2">
+                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} strikes logged`}
+              </p>
             </div>
           </div>
 
-          {/* 4-Tier Real Score Breakdown */}
-          <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/40 overflow-hidden text-xs">
-            <div className="p-4 flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-white">Tier 1: Core Domain Theory (20 Questions)</div>
-                <div className="text-slate-400 text-[11px]">Real score based on answered questions</div>
+          {/* Strong vs Weak / Missing Skills */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-5 rounded-xl border border-emerald-500/25 bg-emerald-950/20 space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <Check className="size-4" /> Strong Skills Identified
+              </span>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {evaluation.strongSkills.map((s) => (
+                  <span key={s} className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 text-xs font-semibold">
+                    {s}
+                  </span>
+                ))}
               </div>
-              <div className="text-sm font-bold text-blue-400">+{skillProfile.theoryScore} / 35 pts</div>
             </div>
 
-            <div className="p-4 flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-white">Tier 2: Production Bug Triage</div>
-                <div className="text-slate-400 text-[11px]">Heap memory leak & unhandled rejection diagnosis</div>
+            <div className="p-5 rounded-xl border border-rose-500/25 bg-rose-950/20 space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                <AlertTriangle className="size-4" /> Weak / Missing Skills (Identified Gaps)
+              </span>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {evaluation.weakSkills.map((w) => (
+                  <span key={w} className="px-3 py-1 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/30 text-xs font-semibold">
+                    {w}
+                  </span>
+                ))}
               </div>
-              <div className="text-sm font-bold text-amber-400">+{skillProfile.debuggingScore} / 20 pts</div>
-            </div>
-
-            <div className="p-4 flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-white">Tier 3: Algorithmic Optimization</div>
-                <div className="text-slate-400 text-[11px]">Detected: <span className="font-mono text-cyan-300 font-bold">{skillProfile.detectedComplexity}</span></div>
-              </div>
-              <div className="text-sm font-bold text-cyan-400">+{skillProfile.codingScore} / 25 pts</div>
-            </div>
-
-            <div className="p-4 flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-white">Tier 4: System Architecture & Scale</div>
-                <div className="text-slate-400 text-[11px]">In-memory data structure for 100K live ranking</div>
-              </div>
-              <div className="text-sm font-bold text-purple-400">+{skillProfile.designScore} / 15 pts</div>
             </div>
           </div>
 
-          {/* 1. SKILL GAP ANALYSIS (EKKADA LAG UNNARU) */}
-          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="size-5 text-blue-400" />
-                <h3 className="text-base font-bold text-white">Diagnostic Skill Gaps (Identify Where You Lag)</h3>
-              </div>
-              <span className="text-xs text-slate-400">Calculated from your attempted answers</span>
+          {/* Existing Skill Gap Analysis */}
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="size-5 text-blue-400" />
+              <h3 className="text-base font-bold text-white">Diagnostic Skill Gap Analysis</h3>
             </div>
+            <p className="text-xs text-slate-400">
+              Granular topic accuracy based on your attempted test questions:
+            </p>
 
             <div className="space-y-3">
-              {skillProfile.topicGaps.map((item) => (
+              {evaluation.topicGaps.map((item) => (
                 <div
                   key={item.topic}
-                  className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"
+                  className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
                 >
                   <div className="flex-1 w-full">
-                    <div className="text-xs font-semibold text-white flex items-center justify-between sm:justify-start gap-2">
+                    <div className="text-xs font-semibold text-white flex items-center gap-2">
                       {item.topic}
                       <span
                         className={cn(
@@ -1573,160 +1737,268 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* 2. HOW TO LEARN (ELA NERCHUKOVALI) */}
-          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
-            <div className="flex items-center gap-2">
-              <BookOpen className="size-5 text-amber-400" />
-              <h3 className="text-base font-bold text-white">Targeted Action Plan (How to Bridge Your Gaps)</h3>
+          {/* ------------------------------------------------------------- */}
+          {/* PROMINENT REQUIRED SECTION: NEXT STEP -> MENTOR GUIDANCE      */}
+          {/* (NO IMMEDIATE PLACEMENTS DISPLAYED)                           */}
+          {/* ------------------------------------------------------------- */}
+          <div className="p-6 sm:p-8 rounded-2xl border-2 border-cyan-500/50 bg-gradient-to-r from-blue-950/80 via-slate-900 to-cyan-950/80 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-bold">
+                <Compass className="size-3.5" /> Next Career Phase
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white">
+                Your Next Step: Get Guidance From a Mentor
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                Your skill analysis identified specific gaps in <strong className="text-rose-400">{evaluation.weakSkills.join(", ")}</strong>. To maximize your hiring outcome, these deficits can be resolved with direct 1:1 mentor guidance and a structured milestone plan before unlocking competitive campus placements.
+              </p>
             </div>
-            <p className="text-xs text-slate-400">
-              Study these key architectural concepts before retaking the assessment to qualify for placements:
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {skillProfile.topicGaps
-                .filter((t) => t.status !== "Strong")
-                .map((gap) => {
-                  const guide = TOPIC_ACTION_GUIDES[gap.topic] || TOPIC_ACTION_GUIDES["Memory Management"];
-                  return (
-                    <div key={gap.topic} className="p-4 rounded-xl bg-black/40 border border-amber-500/20">
-                      <span className="text-xs font-bold text-amber-300">{gap.topic} (Needs Study)</span>
-                      <ul className="mt-2 space-y-1 text-xs text-slate-400">
-                        {guide.actionSteps.map((step, idx) => (
-                          <li key={idx} className="flex items-start gap-1.5">
-                            <span className="text-amber-400">▸</span> {step}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-            </div>
+
+            <Button
+              onClick={() => setAssessmentStage("mentor-hub")}
+              className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-black text-xs sm:text-sm h-12 px-8 shadow-xl shrink-0 transition hover:scale-105"
+            >
+              Find My Mentor <ArrowRight className="size-4 ml-2" />
+            </Button>
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* 3. ASSIGNED PROJECT & DEDICATED MENTOR */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            {/* Recommended Project */}
-            <div className="lg:col-span-7 p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-2 text-cyan-400">
-                  <FolderGit2 className="size-5" />
-                  <h3 className="text-base font-bold text-white">Assigned Capstone Project</h3>
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  Target Topic: {skillProfile.assignedProject.targetTopic}
-                </span>
-                <h4 className="text-sm font-bold text-white mt-3">{skillProfile.assignedProject.title}</h4>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">{skillProfile.assignedProject.details}</p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-xs">
-                <span className="text-slate-400">Build & submit repository for verification</span>
-                <Button
-                  onClick={() => toast.success("Project repository template cloned to your dashboard!")}
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold h-8"
-                >
-                  Start Project
-                </Button>
-              </div>
+  // -------------------------------------------------------------
+  // VIEW 6: MENTOR RECOMMENDATION & PERSONALIZED IMPROVEMENT PLAN
+  // -------------------------------------------------------------
+  if (assessmentStage === "mentor-hub" && evaluation) {
+    const primaryWeakness = evaluation.weakSkills[0] || "Memory Management";
+    const recommendedMentors = PLATFORM_MENTORS.filter(
+      (m) => m.specializationTopic === primaryWeakness || evaluation.weakSkills.includes(m.specializationTopic)
+    );
+
+    return (
+      <div className="min-h-screen bg-[#071224] text-white p-6 sm:p-10 font-sans">
+        <div className="w-full max-w-5xl mx-auto space-y-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-white/10">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">Step 3 of 5 • Mentorship Matching</span>
+              <h1 className="text-2xl sm:text-3xl font-black text-white mt-0.5">Matched Industry Mentors</h1>
+              <p className="text-xs text-slate-400">Curated based on your test deficit in: <strong className="text-rose-400">{primaryWeakness}</strong></p>
             </div>
-
-            {/* Assigned Industry Mentor */}
-            <div className="lg:col-span-5 p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-2 mb-3 text-emerald-400">
-                  <Compass className="size-5" />
-                  <h3 className="text-base font-bold text-white">Assigned Industry Mentor</h3>
-                </div>
-                <div className="flex items-center gap-3">
-                  <img
-                    src={skillProfile.assignedMentor.avatar}
-                    alt="Mentor"
-                    className="size-12 rounded-full object-cover border-2 border-emerald-400/40"
-                  />
-                  <div>
-                    <div className="text-sm font-bold text-white">{skillProfile.assignedMentor.name}</div>
-                    <div className="text-xs text-slate-400">{skillProfile.assignedMentor.role}</div>
-                    <div className="text-[10px] text-emerald-400 font-semibold">{skillProfile.assignedMentor.company}</div>
-                  </div>
-                </div>
-                <div className="mt-3 p-2.5 rounded-lg bg-black/40 border border-white/10 text-[11px] text-slate-300">
-                  <span className="text-[10px] font-bold text-slate-400 block">Assigned Mentor Specialization:</span>
-                  {skillProfile.assignedMentor.focusDomain}
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-right">
+                <span className="text-[10px] text-slate-400 block">Placement Readiness</span>
+                <span className={cn("text-lg font-black", readinessScore >= 75 ? "text-emerald-400" : "text-amber-400")}>{readinessScore}%</span>
               </div>
               <Button
-                onClick={() => toast.success(`1:1 Mentorship channel opened with ${skillProfile.assignedMentor.name}!`)}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold h-8 mt-4 flex items-center justify-center gap-1.5"
+                disabled={readinessScore < 75}
+                onClick={() => setAssessmentStage("placements")}
+                className={cn(
+                  "text-xs font-bold h-10 px-5",
+                  readinessScore >= 75 ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
+                )}
               >
-                <MessageSquare className="size-3.5" /> Connect with Mentor
+                {readinessScore >= 75 ? (
+                  <>Enter Placements <ArrowRight className="size-3.5 ml-1.5" /></>
+                ) : (
+                  <><Lock className="size-3.5 mr-1.5" /> Placements Locked (75% Needed)</>
+                )}
               </Button>
             </div>
           </div>
 
-          {/* 4. UNLOCKED SUITABLE INTERNSHIPS */}
-          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Briefcase className="size-5 text-emerald-400" />
-                <h3 className="text-base font-bold text-white">Suitable Internship & Placement Matches</h3>
-              </div>
-              <span className="text-xs text-emerald-400 font-semibold">Matched to your {skillProfile.totalMeritScore}/100 score</span>
-            </div>
+          {/* MENTOR CARDS SECTION */}
+          <div className="space-y-4">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <UserCheck className="size-5 text-cyan-400" /> Platform Mentors Specialized in Your Gaps
+            </h3>
 
-            <div className="space-y-3">
-              {INTERNSHIP_CATALOG.map((job) => {
-                const isEligible = skillProfile.totalMeritScore >= job.minCutoff;
-                const matchPercentage = Math.min(99, Math.round((skillProfile.totalMeritScore / 100) * 85) + (isEligible ? 14 : 5));
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {(recommendedMentors.length > 0 ? recommendedMentors : PLATFORM_MENTORS.slice(0, 3)).map((m) => {
+                const isSelected = assignedMentor?.id === m.id;
                 return (
                   <div
-                    key={job.id}
-                    className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-white/20 transition"
+                    key={m.id}
+                    className={cn(
+                      "p-5 rounded-2xl border transition-all flex flex-col justify-between bg-slate-900/90",
+                      isSelected ? "border-cyan-400 ring-2 ring-cyan-400/40 shadow-xl" : "border-white/10 hover:border-white/20"
+                    )}
                   >
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-white">{job.role}</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          {job.company}
-                        </span>
+                      <div className="flex items-center gap-3 mb-3">
+                        <img src={m.avatar} alt={m.name} className="size-12 rounded-full object-cover border-2 border-cyan-400/40" />
+                        <div>
+                          <h4 className="text-sm font-bold text-white">{m.name}</h4>
+                          <span className="text-[11px] text-slate-400 block">{m.role}</span>
+                          <span className="text-[10px] text-cyan-300 font-semibold">{m.company}</span>
+                        </div>
                       </div>
-                      <div className="text-xs text-slate-400 mt-1">
-                        {job.location} • <strong className="text-slate-200">{job.stipend}</strong>
+
+                      <div className="space-y-1.5 text-[11px] text-slate-300 p-3 rounded-xl bg-black/40 border border-white/10 mb-4">
+                        <div className="flex justify-between"><span className="text-slate-400">Match Accuracy:</span> <strong className="text-emerald-400">{m.matchScore}%</strong></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Specialization:</span> <strong className="text-cyan-300">{m.specializationTopic}</strong></div>
+                        <div className="flex justify-between"><span className="text-slate-400">Availability:</span> <span>{m.availableDays}</span></div>
                       </div>
-                      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                        {job.skillsNeeded.map((s) => (
-                          <span key={s} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
+                      <p className="text-[11px] text-slate-400 leading-relaxed mb-4">{m.bio}</p>
                     </div>
 
-                    <div className="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
-                      <div className="text-right">
-                        <div className="text-xs font-bold text-emerald-400">{matchPercentage}% Match</div>
-                        <span className="text-[10px] text-slate-400">Min Cutoff: {job.minCutoff} pts</span>
-                      </div>
-                      <Button
-                        disabled={!isEligible}
-                        className={cn(
-                          "text-xs h-8 px-4 font-bold",
-                          isEligible ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
-                        )}
-                        onClick={() => toast.success(`Applied to ${job.company}!`)}
-                      >
-                        {isEligible ? "Direct Apply" : "Below Cutoff"}
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={() => {
+                        setAssignedMentor(m);
+                        setMentorSessionBooked(true);
+                        toast.success(`Connected with ${m.name}! Your 4-Week Guidance Plan is activated.`);
+                      }}
+                      className={cn(
+                        "w-full text-xs font-bold h-9",
+                        isSelected ? "bg-emerald-600 text-white" : "bg-cyan-600 hover:bg-cyan-700 text-white"
+                      )}
+                    >
+                      {isSelected ? "Active Mentor Assigned" : "Select & Connect Mentor"}
+                    </Button>
                   </div>
                 );
               })}
             </div>
           </div>
 
+          {/* PERSONALIZED IMPROVEMENT PLAN & PROGRESS TRACKER */}
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Target className="size-5 text-amber-400" /> Personalized Improvement Plan & Milestone Progress Tracker
+                </h3>
+                <p className="text-xs text-slate-400">Complete milestones with your mentor to increase your readiness index and unlock placements.</p>
+              </div>
+              <div className="text-xs font-mono px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-cyan-300">
+                Readiness: {readinessScore}% / 75% Required
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {improvementPlan.map((week, wIdx) => (
+                <div key={week.weekNumber} className="p-4 rounded-xl bg-black/40 border border-white/10 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                        Week {week.weekNumber} • {week.focusTopic}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-bold text-white mb-3">{week.title}</h4>
+
+                    <div className="space-y-2">
+                      {week.milestones.map((m) => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => toggleMilestone(wIdx, m.id)}
+                          className={cn(
+                            "w-full p-2.5 rounded-lg border text-left text-xs transition flex items-start gap-2.5",
+                            m.done ? "border-emerald-500/40 bg-emerald-950/20 text-emerald-200 line-through" : "border-white/10 bg-slate-950/50 text-slate-300 hover:bg-slate-900"
+                          )}
+                        >
+                          {m.done ? <CheckSquare className="size-4 text-emerald-400 shrink-0 mt-0.5" /> : <Square className="size-4 text-slate-500 shrink-0 mt-0.5" />}
+                          <span className="leading-snug">{m.text}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {readinessScore >= 75 ? (
+              <div className="p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/30 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div className="flex items-center gap-3 text-xs text-emerald-300">
+                  <Award className="size-6 text-emerald-400 shrink-0" />
+                  <span><strong>Placement Qualification Verified:</strong> You have closed key deficit topics with your mentor. Corporate placement applications are now open!</span>
+                </div>
+                <Button onClick={() => setAssessmentStage("placements")} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-6 shrink-0">
+                  Open Placements Board <ArrowRight className="size-3.5 ml-1.5" />
+                </Button>
+              </div>
+            ) : (
+              <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between text-xs text-slate-400">
+                <span className="flex items-center gap-2"><Lock className="size-4 text-amber-400" /> Placements remain locked until you complete sufficient plan milestones.</span>
+                <span className="text-amber-400 font-bold">{75 - readinessScore}% more needed</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // VIEW 7: PLACEMENTS BOARD (UNLOCKED ONLY AFTER MENTOR READINESS)
+  // -------------------------------------------------------------
+  if (assessmentStage === "placements" && evaluation) {
+    return (
+      <div className="min-h-screen bg-[#071224] text-white p-6 sm:p-10 font-sans">
+        <div className="w-full max-w-5xl mx-auto space-y-6">
+          <div className="p-6 rounded-2xl border border-emerald-500/30 bg-slate-900/90 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-1">
+                <Unlock className="size-4" /> Mentor-Endorsed Readiness: {readinessScore}%
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-white">Active Corporate Placement Tracks</h1>
+              <p className="text-xs text-slate-400 mt-1">Unlocked after successfully completing skill remediation and mentor milestones.</p>
+            </div>
+            <Button onClick={() => setAssessmentStage("mentor-hub")} className="bg-white/10 text-white text-xs hover:bg-white/20">
+              Return to Mentor Desk
+            </Button>
+          </div>
+
+          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <Briefcase className="size-5 text-emerald-400" /> Eligible High-Stipend Placements
+            </h3>
+
+            <div className="space-y-3">
+              {INTERNSHIP_CATALOG.map((job) => (
+                <div
+                  key={job.id}
+                  className="p-4 rounded-xl border border-white/10 bg-black/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-white/20 transition"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-white">{job.role}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        {job.company}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-400 mt-1">
+                      {job.location} • <strong className="text-slate-200">{job.stipend}</strong>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                      {job.skillsNeeded.map((s) => (
+                        <span key={s} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex sm:flex-col items-end justify-between w-full sm:w-auto gap-2">
+                    <div className="text-right">
+                      <span className="text-xs font-bold text-emerald-400">Readiness Verified</span>
+                      <span className="text-[10px] text-slate-400 block">Cutoff: {job.minCutoff} pts</span>
+                    </div>
+                    <Button
+                      onClick={() => toast.success(`Application sent to ${job.company} with verified mentor endorsement!`)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-8 px-5"
+                    >
+                      Direct Apply
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div className="flex justify-end pt-4">
             <Link to="/">
               <Button className="bg-white/10 hover:bg-white/20 text-white text-xs">
-                Back to Dashboard
-                <ArrowRight className="size-4 ml-1.5" />
+                Back to Portal Home
               </Button>
             </Link>
           </div>
