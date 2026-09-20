@@ -22,11 +22,7 @@ import {
   Code2,
   FileText,
   ShieldCheck,
-  Globe,
-  Cpu,
-  BarChart3,
-  Cloud,
-  Lock,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -60,41 +56,68 @@ interface CodingQuestion {
 }
 
 const DOMAIN_OPTIONS = [
-  {
-    id: "web-dev",
-    title: "Full Stack Web Development",
-    desc: "React, Node.js, Next.js, System Architecture & REST APIs",
-    icon: Globe,
-    badge: "Popular",
-  },
-  {
-    id: "ai-ml",
-    title: "Artificial Intelligence & ML",
-    desc: "Neural Networks, Python, Computer Vision & LLM Implementations",
-    icon: Cpu,
-    badge: "Trending",
-  },
-  {
-    id: "data-science",
-    title: "Data Analytics & Engineering",
-    desc: "SQL, Python Data Pipelines, BigQuery & Predictive Modeling",
-    icon: BarChart3,
-    badge: "High Demand",
-  },
-  {
-    id: "cloud-devops",
-    title: "Cloud Architecture & DevOps",
-    desc: "AWS, Docker, Kubernetes, CI/CD Pipelines & Terraform",
-    icon: Cloud,
-    badge: "Enterprise",
-  },
-  {
-    id: "cybersecurity",
-    title: "Cybersecurity & InfoSec",
-    desc: "Network Defense, Cryptography, Penetration Testing & Audits",
-    icon: Lock,
-    badge: "Specialized",
-  },
+  // 1. SOFTWARE & SYSTEM ENGINEERING
+  { id: "fullstack-web", title: "Full Stack Web Development", category: "Software Development", desc: "MERN/Next.js, Spring Boot, REST APIs, Microservices, System Design", badge: "Most Popular" },
+  { id: "frontend-dev", title: "Frontend Engineering", category: "Software Development", desc: "React, Angular, Vue, TypeScript, Next.js, Web Performance & UI/UX", badge: "High Demand" },
+  { id: "backend-dev", title: "Backend Systems Architecture", category: "Software Development", desc: "Java, Node.js, Go, Python Django, Distributed DBs, Caching, Kafka", badge: "Core Tech" },
+  { id: "mobile-dev", title: "Mobile App Engineering", category: "Software Development", desc: "Flutter, React Native, Native Android (Kotlin), iOS (Swift)", badge: "Industry" },
+  { id: "game-dev", title: "Game Design & Development", category: "Software Development", desc: "Unity, Unreal Engine 5, C#, C++, 3D Shaders, Physics Engines", badge: "Creative Tech" },
+  { id: "software-testing", title: "QA & Test Automation Engineering", category: "Software Development", desc: "Selenium, Cypress, Playwright, API Testing, Performance (JMeter)", badge: "High Demand" },
+  { id: "api-microservices", title: "API & Microservices Architecture", category: "Software Development", desc: "gRPC, GraphQL, REST, API Gateways, Event-Driven Systems", badge: "Enterprise" },
+
+  // 2. AI, MACHINE LEARNING & DATA SCIENCE
+  { id: "ai-ml", title: "Artificial Intelligence & Machine Learning", category: "Data & AI", desc: "Supervised/Unsupervised Models, Scikit-learn, Neural Networks, PyTorch", badge: "Trending" },
+  { id: "gen-ai", title: "Generative AI & LLM Systems", category: "Data & AI", desc: "LangChain, RAG Pipelines, Vector DBs, Prompt Engineering, Fine-Tuning", badge: "Frontier" },
+  { id: "deep-learning-cv", title: "Deep Learning & Computer Vision", category: "Data & AI", desc: "CNNs, YOLO, OpenCV, Image Segmentation, Video Analytics", badge: "Specialized" },
+  { id: "nlp-speech", title: "NLP & Conversational Systems", category: "Data & AI", desc: "Transformers, BERT, Speech-to-Text, Sentiment Analysis, Tokenization", badge: "Specialized" },
+  { id: "data-science", title: "Data Science & Statistical Analytics", category: "Data & AI", desc: "Python, R, Exploratory Analysis, Predictive Modeling, Hypothesis Testing", badge: "High Demand" },
+  { id: "data-engineering", title: "Data Engineering & Big Data Systems", category: "Data & AI", desc: "Apache Spark, Kafka, Snowflake, Databricks, BigQuery, ETL Pipelines", badge: "Enterprise" },
+  { id: "bi-analytics", title: "Business Intelligence & Data Visualization", category: "Data & AI", desc: "Power BI, Tableau, Advanced SQL, Data Warehousing, Metric Dashboards", badge: "Corporate" },
+
+  // 3. CLOUD, DEVOPS & INFRASTRUCTURE
+  { id: "cloud-architecture", title: "Cloud Architecture (AWS / Azure / GCP)", category: "Cloud & DevOps", desc: "VPC, IAM, Serverless (Lambda), Cloud Security, High Availability Systems", badge: "Enterprise" },
+  { id: "devops-sre", title: "DevOps & Site Reliability Engineering (SRE)", category: "Cloud & DevOps", desc: "Docker, Kubernetes, CI/CD Actions, Terraform, Linux Admin, Prometheus", badge: "High Demand" },
+  { id: "system-admin", title: "Linux Systems & Enterprise Networking", category: "Cloud & DevOps", desc: "Bash Scripting, DNS, TCP/IP, Active Directory, Server Hardening", badge: "Core" },
+
+  // 4. CYBERSECURITY & INFORMATION SECURITY
+  { id: "ethical-hacking", title: "Ethical Hacking & Penetration Testing", category: "Cybersecurity", desc: "VAPT, Metasploit, Burp Suite, Network Vulnerabilities, Bug Bounty", badge: "High Demand" },
+  { id: "cyber-defense", title: "SOC Operations & Threat Intelligence", category: "Cybersecurity", desc: "SIEM (Splunk), Incident Response, Log Analysis, Malware Triage", badge: "Security" },
+  { id: "cloud-security", title: "Cloud Security & DevSecOps", category: "Cybersecurity", desc: "OWASP Top 10, Container Security, SonarQube, Zero Trust Architecture", badge: "Enterprise" },
+  { id: "cryptography-web3", title: "Cryptography & Blockchain Engineering", category: "Cybersecurity", desc: "Solidity, Smart Contracts, Ethereum, EVM, Public-Key Infrastructure", badge: "Emerging" },
+
+  // 5. ELECTRONICS, VLSI & EMBEDDED SYSTEMS (ECE / EEE)
+  { id: "embedded-systems", title: "Embedded Systems & Firmware Engineering", category: "Core Hardware", desc: "Embedded C/C++, ARM Cortex, FreeRTOS, Microcontrollers (ESP32/STM32)", badge: "Core ECE" },
+  { id: "vlsi-design", title: "VLSI Design & RTL Verification", category: "Core Hardware", desc: "Verilog, SystemVerilog, UVM, FPGA Synthesis, Static Timing Analysis", badge: "High Package" },
+  { id: "iot-robotics", title: "Internet of Things (IoT) & Smart Sensors", category: "Core Hardware", desc: "MQTT, Sensor Interfacing, Edge Computing, Raspberry Pi, LoRaWAN", badge: "Modern Hardware" },
+  { id: "robotics-automation", title: "Robotics & Autonomous Systems", category: "Core Hardware", desc: "ROS (Robot Operating System), Kinematics, SLAM, PID Controllers", badge: "Research" },
+  { id: "pcb-hardware", title: "PCB Design & Hardware Architecture", category: "Core Hardware", desc: "Altium, KiCAD, High-Speed Routing, Circuit Simulation (SPICE)", badge: "Core ECE" },
+  { id: "power-systems-ev", title: "Electric Vehicles (EV) & Power Electronics", category: "Core Hardware", desc: "BMS (Battery Management), Inverters, Motor Controllers, Power Grids", badge: "Core EEE" },
+
+  // 6. MECHANICAL, AEROSPACE & MECHATRONICS
+  { id: "cad-cam-design", title: "CAD / CAM & Mechanical Product Design", category: "Core Mechanical", desc: "SolidWorks, CATIA, GD&T, Rapid Prototyping, Sheet Metal Design", badge: "Core Mech" },
+  { id: "fea-cfd-analysis", title: "FEA & CFD Thermal Simulation", category: "Core Mechanical", desc: "ANSYS Mechanical, Fluent, Aerodynamics, Stress Analysis, Meshing", badge: "Simulation" },
+  { id: "industrial-automation", title: "Industrial Automation & PLC / SCADA", category: "Core Mechanical", desc: "Siemens PLC, Ladder Logic, Hydraulics, Pneumatics, Industry 4.0", badge: "Manufacturing" },
+
+  // 7. CIVIL, GEOSPATIAL & STRUCTURAL
+  { id: "structural-engineering", title: "Structural Analysis & BIM Design", category: "Core Civil", desc: "ETABS, STAAD Pro, Revit BIM, Concrete Design, Seismic Analysis", badge: "Core Civil" },
+  { id: "gis-remote-sensing", title: "Geospatial Data Science & GIS", category: "Core Civil", desc: "ArcGIS, QGIS, Satellite Imagery Analysis, Spatial Mapping", badge: "Geospatial" },
+
+  // 8. PRODUCT, DESIGN & TECH MANAGEMENT
+  { id: "ui-ux-design", title: "UI/UX & Digital Product Design", category: "Design & Product", desc: "Figma, User Journey Mapping, Wireframing, Design Systems, Usability", badge: "Creative" },
+  { id: "product-management", title: "Technical Product Management (APM)", category: "Design & Product", desc: "PRDs, Agile/Scrum Sprints, Feature Roadmaps, Product Analytics (Mixpanel)", badge: "Management" },
+  { id: "business-analyst", title: "Technical Business Analyst (IT BA)", category: "Design & Product", desc: "Requirement Gathering, UML Diagrams, User Stories, Gap Analysis, Jira", badge: "Corporate" },
+];
+
+const CATEGORIES = [
+  "All",
+  "Software Development",
+  "Data & AI",
+  "Cloud & DevOps",
+  "Cybersecurity",
+  "Core Hardware",
+  "Core Mechanical",
+  "Core Civil",
+  "Design & Product",
 ];
 
 const MCQ_DATA: MCQQuestion = {
@@ -153,9 +176,13 @@ function StudentAssessmentEngine() {
     "domain-selection" | "guidelines" | "testing" | "submitted"
   >("domain-selection");
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+  const [customDomainText, setCustomDomainText] = useState("");
+  const [domainSearch, setDomainSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
   const [activeTab, setActiveTab] = useState<"mcq" | "coding">("mcq");
 
-  // Camera Validation State: "checking" | "ready" | "denied"
+  // Camera Status: "checking" | "ready" | "denied"
   const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
 
   // Answers & Code
@@ -184,7 +211,7 @@ function StudentAssessmentEngine() {
     mcqPassed: boolean;
   } | null>(null);
 
-  // Camera Activation & Mandatory Check
+  // Camera Validation Hook
   useEffect(() => {
     if (assessmentStage !== "guidelines" && assessmentStage !== "testing") return;
 
@@ -203,8 +230,8 @@ function StudentAssessmentEngine() {
       .catch((err) => {
         console.error("Camera access denied:", err);
         setCameraStatus("denied");
-        toast.error("Camera Permission Tappanisari!", {
-          description: "Ee proctored assessment rayalante camera access allow cheyali.",
+        toast.error("Camera Permission Required!", {
+          description: "Please allow camera access in your browser to proceed with proctored exam.",
         });
       });
 
@@ -213,7 +240,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage]);
 
-  // Timer
+  // Assessment Timer Hook
   useEffect(() => {
     if (assessmentStage === "testing" && !isDisqualified) {
       timerRef.current = setInterval(() => {
@@ -225,7 +252,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Proctoring Violations
+  // Anti-Cheat Violation Handler
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
@@ -238,17 +265,17 @@ function StudentAssessmentEngine() {
         if (next.length === 1) {
           setActiveAlert("Strike 1/2: Integrity Violation Logged. 1 chance remaining!");
           toast.warning("Warning 1/2: Rule Violated!", {
-            description: `${reason}. Inko okka chance mathrame migili undi.`,
+            description: `${reason}. 1 chance remaining before lockout.`,
           });
         } else if (next.length === 2) {
-          setActiveAlert("CRITICAL WARNING 2/2: Next violation tho exam terminate avthundi!");
+          setActiveAlert("CRITICAL WARNING 2/2: Next violation will terminate your test!");
           toast.error("Critical Strike 2/2!", {
-            description: `${reason}. Final warning! Maro sari violate chesthe session aagipothundi.`,
+            description: `${reason}. Final notice! Further infraction terminates test.`,
           });
         } else if (next.length >= 3) {
           setIsDisqualified(true);
           toast.error("Assessment Terminated!", {
-            description: "2 chances datipoyayi. Proctoring rules prakaram test lock aindi.",
+            description: "Exceeded 2 chances. Session revoked under AI proctoring policy.",
           });
         }
         return next;
@@ -257,7 +284,7 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Security Listeners
+  // Security Focus Listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -268,7 +295,7 @@ function StudentAssessmentEngine() {
     };
 
     const onWindowBlur = () => {
-      registerStrike("Window focus lost (external click)");
+      registerStrike("Window focus lost (clicked outside browser)");
     };
 
     const onCopyPaste = (e: ClipboardEvent) => {
@@ -278,7 +305,7 @@ function StudentAssessmentEngine() {
 
     const onContextMenu = (e: MouseEvent) => {
       e.preventDefault();
-      registerStrike("Right-click blocked");
+      registerStrike("Right-click context menu blocked");
     };
 
     document.addEventListener("visibilitychange", onVisibilityChange);
@@ -347,7 +374,7 @@ function StudentAssessmentEngine() {
     });
 
     setAssessmentStage("submitted");
-    toast.success("Assessment vijayavanthamga evaluate aindi!");
+    toast.success("Assessment submitted & evaluated successfully!");
   };
 
   const formatTime = (secs: number) => {
@@ -356,74 +383,145 @@ function StudentAssessmentEngine() {
     return `${mins}m ${s < 10 ? "0" : ""}${s}s`;
   };
 
+  const activeDomainTitle =
+    selectedDomain === "custom-domain"
+      ? customDomainText || "Custom Track"
+      : DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain;
+
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION
+  // VIEW 1: DOMAIN SELECTION (36 DOMAINS + SEARCH + CUSTOM)
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
+    const filteredDomains = DOMAIN_OPTIONS.filter((d) => {
+      const matchesCategory = selectedCategory === "All" || d.category === selectedCategory;
+      const matchesSearch =
+        d.title.toLowerCase().includes(domainSearch.toLowerCase()) ||
+        d.desc.toLowerCase().includes(domainSearch.toLowerCase()) ||
+        d.category.toLowerCase().includes(domainSearch.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
-        <div className="w-full max-w-4xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
-          <div className="text-center max-w-xl mx-auto mb-8">
-            <div className="size-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto mb-3">
-              <Sparkles className="size-6" />
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
+        <div className="w-full max-w-6xl rounded-2xl border border-white/15 bg-slate-900/95 backdrop-blur-xl p-5 sm:p-8 shadow-2xl flex flex-col max-h-[92vh]">
+          {/* Header */}
+          <div className="text-center max-w-2xl mx-auto mb-4 shrink-0">
+            <div className="size-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto mb-2">
+              <Sparkles className="size-5" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Select Your Assessment Track
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Choose Your Engineering Specialization
             </h1>
-            <p className="text-xs sm:text-sm text-blue-200/70 mt-2">
-              Assessment start chese mundhu meeru prepare ayye domain ni choose chesukondi.
+            <p className="text-xs text-blue-200/70 mt-1">
+              Industry-benchmarked tracks across Software, AI, Core Engineering, and Tech Management.
             </p>
+
+            {/* Search Input */}
+            <div className="mt-3 relative max-w-lg mx-auto">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+              <input
+                type="text"
+                value={domainSearch}
+                onChange={(e) => setDomainSearch(e.target.value)}
+                placeholder="Search domains (e.g. AI, VLSI, Full Stack, EV, DevOps, CAD, Robotics)..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
+              />
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto py-2 mt-2.5 no-scrollbar">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-full text-[10px] font-semibold whitespace-nowrap transition border",
+                    selectedCategory === cat
+                      ? "bg-blue-600 text-white border-blue-500 shadow-sm"
+                      : "bg-white/5 text-slate-400 border-white/10 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {DOMAIN_OPTIONS.map((item) => {
-              const Icon = item.icon;
+          {/* Scrollable Domains Grid */}
+          <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {filteredDomains.map((item) => {
               const isSelected = selectedDomain === item.id;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setSelectedDomain(item.id)}
+                  onClick={() => {
+                    setSelectedDomain(item.id);
+                    setCustomDomainText("");
+                  }}
                   className={cn(
-                    "p-5 rounded-xl border text-left transition-all relative flex items-start gap-4",
+                    "p-3.5 rounded-xl border text-left transition-all relative flex flex-col justify-between",
                     isSelected
-                      ? "border-blue-500 bg-blue-600/20 ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/10"
+                      ? "border-blue-500 bg-blue-600/20 ring-2 ring-blue-500/50 shadow-md shadow-blue-500/10"
                       : "border-white/10 bg-slate-900/50 hover:bg-slate-800/80 hover:border-white/20"
                   )}
                 >
-                  <div
-                    className={cn(
-                      "size-11 rounded-lg flex items-center justify-center shrink-0",
-                      isSelected ? "bg-blue-600 text-white" : "bg-white/5 text-blue-400"
-                    )}
-                  >
-                    <Icon className="size-5" />
-                  </div>
-                  <div className="flex-1 min-w-0 pr-6">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-white">{item.title}</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-xs sm:text-sm text-white truncate">{item.title}</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/10 text-slate-300 shrink-0">
                         {item.badge}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
+                    <span className="text-[10px] text-blue-300 font-medium block mt-0.5">{item.category}</span>
+                    <p className="text-[11px] text-slate-400 mt-1 leading-relaxed line-clamp-2">{item.desc}</p>
                   </div>
                   {isSelected && (
-                    <div className="absolute top-4 right-4 size-5 rounded-full bg-blue-500 text-white flex items-center justify-center">
-                      <Check className="size-3 stroke-[3]" />
+                    <div className="absolute top-3 right-3 size-4 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                      <Check className="size-2.5 stroke-[3]" />
                     </div>
                   )}
                 </button>
               );
             })}
+
+            {/* Custom Domain Fallback Card */}
+            <div
+              onClick={() => setSelectedDomain("custom-domain")}
+              className={cn(
+                "p-3.5 rounded-xl border text-left transition-all relative flex flex-col justify-between cursor-pointer",
+                selectedDomain === "custom-domain"
+                  ? "border-blue-500 bg-blue-600/20 ring-2 ring-blue-500/50"
+                  : "border-dashed border-white/20 bg-black/30 hover:border-white/40"
+              )}
+            >
+              <div>
+                <span className="font-bold text-xs sm:text-sm text-white">Other / Custom Specialization</span>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Mee specialization list lo lekapothe ikkada manual ga type cheyandi.
+                </p>
+                {selectedDomain === "custom-domain" && (
+                  <input
+                    type="text"
+                    autoFocus
+                    value={customDomainText}
+                    onChange={(e) => setCustomDomainText(e.target.value)}
+                    placeholder="e.g. Bio-Informatics, Mechatronics, Aerospace..."
+                    className="mt-2 w-full px-3 py-1.5 rounded-lg bg-black/70 border border-blue-400 text-xs text-white placeholder:text-slate-500 focus:outline-none"
+                  />
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+          {/* Footer */}
+          <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between shrink-0">
             <Link to="/" className="text-xs text-slate-400 hover:text-white">
               Back to Home
             </Link>
             <Button
-              disabled={!selectedDomain}
+              disabled={!selectedDomain || (selectedDomain === "custom-domain" && !customDomainText.trim())}
               onClick={() => setAssessmentStage("guidelines")}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
             >
@@ -451,8 +549,7 @@ function StudentAssessmentEngine() {
           </span>
           <h1 className="text-3xl font-black text-white">Assessment Terminated</h1>
           <p className="mt-3 text-sm text-rose-200/80 leading-relaxed">
-            Mee test session cancel aindi. Max allowed strikes (2 chances) cross chesaru. Code
-            mariyu answers lock aipoyayi.
+            Your assessment has been revoked. You exceeded the allowed proctoring violations (2 chances). All inputs are locked.
           </p>
 
           <div className="mt-6 rounded-xl border border-white/10 bg-black/50 p-4 text-left">
@@ -480,7 +577,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: SCORECARD
+  // VIEW 3: FINAL SCORECARD
   // -------------------------------------------------------------
   if (assessmentStage === "submitted" && evaluation) {
     return (
@@ -494,10 +591,7 @@ function StudentAssessmentEngine() {
               Assessment Verified & Evaluated
             </h1>
             <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
-              Domain Track:{" "}
-              <span className="font-semibold text-blue-400 uppercase">
-                {DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain}
-              </span>
+              Domain Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
             </p>
           </div>
 
@@ -521,22 +615,17 @@ function StudentAssessmentEngine() {
                 <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
               </div>
               <p className="text-[11px] text-blue-200/70 mt-2">
-                Benchmark: 8m 00s (
-                {totalElapsed <= 480 ? "Optimal Speed achieved" : "Moderate Speed"})
+                Benchmark: 8m 00s ({totalElapsed <= 480 ? "Optimal Speed achieved" : "Moderate Speed"})
               </p>
             </div>
 
             <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">
-                  AI Integrity Trust
-                </span>
+                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
                 <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
               </div>
               <p className="text-[11px] text-blue-200/70 mt-2">
-                {strikes.length === 0
-                  ? "Zero violations (100% Authentic)"
-                  : `${strikes.length} warnings issued`}
+                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} warnings issued`}
               </p>
             </div>
           </div>
@@ -553,63 +642,42 @@ function StudentAssessmentEngine() {
             <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/40 overflow-hidden text-xs">
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">
-                    1. Correctness & Logic Verification (40%)
-                  </div>
+                  <div className="font-semibold text-white">1. Correctness & Logic Verification (40%)</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    MCQ Assessment:{" "}
-                    {evaluation.mcqPassed ? "Passed (+15 pts)" : "Incorrect (0 pts)"} • 5/5 Coding
-                    Testcases passed (+25 pts)
+                    MCQ Assessment: {evaluation.mcqPassed ? "Passed (+15 pts)" : "Incorrect (0 pts)"} • 5/5 Coding Testcases passed (+25 pts)
                   </div>
                 </div>
-                <div className="text-sm font-bold text-emerald-400">
-                  +{evaluation.logicScore} / 40 pts
-                </div>
+                <div className="text-sm font-bold text-emerald-400">+{evaluation.logicScore} / 40 pts</div>
               </div>
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">
-                    2. Algorithmic Efficiency & Complexity (25%)
-                  </div>
+                  <div className="font-semibold text-white">2. Algorithmic Efficiency & Complexity (25%)</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    Detected:{" "}
-                    <span className="text-cyan-300 font-mono font-bold">
-                      {evaluation.detectedComplexity}
-                    </span>
+                    Detected: <span className="text-cyan-300 font-mono font-bold">{evaluation.detectedComplexity}</span>
                   </div>
                 </div>
-                <div className="text-sm font-bold text-cyan-400">
-                  +{evaluation.complexityScore} / 25 pts
-                </div>
+                <div className="text-sm font-bold text-cyan-400">+{evaluation.complexityScore} / 25 pts</div>
               </div>
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">
-                    3. Benchmark Execution Speed (20%)
-                  </div>
+                  <div className="font-semibold text-white">3. Benchmark Execution Speed (20%)</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
                     Completed in {formatTime(totalElapsed)} vs 8m 00s target speed.
                   </div>
                 </div>
-                <div className="text-sm font-bold text-blue-400">
-                  +{evaluation.speedScore} / 20 pts
-                </div>
+                <div className="text-sm font-bold text-blue-400">+{evaluation.speedScore} / 20 pts</div>
               </div>
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">
-                    4. Code Cleanliness & Defensive Edge Cases (15%)
-                  </div>
+                  <div className="font-semibold text-white">4. Code Cleanliness & Defensive Edge Cases (15%)</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
                     Boundary empty array handling, negative constraints & semantic variable scopes.
                   </div>
                 </div>
-                <div className="text-sm font-bold text-indigo-400">
-                  +{evaluation.qualityScore} / 15 pts
-                </div>
+                <div className="text-sm font-bold text-indigo-400">+{evaluation.qualityScore} / 15 pts</div>
               </div>
             </div>
           </div>
@@ -628,7 +696,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 4: GUIDELINES & MANDATORY CAMERA CHECK (LOCKED BUTTON)
+  // VIEW 4: GUIDELINES & MANDATORY CAMERA CHECK
   // -------------------------------------------------------------
   if (assessmentStage === "guidelines") {
     return (
@@ -643,10 +711,7 @@ function StudentAssessmentEngine() {
                 AI-Proctored Student Assessment
               </h1>
               <p className="text-xs text-blue-200/70">
-                Selected Domain:{" "}
-                <span className="font-semibold text-blue-400 uppercase">
-                  {DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain}
-                </span>
+                Selected Domain: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
               </p>
             </div>
           </div>
@@ -658,8 +723,7 @@ function StudentAssessmentEngine() {
                   <ShieldAlert className="size-4 text-amber-400" />
                   Strict 2-Chance Policy Active
                 </span>
-                Tab switching, minimizing browser, leda copy-paste chesthe strikes padathayi. 2
-                chances tharvatha 3rd strike padithe assessment ventane cancel aipothundi.
+                Tab switching, minimizing browser, or copying code triggers strikes. 2 chances allowed. The 3rd strike terminates exam immediately.
               </div>
 
               <div className="space-y-2">
@@ -724,8 +788,8 @@ function StudentAssessmentEngine() {
               </div>
               <p className="text-[10px] text-slate-400 mt-1">
                 {cameraStatus === "ready"
-                  ? "Face ni screen madhyalo petti test continue cheyandi."
-                  : "Browser address bar lo camera permission allow cheyali."}
+                  ? "Maintain center gaze & ensure adequate lighting."
+                  : "Please grant camera permission in your browser address bar."}
               </p>
             </div>
           </div>
@@ -739,7 +803,7 @@ function StudentAssessmentEngine() {
               Change Domain
             </button>
 
-            {/* CAMERA ON KAKAPOTHE BUTTON WORK AVVADHU */}
+            {/* Locked until Camera is verified */}
             <Button
               disabled={cameraStatus !== "ready"}
               onClick={() => {
@@ -759,7 +823,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: ACTIVE ASSESSMENT (EXAM ENGINE)
+  // VIEW 5: ACTIVE ASSESSMENT ENGINE
   // -------------------------------------------------------------
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
