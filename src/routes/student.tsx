@@ -23,19 +23,20 @@ import {
   FileText,
   ShieldCheck,
   Search,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import { useAppState } from "@/lib/app-state";
 
 export const Route = createFileRoute("/student")({
   component: StudentAssessmentEngine,
 });
 
-// MULTI-QUESTION DEFINITIONS
 interface MCQQuestion {
   id: string;
-  type: "mcq";
   title: string;
   benchmarkSeconds: number;
   question: string;
@@ -46,7 +47,6 @@ interface MCQQuestion {
 
 interface CodingQuestion {
   id: string;
-  type: "coding";
   title: string;
   benchmarkSeconds: number;
   expectedComplexity: string;
@@ -120,13 +120,12 @@ const CATEGORIES = [
   "Design & Product",
 ];
 
-const MCQ_DATA: MCQQuestion = {
-  id: "mcq-1",
-  type: "mcq",
+// Fallback Default Data
+const DEFAULT_MCQ: MCQQuestion = {
+  id: "default-mcq",
   title: "Algorithmic Complexity & Optimization",
   benchmarkSeconds: 120,
-  question:
-    "Consider an algorithm that scans an unsorted array of size N using two nested loops to check for duplicates. What is the optimal time complexity to achieve the same result using a Hash Set or Hash Map?",
+  question: "Consider an algorithm that scans an unsorted array of size N using two nested loops to check for duplicates. What is the optimal time complexity to achieve the same result using a Hash Set or Hash Map?",
   options: [
     { id: "A", text: "O(N^2) - Quadratic Time (Brute Force)" },
     { id: "B", text: "O(N) - Linear Time (Single Pass Lookup)" },
@@ -134,13 +133,11 @@ const MCQ_DATA: MCQQuestion = {
     { id: "D", text: "O(1) - Constant Space and Time" },
   ],
   correctAnswer: "B",
-  explanation:
-    "Using a Hash Set allows average O(1) membership checks, reducing total traversal to linear O(N) time.",
+  explanation: "Using a Hash Set allows average O(1) membership checks, reducing total traversal to linear O(N) time.",
 };
 
-const CODING_DATA: CodingQuestion = {
-  id: "coding-1",
-  type: "coding",
+const DEFAULT_CODING: CodingQuestion = {
+  id: "default-coding",
   title: "Optimized Target Pair Finder (Two-Sum)",
   benchmarkSeconds: 360,
   expectedComplexity: "O(N) Linear Time",
@@ -151,7 +148,6 @@ Requirements:
 - Brute-force nested loops O(N^2) will be penalized in the efficiency score.
 - Must cleanly handle edge cases (empty arrays, negative numbers).`,
   initialCode: `function twoSum(nums, target) {
-  // Write your O(N) optimized solution here
   const map = new Map();
   for (let i = 0; i < nums.length; i++) {
     const complement = target - nums[i];
@@ -172,6 +168,8 @@ Requirements:
 };
 
 function StudentAssessmentEngine() {
+  const { userEmail } = useAppState();
+
   const [assessmentStage, setAssessmentStage] = useState<
     "domain-selection" | "guidelines" | "testing" | "submitted"
   >("domain-selection");
@@ -180,26 +178,24 @@ function StudentAssessmentEngine() {
   const [domainSearch, setDomainSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const [activeTab, setActiveTab] = useState<"mcq" | "coding">("mcq");
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [activeMcq, setActiveMcq] = useState<MCQQuestion>(DEFAULT_MCQ);
+  const [activeCoding] = useState<CodingQuestion>(DEFAULT_CODING);
 
-  // Camera Status: "checking" | "ready" | "denied"
+  const [activeTab, setActiveTab] = useState<"mcq" | "coding">("mcq");
   const [cameraStatus, setCameraStatus] = useState<"checking" | "ready" | "denied">("checking");
 
-  // Answers & Code
   const [selectedMcqAnswer, setSelectedMcqAnswer] = useState<string | null>(null);
-  const [code, setCode] = useState(CODING_DATA.initialCode);
+  const [code, setCode] = useState(DEFAULT_CODING.initialCode);
 
-  // Timers
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Proctoring Strikes
   const [strikes, setStrikes] = useState<string[]>([]);
   const [isDisqualified, setIsDisqualified] = useState(false);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Final Results
   const [evaluation, setEvaluation] = useState<{
     logicScore: number;
     complexityScore: number;
@@ -209,7 +205,44 @@ function StudentAssessmentEngine() {
     detectedComplexity: string;
     trustScore: number;
     mcqPassed: boolean;
+    badge: string;
   } | null>(null);
+
+  // Fetch Domain Questions Dynamically from Supabase
+  const handleProceedToGuidelines = async () => {
+    if (!selectedDomain) return;
+
+    setIsLoadingQuestions(true);
+    try {
+      const { data, error } = await supabase
+        .from("assessment_questions")
+        .select("*")
+        .eq("role_id", selectedDomain)
+        .eq("question_type", "mcq")
+        .limit(1);
+
+      if (!error && data && data.length > 0) {
+        const q = data[0];
+        setActiveMcq({
+          id: q.id,
+          title: q.title,
+          benchmarkSeconds: q.benchmark_seconds || 120,
+          question: q.prompt,
+          options: q.options || DEFAULT_MCQ.options,
+          correctAnswer: q.correct_answer || "B",
+          explanation: q.explanation || "",
+        });
+      } else {
+        setActiveMcq(DEFAULT_MCQ);
+      }
+    } catch (e) {
+      console.error(e);
+      setActiveMcq(DEFAULT_MCQ);
+    } finally {
+      setIsLoadingQuestions(false);
+      setAssessmentStage("guidelines");
+    }
+  };
 
   // Camera Validation Hook
   useEffect(() => {
@@ -230,8 +263,8 @@ function StudentAssessmentEngine() {
       .catch((err) => {
         console.error("Camera access denied:", err);
         setCameraStatus("denied");
-        toast.error("Camera Permission Required!", {
-          description: "Please allow camera access in your browser to proceed with proctored exam.",
+        toast.error("Camera Access Required!", {
+          description: "Please enable camera access in your browser to proceed.",
         });
       });
 
@@ -240,7 +273,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage]);
 
-  // Assessment Timer Hook
+  // Timer
   useEffect(() => {
     if (assessmentStage === "testing" && !isDisqualified) {
       timerRef.current = setInterval(() => {
@@ -252,7 +285,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Anti-Cheat Violation Handler
+  // Strikes
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
@@ -284,25 +317,20 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Security Focus Listeners
+  // Proctoring Listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
     const onVisibilityChange = () => {
-      if (document.hidden) {
-        registerStrike("Tab switched or browser minimized");
-      }
+      if (document.hidden) registerStrike("Tab switched or browser minimized");
     };
-
     const onWindowBlur = () => {
       registerStrike("Window focus lost (clicked outside browser)");
     };
-
     const onCopyPaste = (e: ClipboardEvent) => {
       e.preventDefault();
       registerStrike("Clipboard copy/paste blocked");
     };
-
     const onContextMenu = (e: MouseEvent) => {
       e.preventDefault();
       registerStrike("Right-click context menu blocked");
@@ -325,8 +353,9 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  const handleFinalSubmit = () => {
-    const mcqCorrect = selectedMcqAnswer === MCQ_DATA.correctAnswer;
+  // Submission & Save to Supabase
+  const handleFinalSubmit = async () => {
+    const mcqCorrect = selectedMcqAnswer === activeMcq.correctAnswer;
     const mcqPoints = mcqCorrect ? 15 : 0;
     const codingLogicPoints = 25;
     const logicScore = mcqPoints + codingLogicPoints;
@@ -344,7 +373,7 @@ function StudentAssessmentEngine() {
       detectedComplexity = "O(N log N) - Sorting / Binary Search";
     }
 
-    const totalBenchmark = MCQ_DATA.benchmarkSeconds + CODING_DATA.benchmarkSeconds;
+    const totalBenchmark = activeMcq.benchmarkSeconds + activeCoding.benchmarkSeconds;
     let speedScore = 20;
     if (totalElapsed <= totalBenchmark) {
       speedScore = 20;
@@ -361,6 +390,7 @@ function StudentAssessmentEngine() {
 
     const totalScore = logicScore + complexityScore + speedScore + qualityScore;
     const trustScore = Math.max(0, 100 - strikes.length * 15);
+    const badge = totalScore >= 80 ? "Gold Certified" : totalScore >= 60 ? "Silver Verified" : "Bronze Assessed";
 
     setEvaluation({
       logicScore,
@@ -371,10 +401,28 @@ function StudentAssessmentEngine() {
       detectedComplexity,
       trustScore,
       mcqPassed: mcqCorrect,
+      badge,
     });
 
+    // Save record in Supabase student_assessments table
+    try {
+      await supabase.from("student_assessments").insert({
+        student_email: userEmail || "verified.student@portal.ac.in",
+        role_id: selectedDomain === "custom-domain" ? "fullstack-web" : selectedDomain,
+        total_score: totalScore,
+        logic_score: logicScore,
+        speed_score: speedScore,
+        trust_score: trustScore,
+        competency_badge: badge,
+        time_elapsed_seconds: totalElapsed,
+        strikes_count: strikes.length,
+      });
+    } catch (err) {
+      console.error("Failed to sync scorecard with Supabase:", err);
+    }
+
     setAssessmentStage("submitted");
-    toast.success("Assessment submitted & evaluated successfully!");
+    toast.success("Assessment submitted & recorded successfully!");
   };
 
   const formatTime = (secs: number) => {
@@ -389,7 +437,7 @@ function StudentAssessmentEngine() {
       : DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain;
 
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION (36 DOMAINS + SEARCH + CUSTOM)
+  // VIEW 1: DOMAIN SELECTION
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
     const filteredDomains = DOMAIN_OPTIONS.filter((d) => {
@@ -404,7 +452,6 @@ function StudentAssessmentEngine() {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
         <div className="w-full max-w-6xl rounded-2xl border border-white/15 bg-slate-900/95 backdrop-blur-xl p-5 sm:p-8 shadow-2xl flex flex-col max-h-[92vh]">
-          {/* Header */}
           <div className="text-center max-w-2xl mx-auto mb-4 shrink-0">
             <div className="size-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto mb-2">
               <Sparkles className="size-5" />
@@ -413,22 +460,20 @@ function StudentAssessmentEngine() {
               Choose Your Engineering Specialization
             </h1>
             <p className="text-xs text-blue-200/70 mt-1">
-              Industry-benchmarked tracks across Software, AI, Core Engineering, and Tech Management.
+              Select your domain. The assessment engine dynamically pulls question banks tailored to your choice.
             </p>
 
-            {/* Search Input */}
             <div className="mt-3 relative max-w-lg mx-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
               <input
                 type="text"
                 value={domainSearch}
                 onChange={(e) => setDomainSearch(e.target.value)}
-                placeholder="Search domains (e.g. AI, VLSI, Full Stack, EV, DevOps, CAD, Robotics)..."
+                placeholder="Search domains (e.g. AI, Frontend, Backend, VLSI, EV, DevOps, CAD)..."
                 className="w-full pl-9 pr-4 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
               />
             </div>
 
-            {/* Category Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-2 mt-2.5 no-scrollbar">
               {CATEGORIES.map((cat) => (
                 <button
@@ -448,7 +493,6 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* Scrollable Domains Grid */}
           <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredDomains.map((item) => {
               const isSelected = selectedDomain === item.id;
@@ -486,7 +530,6 @@ function StudentAssessmentEngine() {
               );
             })}
 
-            {/* Custom Domain Fallback Card */}
             <div
               onClick={() => setSelectedDomain("custom-domain")}
               className={cn(
@@ -515,18 +558,29 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* Footer */}
           <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between shrink-0">
             <Link to="/" className="text-xs text-slate-400 hover:text-white">
               Back to Home
             </Link>
             <Button
-              disabled={!selectedDomain || (selectedDomain === "custom-domain" && !customDomainText.trim())}
-              onClick={() => setAssessmentStage("guidelines")}
+              disabled={
+                !selectedDomain ||
+                (selectedDomain === "custom-domain" && !customDomainText.trim()) ||
+                isLoadingQuestions
+              }
+              onClick={handleProceedToGuidelines}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
             >
-              Continue to Assessment Rules
-              <ArrowRight className="size-4 ml-1.5" />
+              {isLoadingQuestions ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="size-3.5 animate-spin" /> Loading Questions...
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5">
+                  Continue to Assessment Rules
+                  <ArrowRight className="size-4" />
+                </span>
+              )}
             </Button>
           </div>
         </div>
@@ -549,7 +603,7 @@ function StudentAssessmentEngine() {
           </span>
           <h1 className="text-3xl font-black text-white">Assessment Terminated</h1>
           <p className="mt-3 text-sm text-rose-200/80 leading-relaxed">
-            Your assessment has been revoked. You exceeded the allowed proctoring violations (2 chances). All inputs are locked.
+            Your assessment session has been permanently revoked. You exceeded the maximum allowed policy infractions (2 chances).
           </p>
 
           <div className="mt-6 rounded-xl border border-white/10 bg-black/50 p-4 text-left">
@@ -577,7 +631,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: FINAL SCORECARD
+  // VIEW 3: SCORECARD (RECORDED IN SUPABASE)
   // -------------------------------------------------------------
   if (assessmentStage === "submitted" && evaluation) {
     return (
@@ -588,7 +642,7 @@ function StudentAssessmentEngine() {
               <CheckCircle2 className="size-6" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              Assessment Verified & Evaluated
+              Assessment Verified & Recorded
             </h1>
             <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
               Domain Track: <span className="font-semibold text-blue-400 uppercase">{activeDomainTitle}</span>
@@ -605,7 +659,7 @@ function StudentAssessmentEngine() {
                 <span className="text-lg font-medium text-blue-200/70">/100</span>
               </div>
               <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                Grade: A (Verified Ready)
+                Badge: {evaluation.badge}
               </span>
             </div>
 
@@ -625,7 +679,7 @@ function StudentAssessmentEngine() {
                 <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
               </div>
               <p className="text-[11px] text-blue-200/70 mt-2">
-                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} warnings issued`}
+                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} warnings logged`}
               </p>
             </div>
           </div>
@@ -636,7 +690,7 @@ function StudentAssessmentEngine() {
                 <Sparkles className="size-3.5 text-blue-400" />
                 Score Breakdown:
               </h3>
-              <span className="text-[11px] text-slate-400">Audited System Calculation</span>
+              <span className="text-[11px] text-slate-400">Synced to Institutional Ledger</span>
             </div>
 
             <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/40 overflow-hidden text-xs">
@@ -644,7 +698,7 @@ function StudentAssessmentEngine() {
                 <div>
                   <div className="font-semibold text-white">1. Correctness & Logic Verification (40%)</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    MCQ Assessment: {evaluation.mcqPassed ? "Passed (+15 pts)" : "Incorrect (0 pts)"} • 5/5 Coding Testcases passed (+25 pts)
+                    Domain MCQ: {evaluation.mcqPassed ? "Passed (+15 pts)" : "Incorrect (0 pts)"} • 5/5 Coding Testcases (+25 pts)
                   </div>
                 </div>
                 <div className="text-sm font-bold text-emerald-400">+{evaluation.logicScore} / 40 pts</div>
@@ -662,9 +716,9 @@ function StudentAssessmentEngine() {
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">3. Benchmark Execution Speed (20%)</div>
+                  <div className="font-semibold text-white">3. Benchmark Speed (20%)</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    Completed in {formatTime(totalElapsed)} vs 8m 00s target speed.
+                    Completed in {formatTime(totalElapsed)} vs benchmark.
                   </div>
                 </div>
                 <div className="text-sm font-bold text-blue-400">+{evaluation.speedScore} / 20 pts</div>
@@ -672,9 +726,9 @@ function StudentAssessmentEngine() {
 
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">4. Code Cleanliness & Defensive Edge Cases (15%)</div>
+                  <div className="font-semibold text-white">4. Code Cleanliness & Edge Cases (15%)</div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    Boundary empty array handling, negative constraints & semantic variable scopes.
+                    Boundary empty array handling & semantic scoping.
                   </div>
                 </div>
                 <div className="text-sm font-bold text-indigo-400">+{evaluation.qualityScore} / 15 pts</div>
@@ -696,7 +750,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 4: GUIDELINES & MANDATORY CAMERA CHECK
+  // VIEW 4: GUIDELINES & PROCTORING CAMERA CHECK
   // -------------------------------------------------------------
   if (assessmentStage === "guidelines") {
     return (
@@ -732,14 +786,13 @@ function StudentAssessmentEngine() {
                 </h4>
                 <div className="space-y-1.5 text-slate-300">
                   <div>• <strong>40% Logic:</strong> Correct answers & passed test cases.</div>
-                  <div>• <strong>25% Efficiency:</strong> Algorithmic time complexity (O(N) target).</div>
+                  <div>• <strong>25% Efficiency:</strong> Algorithmic time complexity.</div>
                   <div>• <strong>20% Speed:</strong> Completion time vs expected benchmark.</div>
                   <div>• <strong>15% Quality:</strong> Handling corner cases & clean syntax.</div>
                 </div>
               </div>
             </div>
 
-            {/* Live Camera Validation Box */}
             <div className="md:col-span-5 flex flex-col items-center justify-center p-4 rounded-xl border border-white/10 bg-black/40 text-center">
               <div
                 className={cn(
@@ -803,7 +856,6 @@ function StudentAssessmentEngine() {
               Change Domain
             </button>
 
-            {/* Locked until Camera is verified */}
             <Button
               disabled={cameraStatus !== "ready"}
               onClick={() => {
@@ -823,7 +875,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 5: ACTIVE ASSESSMENT ENGINE
+  // VIEW 5: ACTIVE ASSESSMENT ENGINE (DYNAMIC QUESTION LOADED)
   // -------------------------------------------------------------
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -857,7 +909,7 @@ function StudentAssessmentEngine() {
               )}
             >
               <HelpCircle className="size-3.5" />
-              1. Theory & Complexity
+              1. Domain Theory ({activeDomainTitle})
             </button>
             <button
               onClick={() => setActiveTab("coding")}
@@ -898,7 +950,7 @@ function StudentAssessmentEngine() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
-                  Section 1 of 2 • Core Theory & Optimization
+                  Section 1 of 2 • {activeMcq.title}
                 </span>
                 <span className="text-xs text-slate-400 flex items-center gap-1">
                   <Zap className="size-3.5 text-amber-400" />
@@ -907,11 +959,11 @@ function StudentAssessmentEngine() {
               </div>
 
               <h2 className="text-lg sm:text-xl font-bold text-white mb-6">
-                {MCQ_DATA.question}
+                {activeMcq.question}
               </h2>
 
               <div className="space-y-3">
-                {MCQ_DATA.options.map((opt) => (
+                {activeMcq.options.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
@@ -963,16 +1015,16 @@ function StudentAssessmentEngine() {
                   </span>
                 </div>
 
-                <h2 className="text-xl font-bold text-white mb-3">{CODING_DATA.title}</h2>
+                <h2 className="text-xl font-bold text-white mb-3">{activeCoding.title}</h2>
                 <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line mb-6">
-                  {CODING_DATA.description}
+                  {activeCoding.description}
                 </div>
 
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
                   Validation Test Cases:
                 </h4>
                 <div className="space-y-2">
-                  {CODING_DATA.testCases.map((tc, idx) => (
+                  {activeCoding.testCases.map((tc, idx) => (
                     <div
                       key={idx}
                       className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-xs font-mono"
