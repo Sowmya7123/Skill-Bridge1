@@ -22,6 +22,11 @@ import {
   Code2,
   FileText,
   ShieldCheck,
+  Globe,
+  Cpu,
+  BarChart3,
+  Cloud,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -54,12 +59,51 @@ interface CodingQuestion {
   testCases: { input: string; expected: string; isEdgeCase?: boolean }[];
 }
 
+const DOMAIN_OPTIONS = [
+  {
+    id: "web-dev",
+    title: "Full Stack Web Development",
+    desc: "React, Node.js, Next.js, System Architecture & REST APIs",
+    icon: Globe,
+    badge: "Popular",
+  },
+  {
+    id: "ai-ml",
+    title: "Artificial Intelligence & ML",
+    desc: "Neural Networks, Python, Computer Vision & LLM Implementations",
+    icon: Cpu,
+    badge: "Trending",
+  },
+  {
+    id: "data-science",
+    title: "Data Analytics & Engineering",
+    desc: "SQL, Python Data Pipelines, BigQuery & Predictive Modeling",
+    icon: BarChart3,
+    badge: "High Demand",
+  },
+  {
+    id: "cloud-devops",
+    title: "Cloud Architecture & DevOps",
+    desc: "AWS, Docker, Kubernetes, CI/CD Pipelines & Terraform",
+    icon: Cloud,
+    badge: "Enterprise",
+  },
+  {
+    id: "cybersecurity",
+    title: "Cybersecurity & InfoSec",
+    desc: "Network Defense, Cryptography, Penetration Testing & Audits",
+    icon: Lock,
+    badge: "Specialized",
+  },
+];
+
 const MCQ_DATA: MCQQuestion = {
   id: "mcq-1",
   type: "mcq",
   title: "Algorithmic Complexity & Optimization",
-  benchmarkSeconds: 120, // 2 minutes
-  question: "Consider an algorithm that scans an unsorted array of size N using two nested loops to check for duplicates. What is the optimal time complexity to achieve the same result using a Hash Set or Hash Map?",
+  benchmarkSeconds: 120,
+  question:
+    "Consider an algorithm that scans an unsorted array of size N using two nested loops to check for duplicates. What is the optimal time complexity to achieve the same result using a Hash Set or Hash Map?",
   options: [
     { id: "A", text: "O(N^2) - Quadratic Time (Brute Force)" },
     { id: "B", text: "O(N) - Linear Time (Single Pass Lookup)" },
@@ -67,14 +111,15 @@ const MCQ_DATA: MCQQuestion = {
     { id: "D", text: "O(1) - Constant Space and Time" },
   ],
   correctAnswer: "B",
-  explanation: "Using a Hash Set allows average O(1) membership checks, reducing total traversal to linear O(N) time.",
+  explanation:
+    "Using a Hash Set allows average O(1) membership checks, reducing total traversal to linear O(N) time.",
 };
 
 const CODING_DATA: CodingQuestion = {
   id: "coding-1",
   type: "coding",
   title: "Optimized Target Pair Finder (Two-Sum)",
-  benchmarkSeconds: 360, // 6 minutes
+  benchmarkSeconds: 360,
   expectedComplexity: "O(N) Linear Time",
   description: `Given an array of integers 'nums' and an integer 'target', return indices of the two numbers such that they add up to target.
 
@@ -104,8 +149,11 @@ Requirements:
 };
 
 function StudentAssessmentEngine() {
-  // Test Lifecycle: "guidelines" | "testing" | "submitted"
-  const [assessmentStage, setAssessmentStage] = useState<"guidelines" | "testing" | "submitted">("guidelines");
+  // Starts with domain selection before rules or exam
+  const [assessmentStage, setAssessmentStage] = useState<
+    "domain-selection" | "guidelines" | "testing" | "submitted"
+  >("domain-selection");
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"mcq" | "coding">("mcq");
 
   // Answers & Code
@@ -116,7 +164,7 @@ function StudentAssessmentEngine() {
   const [totalElapsed, setTotalElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // AI Proctoring & 2-Chance System
+  // AI Proctoring & Strikes
   const [strikes, setStrikes] = useState<string[]>([]);
   const [isDisqualified, setIsDisqualified] = useState(false);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
@@ -134,8 +182,9 @@ function StudentAssessmentEngine() {
     mcqPassed: boolean;
   } | null>(null);
 
-  // Camera stream activation
+  // Activate Camera only when past domain selection
   useEffect(() => {
+    if (assessmentStage !== "guidelines" && assessmentStage !== "testing") return;
     let stream: MediaStream | null = null;
     navigator.mediaDevices
       ?.getUserMedia({ video: true, audio: false })
@@ -152,7 +201,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage]);
 
-  // Assessment Timer
+  // Timer
   useEffect(() => {
     if (assessmentStage === "testing" && !isDisqualified) {
       timerRef.current = setInterval(() => {
@@ -164,7 +213,7 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified]);
 
-  // Central Strike & Disqualification Handler (2 chances, 3rd = Terminate)
+  // Strike handler
   const registerStrike = useCallback(
     (reason: string) => {
       if (isDisqualified || assessmentStage !== "testing") return;
@@ -196,7 +245,7 @@ function StudentAssessmentEngine() {
     [isDisqualified, assessmentStage]
   );
 
-  // Browser Lockdown Listeners (Focus, Tabs, Clipboard)
+  // Proctoring listeners
   useEffect(() => {
     if (assessmentStage !== "testing" || isDisqualified) return;
 
@@ -237,15 +286,12 @@ function StudentAssessmentEngine() {
     };
   }, [assessmentStage, isDisqualified, registerStrike]);
 
-  // Comprehensive Evaluation Engine (40% + 25% + 20% + 15%)
   const handleFinalSubmit = () => {
-    // 1. Correctness (40 pts)
     const mcqCorrect = selectedMcqAnswer === MCQ_DATA.correctAnswer;
     const mcqPoints = mcqCorrect ? 15 : 0;
-    const codingLogicPoints = 25; // Sample test cases passed
-    const logicScore = mcqPoints + codingLogicPoints; // Max 40
+    const codingLogicPoints = 25;
+    const logicScore = mcqPoints + codingLogicPoints;
 
-    // 2. Time Complexity (25 pts)
     const hasNestedLoop = /for\s*\(.*for\s*\(|while\s*\(.*while\s*\(/.test(code);
     const hasHashMap = /Map|Set|complement|diff/.test(code);
     let complexityScore = 25;
@@ -259,8 +305,7 @@ function StudentAssessmentEngine() {
       detectedComplexity = "O(N log N) - Sorting / Binary Search";
     }
 
-    // 3. Speed vs Benchmark (20 pts)
-    const totalBenchmark = MCQ_DATA.benchmarkSeconds + CODING_DATA.benchmarkSeconds; // 480s (8 mins)
+    const totalBenchmark = MCQ_DATA.benchmarkSeconds + CODING_DATA.benchmarkSeconds;
     let speedScore = 20;
     if (totalElapsed <= totalBenchmark) {
       speedScore = 20;
@@ -270,8 +315,10 @@ function StudentAssessmentEngine() {
       speedScore = 10;
     }
 
-    // 4. Code Quality & Edge Cases (15 pts)
-    const qualityScore = code.includes("return []") && (code.includes("null") || code.includes("nums.length")) ? 15 : 12;
+    const qualityScore =
+      code.includes("return []") && (code.includes("null") || code.includes("nums.length"))
+        ? 15
+        : 12;
 
     const totalScore = logicScore + complexityScore + speedScore + qualityScore;
     const trustScore = Math.max(0, 100 - strikes.length * 15);
@@ -298,7 +345,87 @@ function StudentAssessmentEngine() {
   };
 
   // -------------------------------------------------------------
-  // VIEW 1: DISQUALIFIED SCREEN
+  // VIEW 1: DOMAIN SELECTION SCREEN (NEW STEP)
+  // -------------------------------------------------------------
+  if (assessmentStage === "domain-selection") {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
+        <div className="w-full max-w-4xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
+          <div className="text-center max-w-xl mx-auto mb-8">
+            <div className="size-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto mb-3">
+              <Sparkles className="size-6" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+              Select Your Assessment Track
+            </h1>
+            <p className="text-xs sm:text-sm text-blue-200/70 mt-2">
+              Choose the domain/interest you want to be evaluated for before starting the proctored test.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {DOMAIN_OPTIONS.map((item) => {
+              const Icon = item.icon;
+              const isSelected = selectedDomain === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedDomain(item.id)}
+                  className={cn(
+                    "p-5 rounded-xl border text-left transition-all relative flex items-start gap-4",
+                    isSelected
+                      ? "border-blue-500 bg-blue-600/20 ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/10"
+                      : "border-white/10 bg-slate-900/50 hover:bg-slate-800/80 hover:border-white/20"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "size-11 rounded-lg flex items-center justify-center shrink-0",
+                      isSelected ? "bg-blue-600 text-white" : "bg-white/5 text-blue-400"
+                    )}
+                  >
+                    <Icon className="size-5" />
+                  </div>
+                  <div className="flex-1 min-w-0 pr-6">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm text-white">{item.title}</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                        {item.badge}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">{item.desc}</p>
+                  </div>
+                  {isSelected && (
+                    <div className="absolute top-4 right-4 size-5 rounded-full bg-blue-500 text-white flex items-center justify-center">
+                      <Check className="size-3 stroke-[3]" />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+            <Link to="/" className="text-xs text-slate-400 hover:text-white">
+              Back to Home
+            </Link>
+            <Button
+              disabled={!selectedDomain}
+              onClick={() => setAssessmentStage("guidelines")}
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs px-6"
+            >
+              Continue to Assessment Rules
+              <ArrowRight className="size-4 ml-1.5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // VIEW 2: DISQUALIFIED SCREEN
   // -------------------------------------------------------------
   if (isDisqualified) {
     return (
@@ -312,7 +439,8 @@ function StudentAssessmentEngine() {
           </span>
           <h1 className="text-3xl font-black text-white">Assessment Terminated</h1>
           <p className="mt-3 text-sm text-rose-200/80 leading-relaxed">
-            Your evaluation session has been permanently revoked. You exceeded the maximum allowed policy infractions (2 chances). All inputs and codes have been locked.
+            Your evaluation session has been permanently revoked. You exceeded the maximum allowed
+            policy infractions (2 chances). All inputs and codes have been locked.
           </p>
 
           <div className="mt-6 rounded-xl border border-white/10 bg-black/50 p-4 text-left">
@@ -340,13 +468,12 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 2: FINAL RESULTS TRANSPARENT SCORECARD
+  // VIEW 3: FINAL RESULTS SCORECARD
   // -------------------------------------------------------------
   if (assessmentStage === "submitted" && evaluation) {
     return (
       <div className="min-h-screen bg-[#071224] text-white flex flex-col items-center justify-center p-4 sm:p-8 font-sans">
         <div className="w-full max-w-3xl rounded-2xl border border-white/15 bg-slate-900/90 backdrop-blur-xl p-6 sm:p-10 shadow-2xl">
-          
           <div className="text-center pb-6 border-b border-white/10">
             <div className="size-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-3">
               <CheckCircle2 className="size-6" />
@@ -355,11 +482,13 @@ function StudentAssessmentEngine() {
               Assessment Verified & Evaluated
             </h1>
             <p className="text-xs sm:text-sm text-blue-200/70 mt-1">
-              Holistic Talent Readiness Index & Performance Derivation
+              Domain Track:{" "}
+              <span className="font-semibold text-blue-400 uppercase">
+                {DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain}
+              </span>
             </p>
           </div>
 
-          {/* Top 3 Score Summaries */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
             <div className="p-5 rounded-xl bg-gradient-to-br from-blue-600/30 to-indigo-600/30 border border-blue-400/30 text-center flex flex-col justify-center">
               <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-wider">
@@ -380,74 +509,95 @@ function StudentAssessmentEngine() {
                 <div className="text-xl font-bold text-white mt-1">{formatTime(totalElapsed)}</div>
               </div>
               <p className="text-[11px] text-blue-200/70 mt-2">
-                Benchmark: 8m 00s ({totalElapsed <= 480 ? "Optimal Speed achieved" : "Moderate Speed"})
+                Benchmark: 8m 00s (
+                {totalElapsed <= 480 ? "Optimal Speed achieved" : "Moderate Speed"})
               </p>
             </div>
 
             <div className="p-4 rounded-xl bg-white/5 border border-white/10 flex flex-col justify-between">
               <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400">AI Integrity Trust</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400">
+                  AI Integrity Trust
+                </span>
                 <div className="text-xl font-bold text-white mt-1">{evaluation.trustScore}%</div>
               </div>
               <p className="text-[11px] text-blue-200/70 mt-2">
-                {strikes.length === 0 ? "Zero violations (100% Authentic)" : `${strikes.length} warnings issued`}
+                {strikes.length === 0
+                  ? "Zero violations (100% Authentic)"
+                  : `${strikes.length} warnings issued`}
               </p>
             </div>
           </div>
 
-          {/* Transparent 4-Pillar Score Breakdown */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-blue-200 flex items-center gap-2">
                 <Sparkles className="size-3.5 text-blue-400" />
-                Transparent Score Explanation:
+                Score Breakdown:
               </h3>
               <span className="text-[11px] text-slate-400">Audited System Calculation</span>
             </div>
 
             <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-black/40 overflow-hidden text-xs">
-              {/* Row 1: Correctness (40%) */}
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">1. Correctness & Logic Verification (40%)</div>
+                  <div className="font-semibold text-white">
+                    1. Correctness & Logic Verification (40%)
+                  </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    MCQ Assessment: {evaluation.mcqPassed ? "Passed (+15 pts)" : "Incorrect (0 pts)"} • 5/5 Coding Testcases passed (+25 pts)
+                    MCQ Assessment:{" "}
+                    {evaluation.mcqPassed ? "Passed (+15 pts)" : "Incorrect (0 pts)"} • 5/5 Coding
+                    Testcases passed (+25 pts)
                   </div>
                 </div>
-                <div className="text-sm font-bold text-emerald-400">+{evaluation.logicScore} / 40 pts</div>
+                <div className="text-sm font-bold text-emerald-400">
+                  +{evaluation.logicScore} / 40 pts
+                </div>
               </div>
 
-              {/* Row 2: Complexity (25%) */}
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">2. Algorithmic Efficiency & Complexity (25%)</div>
+                  <div className="font-semibold text-white">
+                    2. Algorithmic Efficiency & Complexity (25%)
+                  </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    Detected: <span className="text-cyan-300 font-mono font-bold">{evaluation.detectedComplexity}</span>
+                    Detected:{" "}
+                    <span className="text-cyan-300 font-mono font-bold">
+                      {evaluation.detectedComplexity}
+                    </span>
                   </div>
                 </div>
-                <div className="text-sm font-bold text-cyan-400">+{evaluation.complexityScore} / 25 pts</div>
+                <div className="text-sm font-bold text-cyan-400">
+                  +{evaluation.complexityScore} / 25 pts
+                </div>
               </div>
 
-              {/* Row 3: Speed (20%) */}
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">3. Benchmark Execution Speed (20%)</div>
+                  <div className="font-semibold text-white">
+                    3. Benchmark Execution Speed (20%)
+                  </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    Completed in {formatTime(totalElapsed)} vs 8m 00s target benchmark speed.
+                    Completed in {formatTime(totalElapsed)} vs 8m 00s target speed.
                   </div>
                 </div>
-                <div className="text-sm font-bold text-blue-400">+{evaluation.speedScore} / 20 pts</div>
+                <div className="text-sm font-bold text-blue-400">
+                  +{evaluation.speedScore} / 20 pts
+                </div>
               </div>
 
-              {/* Row 4: Quality & Edge Cases (15%) */}
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">4. Code Cleanliness & Defensive Edge Cases (15%)</div>
+                  <div className="font-semibold text-white">
+                    4. Code Cleanliness & Defensive Edge Cases (15%)
+                  </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
                     Boundary empty array handling, negative constraints & semantic variable scopes.
                   </div>
                 </div>
-                <div className="text-sm font-bold text-indigo-400">+{evaluation.qualityScore} / 15 pts</div>
+                <div className="text-sm font-bold text-indigo-400">
+                  +{evaluation.qualityScore} / 15 pts
+                </div>
               </div>
             </div>
           </div>
@@ -466,7 +616,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 3: PRE-ASSESSMENT GUIDELINES & CAMERA CHECK
+  // VIEW 4: GUIDELINES & PROCTOR CAMERA CHECK
   // -------------------------------------------------------------
   if (assessmentStage === "guidelines") {
     return (
@@ -477,20 +627,27 @@ function StudentAssessmentEngine() {
               SB
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-white">AI-Proctored Student Assessment</h1>
-              <p className="text-xs text-blue-200/70">Readiness & Algorithmic Capability Evaluation</p>
+              <h1 className="text-xl sm:text-2xl font-black text-white">
+                AI-Proctored Student Assessment
+              </h1>
+              <p className="text-xs text-blue-200/70">
+                Selected Domain:{" "}
+                <span className="font-semibold text-blue-400 uppercase">
+                  {DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain}
+                </span>
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 my-6">
-            {/* Guidelines */}
             <div className="md:col-span-7 space-y-4 text-xs text-slate-300">
               <div className="p-3.5 rounded-xl border border-amber-400/20 bg-amber-500/10 text-amber-200">
                 <span className="font-bold flex items-center gap-1.5 mb-1">
                   <ShieldAlert className="size-4 text-amber-400" />
                   Strict 2-Chance Policy Active
                 </span>
-                Tab switching, minimizing the browser, or copying code will trigger strikes. You have 2 chances. The 3rd strike will terminate and lock your exam immediately.
+                Tab switching, minimizing the browser, or copying code will trigger strikes. You
+                have 2 chances. The 3rd strike will terminate and lock your exam immediately.
               </div>
 
               <div className="space-y-2">
@@ -506,7 +663,6 @@ function StudentAssessmentEngine() {
               </div>
             </div>
 
-            {/* Webcam Preview Check */}
             <div className="md:col-span-5 flex flex-col items-center justify-center p-4 rounded-xl border border-white/10 bg-black/40 text-center">
               <div className="relative size-32 rounded-xl overflow-hidden bg-slate-900 border-2 border-emerald-500 shadow-md mb-3">
                 <video
@@ -529,9 +685,13 @@ function StudentAssessmentEngine() {
           </div>
 
           <div className="pt-6 border-t border-white/10 flex items-center justify-between">
-            <Link to="/" className="text-xs text-slate-400 hover:text-white">
-              Cancel & Exit
-            </Link>
+            <button
+              type="button"
+              onClick={() => setAssessmentStage("domain-selection")}
+              className="text-xs text-slate-400 hover:text-white"
+            >
+              Change Domain
+            </button>
             <Button
               onClick={() => setAssessmentStage("testing")}
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6"
@@ -546,11 +706,10 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 4: ACTIVE ASSESSMENT (MCQ + CODING + PROCTORING)
+  // VIEW 5: ACTIVE ASSESSMENT (MCQ + CODING + PROCTORING)
   // -------------------------------------------------------------
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      {/* Dynamic Warning Alert Banner */}
       {activeAlert && (
         <div className="bg-amber-500/20 border-b border-amber-500/40 px-6 py-2.5 flex items-center justify-between text-amber-200 text-xs sticky top-0 z-50">
           <div className="flex items-center gap-2">
@@ -567,10 +726,11 @@ function StudentAssessmentEngine() {
         </div>
       )}
 
-      {/* Header Bar */}
       <header className="border-b border-white/10 bg-slate-900/80 backdrop-blur-md px-6 py-3 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <span className="font-extrabold text-sm text-white tracking-tight">SkillBridge Assessment Engine</span>
+          <span className="font-extrabold text-sm text-white tracking-tight">
+            SkillBridge Assessment Engine
+          </span>
           <div className="flex rounded-lg bg-black/40 p-0.5 text-xs border border-white/10">
             <button
               onClick={() => setActiveTab("mcq")}
@@ -596,13 +756,11 @@ function StudentAssessmentEngine() {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Live Timer */}
           <div className="flex items-center gap-1.5 text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-slate-200">
             <Clock className="size-3.5 text-blue-400" />
             <span>Elapsed: {formatTime(totalElapsed)}</span>
           </div>
 
-          {/* 2-Chances Strike Counter */}
           <div className="flex items-center gap-1.5 text-xs bg-rose-500/10 border border-rose-500/30 px-3 py-1.5 rounded-lg text-rose-300">
             <ShieldAlert className="size-3.5 text-rose-400" />
             <span>Strikes: {strikes.length} / 2</span>
@@ -617,10 +775,8 @@ function StudentAssessmentEngine() {
         </div>
       </header>
 
-      {/* BODY CONTENT BASED ON ACTIVE TAB */}
       <div className="flex-1 flex overflow-hidden">
         {activeTab === "mcq" ? (
-          /* TAB 1: MCQ SECTION */
           <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -677,9 +833,7 @@ function StudentAssessmentEngine() {
             </div>
           </div>
         ) : (
-          /* TAB 2: CODING WORKSPACE */
           <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-            {/* Left: Problem & Camera Preview */}
             <div className="lg:col-span-5 border-r border-white/10 p-6 flex flex-col justify-between overflow-y-auto bg-slate-900/40">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -702,7 +856,10 @@ function StudentAssessmentEngine() {
                 </h4>
                 <div className="space-y-2">
                   {CODING_DATA.testCases.map((tc, idx) => (
-                    <div key={idx} className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-xs font-mono">
+                    <div
+                      key={idx}
+                      className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-xs font-mono"
+                    >
                       <div className="text-slate-400">Input: <span className="text-white">{tc.input}</span></div>
                       <div className="text-slate-400">Expected: <span className="text-emerald-400">{tc.expected}</span></div>
                     </div>
@@ -710,7 +867,6 @@ function StudentAssessmentEngine() {
                 </div>
               </div>
 
-              {/* Real-time AI Proctoring Feed in Corner */}
               <div className="mt-6 pt-4 border-t border-white/10 flex items-center gap-4">
                 <div className="relative size-20 rounded-xl overflow-hidden bg-black border-2 border-emerald-500 shadow-md">
                   <video
@@ -734,7 +890,6 @@ function StudentAssessmentEngine() {
               </div>
             </div>
 
-            {/* Right: Code Editor */}
             <div className="lg:col-span-7 flex flex-col bg-black">
               <div className="px-4 py-2 border-b border-white/10 bg-slate-900/80 flex items-center justify-between text-xs text-slate-400">
                 <div className="flex items-center gap-2 font-mono">
