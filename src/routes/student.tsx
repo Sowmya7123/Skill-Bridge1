@@ -30,6 +30,14 @@ import {
   Target,
   CheckSquare,
   Square,
+  Play,
+  FileText,
+  Mic,
+  MicOff,
+  Video,
+  VideoOff,
+  BarChart3,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -46,7 +54,6 @@ export const Route = createFileRoute("/student")({
 // 1. ALL 36 COMPREHENSIVE DOMAIN TRACKS
 // -------------------------------------------------------------
 const DOMAIN_OPTIONS = [
-  // SOFTWARE & SYSTEM ENGINEERING
   { id: "fullstack-web", title: "Full Stack Web Development", category: "Software Development", desc: "MERN/Next.js, Spring Boot, REST APIs, Microservices, System Design", badge: "Most Popular" },
   { id: "frontend-dev", title: "Frontend Engineering", category: "Software Development", desc: "React, Angular, Vue, TypeScript, Next.js, Web Performance & UI/UX", badge: "High Demand" },
   { id: "backend-dev", title: "Backend Systems Architecture", category: "Software Development", desc: "Java, Node.js, Go, Python Django, Distributed DBs, Caching, Kafka", badge: "Core Tech" },
@@ -269,6 +276,59 @@ const PLATFORM_MENTORS: Mentor[] = [
   },
 ];
 
+interface Module {
+  id: string;
+  title: string;
+  type: "video" | "reading" | "quiz" | "assignment";
+  duration: string;
+  completed: boolean;
+}
+
+interface WeekCurriculum {
+  week: number;
+  title: string;
+  modules: Module[];
+}
+
+const INITIAL_CURRICULUM: WeekCurriculum[] = [
+  {
+    week: 1,
+    title: "Fundamentals & Architecture Foundations",
+    modules: [
+      { id: "w1-m1", title: "System Architecture & Design Principles", type: "video", duration: "45 mins", completed: false },
+      { id: "w1-m2", title: "Reading: Clean Code & Best Practices", type: "reading", duration: "30 mins", completed: false },
+      { id: "w1-m3", title: "Week 1 Knowledge Check (Quiz)", type: "quiz", duration: "20 mins", completed: false },
+    ],
+  },
+  {
+    week: 2,
+    title: "Advanced Data Structures & Algorithms",
+    modules: [
+      { id: "w2-m1", title: "Optimizing Search & Graph Traversals", type: "video", duration: "60 mins", completed: false },
+      { id: "w2-m2", title: "Practical Coding Assignment", type: "assignment", duration: "90 mins", completed: false },
+      { id: "w2-m3", title: "Algorithmic Complexity Assessment", type: "quiz", duration: "25 mins", completed: false },
+    ],
+  },
+  {
+    week: 3,
+    title: "System Scalability & Cloud Deployment",
+    modules: [
+      { id: "w3-m1", title: "Microservices & Load Balancing", type: "video", duration: "50 mins", completed: false },
+      { id: "w3-m2", title: "Case Study: Scaling to 10M Users", type: "reading", duration: "40 mins", completed: false },
+      { id: "w3-m3", title: "Cloud Deployment Verification Task", type: "assignment", duration: "60 mins", completed: false },
+    ],
+  },
+  {
+    week: 4,
+    title: "Capstone Project & Industry Readiness",
+    modules: [
+      { id: "w4-m1", title: "Building Production-Ready Endpoints", type: "video", duration: "75 mins", completed: false },
+      { id: "w4-m2", title: "Final Capstone Implementation", type: "assignment", duration: "120 mins", completed: false },
+      { id: "w4-m3", title: "Final Comprehensive Course Defense", type: "quiz", duration: "30 mins", completed: false },
+    ],
+  },
+];
+
 interface ImprovementWeek {
   weekNumber: number;
   title: string;
@@ -307,7 +367,15 @@ function StudentAssessmentEngine() {
   const { userEmail } = useAppState();
 
   const [assessmentStage, setAssessmentStage] = useState<
-    "domain-selection" | "guidelines" | "testing" | "result-gaps" | "mentor-hub" | "placements"
+    | "domain-selection"
+    | "guidelines"
+    | "testing"
+    | "result-gaps"
+    | "mentor-hub"
+    | "four-week-course"
+    | "ai-mock-interview"
+    | "interview-feedback"
+    | "placements"
   >("domain-selection");
 
   const [selectedDomain, setSelectedDomain] = useState<string>("fullstack-web");
@@ -358,6 +426,54 @@ function StudentAssessmentEngine() {
   const [assignedMentor, setAssignedMentor] = useState<Mentor | null>(null);
   const [improvementPlan, setImprovementPlan] = useState<ImprovementWeek[]>([]);
   const [readinessScore, setReadinessScore] = useState(0);
+
+  // New states for added features
+  const [curriculum, setCurriculum] = useState<WeekCurriculum[]>(INITIAL_CURRICULUM);
+  const [selectedModule, setSelectedModule] = useState<Module | null>(null);
+  const [assessmentAnswer, setAssessmentAnswer] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const totalModules = curriculum.reduce((acc, w) => acc + w.modules.length, 0);
+  const completedModulesCount = curriculum.reduce((acc, w) => acc + w.modules.filter(m => m.completed).length, 0);
+  const isCourseComplete = completedModulesCount === totalModules;
+
+  // AI Mock Interview States
+  const [interviewStarted, setInterviewStarted] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [studentAnswer, setStudentAnswer] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [interviewCameraActive, setInterviewCameraActive] = useState(false);
+  const [interviewFinished, setInterviewFinished] = useState(false);
+  const interviewVideoRef = useRef<HTMLVideoElement>(null);
+
+  const interviewQuestions = [
+    "Can you explain how you would design a scalable URL shortener service handling 10,000 requests per second?",
+    "What are the trade-offs between SQL and NoSQL databases in modern microservices architecture?",
+    "Describe a time when you optimized a slow-running query or bottleneck in your application.",
+    "How do you ensure security and token verification in RESTful APIs?"
+  ];
+
+  async function toggleInterviewCamera() {
+    if (!interviewCameraActive) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (interviewVideoRef.current) {
+          interviewVideoRef.current.srcObject = stream;
+        }
+        setInterviewCameraActive(true);
+        toast.success("Camera & Microphone activated successfully.");
+      } catch {
+        toast.error("Permission Denied", { description: "Unable to access camera/microphone. Please check browser settings." });
+      }
+    } else {
+      if (interviewVideoRef.current && interviewVideoRef.current.srcObject) {
+        const stream = interviewVideoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+      setInterviewCameraActive(false);
+      toast.info("Camera deactivated.");
+    }
+  }
 
   const handleProceedToGuidelines = async () => {
     if (!selectedDomain) return;
@@ -1348,7 +1464,7 @@ function StudentAssessmentEngine() {
 
                   <h2 className="text-xl font-bold text-white mb-3">{CODING_DATA.title}</h2>
                   <div className="text-xs text-slate-300 leading-relaxed whitespace-pre-line mb-6">
-                    {CODING_DATA.description}
+                    {CODING_DATA.placeholderTemplate}
                   </div>
 
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
@@ -1523,56 +1639,6 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* Existing Skill Gap Analysis */}
-          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="size-5 text-blue-400" />
-              <h3 className="text-base font-bold text-white">Diagnostic Skill Gap Analysis</h3>
-            </div>
-            <p className="text-xs text-slate-400">
-              Granular topic accuracy based on your attempted test questions:
-            </p>
-
-            <div className="space-y-3">
-              {scoreReport.topicGaps.map((item) => (
-                <div
-                  key={item.topic}
-                  className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2"
-                >
-                  <div className="flex-1 w-full">
-                    <div className="text-xs font-semibold text-white flex items-center gap-2">
-                      {item.topic}
-                      <span
-                        className={cn(
-                          "text-[9px] font-bold px-2 py-0.5 rounded border",
-                          item.status === "Strong"
-                            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-                            : item.status === "Average"
-                            ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                            : "bg-rose-500/15 text-rose-300 border-rose-500/30"
-                        )}
-                      >
-                        {item.status}
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2">
-                      <div
-                        className={cn(
-                          "h-1.5 rounded-full",
-                          item.status === "Strong" ? "bg-emerald-500" : item.status === "Average" ? "bg-amber-500" : "bg-rose-500"
-                        )}
-                        style={{ width: `${item.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div className="text-xs font-mono text-slate-300 shrink-0">
-                    {item.correct} of {item.total} correct ({item.percentage}%)
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* PROMINENT NEXT STEP: MENTOR GUIDANCE FIRST */}
           <div className="p-6 sm:p-8 rounded-2xl border-2 border-cyan-500/50 bg-gradient-to-r from-blue-950/80 via-slate-900 to-cyan-950/80 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-2 text-center sm:text-left">
@@ -1580,19 +1646,27 @@ function StudentAssessmentEngine() {
                 <Compass className="size-3.5" /> Next Career Phase
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white">
-                Your Next Step: Get Guidance From a Mentor
+                Your Next Step: Get Guidance From a Mentor & Complete Mandatory Course
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-                The identified skill gaps can be improved with mentor guidance before applying for placements. Connect with a specialized industry architect to close these deficits through a personalized action plan.
+                Connect with a specialized industry architect and go through the mandatory 4-week learning curriculum before unlocking placements.
               </p>
             </div>
 
-            <Button
-              onClick={() => setAssessmentStage("mentor-hub")}
-              className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-black text-xs sm:text-sm h-12 px-8 shadow-xl shrink-0 transition hover:scale-105"
-            >
-              Find My Mentor <ArrowRight className="size-4 ml-2" />
-            </Button>
+            <div className="flex flex-col gap-2.5 shrink-0">
+              <Button
+                onClick={() => setAssessmentStage("mentor-hub")}
+                className="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-black text-xs sm:text-sm h-11 px-6 shadow-xl transition hover:scale-105"
+              >
+                Find My Mentor <ArrowRight className="size-4 ml-2" />
+              </Button>
+              <Button
+                onClick={() => setAssessmentStage("four-week-course")}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-black text-xs sm:text-sm h-11 px-6 shadow-xl transition"
+              >
+                4-Week Learning Program <BookOpen className="size-4 ml-2" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -1618,22 +1692,24 @@ function StudentAssessmentEngine() {
               <p className="text-xs text-slate-400">Targeting your verified deficits in: <strong className="text-rose-400">{primaryWeakness}</strong></p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-right">
-                <span className="text-[10px] text-slate-400 block">Placement Readiness</span>
-                <span className={cn("text-lg font-black", readinessScore >= 75 ? "text-emerald-400" : "text-amber-400")}>{readinessScore}%</span>
-              </div>
               <Button
-                disabled={readinessScore < 75}
-                onClick={() => setAssessmentStage("placements")}
+                onClick={() => setAssessmentStage("four-week-course")}
+                className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold h-10 px-4"
+              >
+                Go to 4-Week Course ({completedModulesCount}/{totalModules})
+              </Button>
+              <Button
+                disabled={!isCourseComplete || readinessScore < 75}
+                onClick={() => setAssessmentStage("ai-mock-interview")}
                 className={cn(
                   "text-xs font-bold h-10 px-5",
-                  readinessScore >= 75 ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
+                  isCourseComplete && readinessScore >= 75 ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
                 )}
               >
-                {readinessScore >= 75 ? (
-                  <>Enter Placements <ArrowRight className="size-3.5 ml-1.5" /></>
+                {isCourseComplete && readinessScore >= 75 ? (
+                  <>Start AI Mock Interview <ArrowRight className="size-3.5 ml-1.5" /></>
                 ) : (
-                  <><Lock className="size-3.5 mr-1.5" /> Placements Locked (75% Needed)</>
+                  <><Lock className="size-3.5 mr-1.5" /> Interview Locked (Course + 75% Needed)</>
                 )}
               </Button>
             </div>
@@ -1692,68 +1768,370 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* Personalized Improvement Plan & Progress Tracker */}
-          <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Target className="size-5 text-amber-400" /> Personalized Improvement Plan & Milestone Progress Tracker
-                </h3>
-                <p className="text-xs text-slate-400">Complete milestones with your mentor to increase your readiness index and unlock placements.</p>
-              </div>
-              <div className="text-xs font-mono px-3 py-1.5 rounded-lg bg-black/50 border border-white/10 text-cyan-300">
-                Readiness: {readinessScore}% / 75% Required
-              </div>
-            </div>
+          <div className="flex justify-between pt-4">
+            <Button onClick={() => setAssessmentStage("result-gaps")} className="bg-white/10 text-white text-xs">
+              Back to Scorecard
+            </Button>
+            <Button onClick={() => setAssessmentStage("four-week-course")} className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">
+              Proceed to Mandatory 4-Week Course <ArrowRight className="size-4 ml-1.5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {improvementPlan.map((week, wIdx) => (
-                <div key={week.weekNumber} className="p-4 rounded-xl bg-black/40 border border-white/10 flex flex-col justify-between">
+  // -------------------------------------------------------------
+  // VIEW 8: MANDATORY 4-WEEK LEARNING PROGRAM & VERIFICATION
+  // -------------------------------------------------------------
+  if (assessmentStage === "four-week-course") {
+    return (
+      <div className="min-h-screen bg-[#071224] text-white p-6 sm:p-10 font-sans">
+        <div className="w-full max-w-5xl mx-auto space-y-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-white/10">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider">Mandatory Curriculum Gating</span>
+              <h1 className="text-2xl sm:text-3xl font-black text-white mt-0.5">4-Week Structured Learning & Verification</h1>
+              <p className="text-xs text-slate-400">Complete all modules with assessment proof before unlocking AI Mock Interviews & Placements.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => setAssessmentStage("mentor-hub")} className="bg-white/10 text-white text-xs">
+                Back to Mentor Hub
+              </Button>
+              <Button
+                disabled={!isCourseComplete}
+                onClick={() => setAssessmentStage("ai-mock-interview")}
+                className={cn(
+                  "text-xs font-bold h-10 px-5",
+                  isCourseComplete ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
+                )}
+              >
+                {isCourseComplete ? "Start AI Mock Interview" : <><Lock className="size-3.5 mr-1" /> Course Incomplete</>}
+              </Button>
+            </div>
+          </div>
+
+          {/* Progress Summary Card */}
+          <div className="p-6 rounded-2xl border border-blue-500/30 bg-gradient-to-r from-blue-950/60 to-slate-900 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1 text-center sm:text-left">
+              <h3 className="text-base font-bold text-white">Course Completion Status</h3>
+              <p className="text-xs text-slate-300">
+                {completedModulesCount} of {totalModules} modules verified successfully ({Math.round((completedModulesCount / totalModules) * 100)}%)
+              </p>
+            </div>
+            <div className="w-full sm:w-64 bg-slate-800 rounded-full h-3 overflow-hidden border border-white/10">
+              <div
+                className="bg-blue-500 h-full transition-all duration-500"
+                style={{ width: `${(completedModulesCount / totalModules) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Curriculum Weeks */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {curriculum.map((weekData) => {
+              const weekProgress = weekData.modules.filter(m => m.completed).length;
+              const weekCompleted = weekProgress === weekData.modules.length;
+
+              return (
+                <div key={weekData.week} className="bg-slate-900/90 border border-white/10 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                        Week {week.weekNumber} • {week.focusTopic}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                        Week {weekData.week}
+                      </span>
+                      <span className="text-xs font-semibold text-slate-400">
+                        {weekProgress}/{weekData.modules.length} Completed {weekCompleted && "✅"}
                       </span>
                     </div>
-                    <h4 className="text-xs font-bold text-white mb-3">{week.title}</h4>
 
-                    <div className="space-y-2">
-                      {week.milestones.map((m) => (
-                        <button
-                          key={m.id}
-                          type="button"
-                          onClick={() => toggleMilestone(wIdx, m.id)}
-                          className={cn(
-                            "w-full p-2.5 rounded-lg border text-left text-xs transition flex items-start gap-2.5",
-                            m.done ? "border-emerald-500/40 bg-emerald-950/20 text-emerald-200 line-through" : "border-white/10 bg-slate-950/50 text-slate-300 hover:bg-slate-900"
-                          )}
+                    <h3 className="text-base font-bold text-white mb-4">{weekData.title}</h3>
+
+                    <div className="space-y-3">
+                      {weekData.modules.map((mod) => (
+                        <div
+                          key={mod.id}
+                          className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/10 hover:border-blue-500/40 transition"
                         >
-                          {m.done ? <CheckSquare className="size-4 text-emerald-400 shrink-0 mt-0.5" /> : <Square className="size-4 text-slate-500 shrink-0 mt-0.5" />}
-                          <span className="leading-snug">{m.text}</span>
-                        </button>
+                          <div className="flex items-center gap-3">
+                            {mod.completed ? (
+                              <CheckCircle2 className="size-4 text-emerald-400 shrink-0" />
+                            ) : (
+                              <div className="size-4 rounded-full border-2 border-slate-500 shrink-0" />
+                            )}
+                            <div>
+                              <h4 className="text-xs font-semibold text-white">{mod.title}</h4>
+                              <span className="text-[10px] text-slate-400 capitalize">{mod.type} • {mod.duration}</span>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={() => setSelectedModule(mod)}
+                            size="sm"
+                            className={cn(
+                              "text-xs font-bold h-8 rounded-lg",
+                              mod.completed ? "bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/30 border border-emerald-500/30" : "bg-blue-600 text-white hover:bg-blue-500"
+                            )}
+                          >
+                            {mod.completed ? "Review" : "Learn & Verify"}
+                          </Button>
+                        </div>
                       ))}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
 
-            {readinessScore >= 75 ? (
-              <div className="p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/30 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <div className="flex items-center gap-3 text-xs text-emerald-300">
-                  <Award className="size-6 text-emerald-400 shrink-0" />
-                  <span><strong>Placement Qualification Verified:</strong> You have closed key deficit topics with your mentor. Corporate placement applications are now open!</span>
+          {/* Module Modal */}
+          {selectedModule && (
+            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-white/20 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-fade-in text-white">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <h3 className="text-sm font-bold text-white">{selectedModule.title}</h3>
+                  <button onClick={() => setSelectedModule(null)} className="text-xs text-slate-400 hover:text-white">Close</button>
                 </div>
-                <Button onClick={() => setAssessmentStage("placements")} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-9 px-6 shrink-0">
-                  Open Placements Board <ArrowRight className="size-3.5 ml-1.5" />
+
+                <div className="space-y-4 text-xs text-slate-300">
+                  <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
+                    <span className="font-bold text-blue-400">Mandatory Learning Material</span>
+                    <p className="leading-relaxed">
+                      Study the concepts, video lectures, and documentation. To complete this module, provide your assessment answer or solution summary below.
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-semibold text-white">Assessment Proof / Solution:</label>
+                    <input
+                      type="text"
+                      value={assessmentAnswer}
+                      onChange={(e) => setAssessmentAnswer(e.target.value)}
+                      placeholder="Enter your solution code or summary..."
+                      className="w-full h-10 px-3 bg-black/60 border border-white/15 rounded-xl text-white outline-none focus:border-blue-500 text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+                  <Button onClick={() => setSelectedModule(null)} variant="ghost" className="text-xs text-slate-300">Cancel</Button>
+                  <Button
+                    disabled={isVerifying || !assessmentAnswer.trim()}
+                    onClick={() => {
+                      setIsVerifying(true);
+                      setTimeout(() => {
+                        setCurriculum(prev =>
+                          prev.map(week => ({
+                            ...week,
+                            modules: week.modules.map(m => m.id === selectedModule.id ? { ...m, completed: true } : m)
+                          }))
+                        );
+                        setIsVerifying(false);
+                        setSelectedModule(null);
+                        setAssessmentAnswer("");
+                        toast.success("Module Verified & Completed!");
+                      }, 800);
+                    }}
+                    className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow"
+                  >
+                    {isVerifying ? <Loader2 className="size-4 animate-spin" /> : "Verify & Complete Module"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // VIEW 9: AI MOCK INTERVIEW (VOICE & CAMERA SUPPORT)
+  // -------------------------------------------------------------
+  if (assessmentStage === "ai-mock-interview") {
+    return (
+      <div className="min-h-screen bg-[#071224] text-white p-6 sm:p-10 font-sans">
+        <div className="w-full max-w-4xl mx-auto space-y-8">
+          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider">Post-Course Evaluation</span>
+              <h1 className="text-2xl font-black text-white">AI Mock Interview Suite</h1>
+            </div>
+            <Button onClick={() => setAssessmentStage("four-week-course")} className="bg-white/10 text-white text-xs">
+              Back to Course
+            </Button>
+          </div>
+
+          {!interviewStarted ? (
+            <div className="bg-slate-900/90 border border-white/15 rounded-2xl p-8 text-center space-y-6 shadow-2xl">
+              <div className="size-16 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto">
+                <Sparkles className="size-8" />
+              </div>
+              <h2 className="text-xl font-black text-white">Ready for Your AI Voice & Camera Mock Interview?</h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
+                The AI will ask technical, behavioral, and architecture questions dynamically. You can use your microphone for voice answers and enable camera preview.
+              </p>
+              <Button
+                onClick={() => setInterviewStarted(true)}
+                className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg"
+              >
+                Start Interview Session
+              </Button>
+            </div>
+          ) : !interviewFinished ? (
+            <div className="bg-slate-900/90 border border-white/15 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
+              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="size-3 rounded-full bg-red-500 animate-pulse" />
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">Live AI Interview Session</h3>
+                </div>
+                <span className="text-xs font-semibold text-slate-400">Question {currentQuestionIndex + 1} of {interviewQuestions.length}</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div className="relative h-48 rounded-xl overflow-hidden bg-black border border-white/10 flex items-center justify-center">
+                  <video ref={interviewVideoRef} autoPlay playsInline muted className={cn("w-full h-full object-cover", !interviewCameraActive && "hidden")} />
+                  {!interviewCameraActive && (
+                    <div className="text-center p-4">
+                      <VideoOff className="size-8 text-slate-500 mx-auto mb-2" />
+                      <p className="text-xs text-slate-400">Camera preview is inactive</p>
+                    </div>
+                  )}
+                  <button
+                    onClick={toggleInterviewCamera}
+                    className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-black/70 backdrop-blur-md border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5"
+                  >
+                    {interviewCameraActive ? <Video className="size-3.5 text-emerald-400" /> : <VideoOff className="size-3.5 text-slate-400" />}
+                    {interviewCameraActive ? "Disable Camera" : "Enable Camera"}
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2">
+                    <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">AI Question</span>
+                    <p className="text-sm font-semibold text-white leading-relaxed">
+                      {interviewQuestions[currentQuestionIndex]}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Button
+                      onClick={() => setIsRecording(!isRecording)}
+                      className={cn("flex-1 h-10 text-xs font-bold rounded-xl", isRecording ? "bg-red-600 hover:bg-red-500 text-white animate-pulse" : "bg-white/10 hover:bg-white/15 text-white")}
+                    >
+                      {isRecording ? <MicOff className="size-4 mr-2" /> : <Mic className="size-4 mr-2" />}
+                      {isRecording ? "Stop Recording Answer" : "Start Voice Answer"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-300">Your Answer (Voice Transcript / Text Input):</label>
+                <textarea
+                  rows={3}
+                  value={studentAnswer}
+                  onChange={(e) => setStudentAnswer(e.target.value)}
+                  placeholder="Speak into microphone or type your detailed answer here..."
+                  className="w-full p-3 text-xs bg-black/60 border border-white/15 rounded-xl text-white outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-end pt-3">
+                <Button
+                  onClick={() => {
+                    if (currentQuestionIndex < interviewQuestions.length - 1) {
+                      setCurrentQuestionIndex(prev => prev + 1);
+                      setStudentAnswer("");
+                      toast.success("Answer recorded. Next question loaded.");
+                    } else {
+                      setInterviewFinished(true);
+                      toast.success("Interview completed! Generating feedback report...");
+                    }
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs"
+                >
+                  {currentQuestionIndex < interviewQuestions.length - 1 ? "Next Question" : "Finish & View Feedback"}
                 </Button>
               </div>
-            ) : (
-              <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between text-xs text-slate-400">
-                <span className="flex items-center gap-2"><Lock className="size-4 text-amber-400" /> Placements remain locked until you complete sufficient plan milestones.</span>
-                <span className="text-amber-400 font-bold">{75 - readinessScore}% more needed</span>
+            </div>
+          ) : (
+            <div className="bg-slate-900/90 border border-white/15 rounded-2xl p-8 text-center space-y-6 shadow-2xl">
+              <div className="size-16 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
+                <Award className="size-8" />
               </div>
-            )}
+              <h2 className="text-xl font-black text-white">Interview Complete!</h2>
+              <p className="text-xs text-slate-300 max-w-md mx-auto">
+                Your interview has been processed successfully. View your detailed AI performance report and improvement plan.
+              </p>
+              <Button
+                onClick={() => setAssessmentStage("interview-feedback")}
+                className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs"
+              >
+                View Detailed Feedback Report
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // VIEW 10: INTERVIEW FEEDBACK & READINESS REPORT
+  // -------------------------------------------------------------
+  if (assessmentStage === "interview-feedback") {
+    return (
+      <div className="min-h-screen bg-[#071224] text-white p-6 sm:p-10 font-sans">
+        <div className="w-full max-w-4xl mx-auto space-y-8">
+          <div className="bg-slate-900/90 border border-white/15 rounded-2xl p-8 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-6 border-b border-white/10">
+              <div>
+                <h2 className="text-xl font-bold text-white">AI Mock Interview Feedback Report</h2>
+                <p className="text-xs text-slate-400">Detailed analytical breakdown of your mock interview performance</p>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-black text-emerald-400">88 / 100</span>
+                <span className="block text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Readiness Score</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Technical Knowledge</span>
+                <div className="text-lg font-bold text-white">92%</div>
+              </div>
+              <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Communication</span>
+                <div className="text-lg font-bold text-white">85%</div>
+              </div>
+              <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-1">
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Problem Solving</span>
+                <div className="text-lg font-bold text-white">88%</div>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Personalized Improvement Plan</h4>
+              <ul className="space-y-2 text-xs text-slate-300 list-disc pl-4">
+                <li>Revise database indexing strategies for high-throughput write operations.</li>
+                <li>Incorporate more quantitative metrics when explaining past project impact.</li>
+                <li>Practice system design latency estimation exercises.</li>
+              </ul>
+            </div>
+
+            <div className="p-4 rounded-xl bg-blue-600/10 border border-blue-500/20 text-xs text-slate-300">
+              <span className="font-semibold text-white">Note:</span> AI feedback is designed as a practice aid and constructive guide to help refine your interview presence.
+            </div>
+
+            <div className="flex justify-between pt-4 border-t border-white/10">
+              <Button onClick={() => setAssessmentStage("ai-mock-interview")} className="bg-white/10 text-white text-xs">
+                Retake Mock Interview
+              </Button>
+              <Button onClick={() => setAssessmentStage("placements")} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-6">
+                Proceed to Placements Board <ArrowRight className="size-4 ml-1.5" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -1770,14 +2148,19 @@ function StudentAssessmentEngine() {
           <div className="p-6 rounded-2xl border border-emerald-500/30 bg-slate-900/90 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-1">
-                <Unlock className="size-4" /> Mentor Verified Readiness: {readinessScore}%
+                <Unlock className="size-4" /> Mentor & Course Verified Readiness: {readinessScore}%
               </span>
               <h1 className="text-2xl sm:text-3xl font-black text-white">Active Corporate Placement Tracks</h1>
-              <p className="text-xs text-slate-400 mt-1">Unlocked after successfully completing skill remediation and mentor milestones.</p>
+              <p className="text-xs text-slate-400 mt-1">Unlocked after successfully completing the 4-week learning curriculum and mentor milestones.</p>
             </div>
-            <Button onClick={() => setAssessmentStage("mentor-hub")} className="bg-white/10 text-white text-xs hover:bg-white/20">
-              Return to Mentor Desk
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setAssessmentStage("ai-mock-interview")} className="bg-white/10 text-white text-xs">
+                AI Mock Interview
+              </Button>
+              <Button onClick={() => setAssessmentStage("mentor-hub")} className="bg-white/10 text-white text-xs">
+                Mentor Desk
+              </Button>
+            </div>
           </div>
 
           <div className="p-6 rounded-2xl border border-white/15 bg-slate-900/90 shadow-xl space-y-4">
