@@ -210,10 +210,6 @@ function LanguageMenu() {
     { code: "ml", label: "Malayalam", native: "മലയാളം" },
     { code: "mr", label: "Marathi", native: "मराठी" },
     { code: "bn", label: "Bengali", native: "বাংলা" },
-    { code: "gu", label: "Gujarati", native: "ગુજરાતી" },
-    { code: "pa", label: "Punjabi", native: "ਪੰਜਾਬੀ" },
-    { code: "or", label: "Odia", native: "ଓଡ଼ିଆ" },
-    { code: "ur", label: "Urdu", native: "اردو" },
   ];
 
   return (
@@ -424,14 +420,21 @@ function Welcome() {
   }
 
   return (
-    <div className="min-h-screen relative flex flex-col font-sans text-[#0F172A] bg-[#F8FAFC]">
-      <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white/80 backdrop-blur-md px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs transition-all">
+    <div className="min-h-screen relative flex flex-col font-sans text-[#0F172A] bg-[#F8FAFC] overflow-x-hidden">
+      <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white/85 backdrop-blur-md px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs transition-all">
         <div className="flex items-center gap-3">
           <div className="flex size-9 items-center justify-center rounded-xl bg-[#2563EB] text-white font-bold text-sm shadow-sm">
             SB
           </div>
           <span className="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">SkillBridge</span>
         </div>
+
+        <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-[#64748B]">
+          <a href="#" className="hover:text-[#2563EB] transition">Home</a>
+          <a href="#features" className="hover:text-[#2563EB] transition">Features</a>
+          <a href="#roles" className="hover:text-[#2563EB] transition">Portals</a>
+          <a href="#about" className="hover:text-[#2563EB] transition">About</a>
+        </nav>
 
         <div className="flex items-center gap-3">
           <div className="relative" ref={roleDropdownRef}>
@@ -485,22 +488,71 @@ function Welcome() {
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-4 sm:px-8 py-10 max-w-7xl mx-auto w-full">
+      {/* Hero Section with Diagonal Building Graphic Background matching user reference */}
+      <section className="relative w-full bg-white overflow-hidden border-b border-[#E2E8F0]">
+        <div className="absolute right-0 top-0 bottom-0 w-full lg:w-3/5 pointer-events-none overflow-hidden z-0">
+          <div className="absolute inset-0 bg-gradient-to-bl from-blue-50/80 via-cyan-50/30 to-transparent" />
+          <div 
+            className="absolute -right-20 -top-20 w-[120%] h-[120%] opacity-25 bg-cover bg-center transform rotate-[-12deg]"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80')`,
+              clipPath: 'polygon(30% 0%, 100% 0%, 100% 100%, 0% 100%)'
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7 flex flex-col items-start text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB] mb-6 shadow-2xs">
+              <Sparkles className="size-3.5 text-[#2563EB]" />
+              Professional Website Header Background
+            </div>
+            
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-[#0F172A] leading-[1.15]">
+              Professional Website Header Background
+            </h1>
+            
+            <p className="mt-5 text-sm sm:text-base text-[#64748B] max-w-xl leading-relaxed">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-4">
+              <a
+                href="#roles"
+                className="px-6.5 py-3.5 rounded-2xl bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all transform hover:-translate-y-0.5"
+              >
+                EXPLORE ROLES
+              </a>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 relative">
+            <div className="rounded-3xl border border-slate-200/80 bg-white/90 backdrop-blur-xl p-6 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="flex items-center gap-3 mb-4">
+                <div className="size-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563EB] font-bold">
+                  SB
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#0F172A]">SkillBridge Enterprise</h4>
+                  <p className="text-[10px] text-[#64748B]">Verified Academic & Industry Hub</p>
+                </div>
+              </div>
+              <div className="h-40 rounded-2xl overflow-hidden relative">
+                <img 
+                  src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80" 
+                  alt="Building" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-4 sm:px-8 py-12 max-w-7xl mx-auto w-full">
         {!selectedRole ? (
           <div className="w-full flex flex-col items-center">
-            <div className="text-center max-w-3xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB] mb-4 shadow-2xs">
-                <Sparkles className="size-3.5 text-[#2563EB]" />
-                Next-Gen Academic & Corporate Exchange
-              </div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#0F172A] leading-tight">
-                SkillBridge
-              </h1>
-              <p className="mt-3 text-sm sm:text-base text-[#64748B] max-w-xl mx-auto leading-relaxed">
-                Connect students, corporate recruiters, deans, and certified industry mentors on a single verified platform.
-              </p>
-            </div>
-
             <div className="w-full max-w-2xl mx-auto mb-14 px-4 text-center">
               <span className="text-xs font-bold uppercase tracking-wider text-[#64748B] mb-2 block">Search SkillBridge</span>
               <div className="relative group">
@@ -515,7 +567,7 @@ function Welcome() {
               </div>
             </div>
 
-            <div className="w-full">
+            <div id="roles" className="w-full">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-[#0F172A] tracking-tight">Explore by Role</h2>
                 <span className="text-xs text-[#64748B]">Select your professional workspace</span>
@@ -554,7 +606,6 @@ function Welcome() {
           </div>
         ) : (
           <div className="w-full max-w-4xl rounded-[20px] border-2 border-[#2563EB] bg-[#EFF6FF] shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-4">
-            
             <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-[#0F172A] text-white p-6 sm:p-8 min-h-[360px]">
               <img src={currentStakeholder?.imageUrl} alt={currentStakeholder?.title} className="absolute inset-0 h-full w-full object-cover opacity-30" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/80 to-[#0F172A]/40" />
