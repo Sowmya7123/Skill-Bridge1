@@ -273,6 +273,7 @@ function Welcome() {
 
   const [selectedRole, setSelectedRole] = useState<RoleId | null>(null);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const [stakeholderId, setStakeholderId] = useState("");
   const [emailInput, setEmailInput] = useState("");
@@ -282,11 +283,9 @@ function Welcome() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Top-right role dropdown state
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const roleDropdownRef = useRef<HTMLDivElement>(null);
 
-  // College Database Search State
   const [collegeSearch, setCollegeSearch] = useState("");
   const [collegeResults, setCollegeResults] = useState<{ id: string; name: string; state?: string; category?: string }[]>([]);
   const [isSearchingColleges, setIsSearchingColleges] = useState(false);
@@ -449,16 +448,47 @@ function Welcome() {
     }
   }
 
+  async function handleForgotPasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const emailValue = emailInput.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(emailValue)) {
+      toast.error("Invalid Email", { description: "Please enter a valid email address." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(emailValue, {
+        redirectTo: window.location.origin,
+      });
+
+      if (error) {
+        toast.error("Error", { description: error.message });
+      } else {
+        toast.success("Password Reset Link Sent! ✉️", {
+          description: `Check ${emailValue} for the password reset link.`,
+          duration: 8000,
+        });
+        setIsForgotPassword(false);
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred.";
+      toast.error("Error", { description: errorMessage });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className="min-h-screen relative flex flex-col font-sans text-[#0F172A] bg-[#F8FAFC]">
       <div id="google_translate_element" style={{ display: "none" }} />
 
-      {/* Subtle SaaS Background Gradients */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" style={{
         background: `radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.06), transparent 30%), radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.05), transparent 30%), #F8FAFC`
       }} />
 
-      {/* Sticky Modern SaaS Navbar */}
       <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white/80 backdrop-blur-md px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs transition-all">
         <div className="flex items-center gap-3">
           <div className="flex size-9 items-center justify-center rounded-xl bg-[#2563EB] text-white font-bold text-sm shadow-sm">
@@ -469,7 +499,6 @@ function Welcome() {
           </div>
         </div>
 
-        {/* Center Nav Links */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-[#64748B]">
           <a href="#" className="hover:text-[#2563EB] transition">Home</a>
           <a href="#features" className="hover:text-[#2563EB] transition">Features</a>
@@ -477,10 +506,7 @@ function Welcome() {
           <a href="#about" className="hover:text-[#2563EB] transition">About</a>
         </nav>
 
-        {/* Top-Right Controls: Role Selector + Language + Mobile Menu */}
         <div className="flex items-center gap-3">
-          
-          {/* Top-Right Role Selector Dropdown as requested in Rule 3 */}
           <div className="relative" ref={roleDropdownRef}>
             <button
               type="button"
@@ -534,7 +560,6 @@ function Welcome() {
         </div>
       </header>
 
-      {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 z-40 bg-white border-b border-[#E2E8F0] p-4 shadow-xl flex flex-col gap-3">
           <a href="#" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">Home</a>
@@ -544,12 +569,10 @@ function Welcome() {
         </div>
       )}
 
-      {/* Main Hero & Content Section */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-4 sm:px-8 py-10 max-w-7xl mx-auto w-full">
         {!selectedRole ? (
           <div className="w-full flex flex-col items-center">
             
-            {/* Hero Section */}
             <div className="text-center max-w-3xl mx-auto mb-10">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB] mb-4 shadow-2xs">
                 <Sparkles className="size-3.5 text-[#2563EB]" />
@@ -563,7 +586,6 @@ function Welcome() {
               </p>
             </div>
 
-            {/* Central Prominent Search Bar (Rule 4) */}
             <div className="w-full max-w-2xl mx-auto mb-14 px-4 text-center">
               <span className="text-xs font-bold uppercase tracking-wider text-[#64748B] mb-2 block">Search SkillBridge</span>
               <div className="relative group">
@@ -578,7 +600,6 @@ function Welcome() {
               </div>
             </div>
 
-            {/* Explore by Role Grid (Rule 5) */}
             <div id="roles" className="w-full">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-[#0F172A] tracking-tight">Explore by Role</h2>
@@ -637,7 +658,6 @@ function Welcome() {
 
           </div>
         ) : (
-          /* Role Selected Auth Screen with selected state styling (Rule 7) */
           <div className="w-full max-w-4xl rounded-[20px] border-2 border-[#2563EB] bg-[#EFF6FF] shadow-[0_8px_24px_rgba(37,99,235,0.12)] overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-4">
             
             <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-[#0F172A] text-white p-6 sm:p-8 min-h-[360px]">
@@ -651,7 +671,10 @@ function Welcome() {
               <div className="relative z-10">
                 <button
                   type="button"
-                  onClick={() => setSelectedRole(null)}
+                  onClick={() => {
+                    setSelectedRole(null);
+                    setIsForgotPassword(false);
+                  }}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white mb-6 transition"
                 >
                   <ArrowLeft className="size-3.5" />
@@ -698,199 +721,258 @@ function Welcome() {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="text-base font-bold text-[#0F172A]">
-                    {authMode === "signin" ? "Authorized Login" : "New Registration"}
+                    {isForgotPassword ? "Reset Password" : authMode === "signin" ? "Authorized Login" : "New Registration"}
                   </h3>
                   <p className="text-xs text-[#64748B]">
-                    {authMode === "signin"
+                    {isForgotPassword 
+                      ? "Enter your email to receive a password reset link"
+                      : authMode === "signin"
                       ? "Enter your verified credentials to continue"
                       : "Register with pan-India institutional database"}
                   </p>
                 </div>
 
-                <div className="flex rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-0.5 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode("signin")}
-                    className={cn(
-                      "px-3 py-1 rounded-lg font-semibold transition",
-                      authMode === "signin" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]"
-                    )}
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode("signup")}
-                    className={cn(
-                      "px-3 py-1 rounded-lg font-semibold transition",
-                      authMode === "signup" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]"
-                    )}
-                  >
-                    Register
-                  </button>
-                </div>
-              </div>
-
-              <form onSubmit={handleAuthSubmit} className="space-y-3.5">
-                <div className="space-y-1">
-                  <Label htmlFor="id-input" className="text-xs font-semibold text-[#0F172A]">
-                    {currentStakeholder?.idFieldLabel} <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="relative">
-                    <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
-                    <Input
-                      id="id-input"
-                      required
-                      value={stakeholderId}
-                      onChange={(e) => setStakeholderId(e.target.value)}
-                      placeholder={currentStakeholder?.idPlaceholder}
-                      className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
-                    />
-                  </div>
-                </div>
-
-                {authMode === "signup" && (
-                  <div className="space-y-1 relative" ref={dropdownRef}>
-                    <Label htmlFor="org-input" className="text-xs font-semibold text-[#0F172A]">
-                      {currentStakeholder?.orgLabel} <span className="text-red-500">*</span>
-                    </Label>
-                    
-                    {selectedRole === "student" ? (
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
-                        <Input
-                          id="org-input"
-                          required
-                          value={collegeSearch}
-                          onChange={(e) => {
-                            setCollegeSearch(e.target.value);
-                            setShowCollegeDropdown(true);
-                          }}
-                          onFocus={() => setShowCollegeDropdown(true)}
-                          placeholder="Type 2+ letters to search (e.g. IIT, JNTU, CBIT, BITS)..."
-                          className="pl-9 pr-8 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
-                        />
-                        {isSearchingColleges && (
-                          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 animate-spin text-[#2563EB]" />
-                        )}
-
-                        {showCollegeDropdown && collegeSearch.trim().length >= 2 && (
-                          <div className="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl">
-                            {isSearchingColleges ? (
-                              <div className="p-3 text-xs text-[#64748B] text-center flex items-center justify-center gap-2">
-                                <Loader2 className="size-3.5 animate-spin" /> Searching pan-India colleges...
-                              </div>
-                            ) : collegeResults.length > 0 ? (
-                              collegeResults.map((c) => (
-                                <button
-                                  key={c.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setCollegeSearch(c.name);
-                                    setOrgInput(c.name);
-                                    setShowCollegeDropdown(false);
-                                  }}
-                                  className="w-full text-left px-3 py-2 text-xs text-[#0F172A] hover:bg-blue-50 hover:text-blue-700 border-b border-[#E2E8F0] last:border-0 transition"
-                                >
-                                  <div className="font-semibold">{c.name}</div>
-                                  <div className="text-[10px] text-[#64748B] flex items-center gap-2 mt-0.5">
-                                    {c.state && <span>{c.state}</span>}
-                                    {c.category && <span className="bg-slate-100 px-1 rounded text-[#64748B]">{c.category}</span>}
-                                  </div>
-                                </button>
-                              ))
-                            ) : (
-                              <div className="p-3 text-xs text-[#64748B]">
-                                <span className="font-semibold text-[#0F172A]">College not found in pre-index.</span>
-                                <div className="text-[11px] text-[#64748B] mt-0.5">
-                                  You can continue typing your college name manually.
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="relative">
-                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
-                        <Input
-                          id="org-input"
-                          required
-                          value={orgInput}
-                          onChange={(e) => setOrgInput(e.target.value)}
-                          placeholder={currentStakeholder?.orgPlaceholder}
-                          className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
-                        />
-                      </div>
-                    )}
+                {!isForgotPassword && (
+                  <div className="flex rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-0.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode("signin")}
+                      className={cn(
+                        "px-3 py-1 rounded-lg font-semibold transition",
+                        authMode === "signin" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]"
+                      )}
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode("signup")}
+                      className={cn(
+                        "px-3 py-1 rounded-lg font-semibold transition",
+                        authMode === "signup" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]"
+                      )}
+                    >
+                      Register
+                    </button>
                   </div>
                 )}
+              </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="email-input" className="text-xs font-semibold text-[#0F172A]">
-                    {currentStakeholder?.emailLabel} <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
-                    <Input
-                      id="email-input"
-                      type="email"
-                      required
-                      value={emailInput}
-                      onChange={(e) => setEmailInput(e.target.value)}
-                      placeholder={currentStakeholder?.emailPlaceholder}
-                      className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
-                    />
+              {isForgotPassword ? (
+                /* Forgot Password Form */
+                <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="forgot-email" className="text-xs font-semibold text-[#0F172A]">
+                      {currentStakeholder?.emailLabel} <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <Input
+                        id="forgot-email"
+                        type="email"
+                        required
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        placeholder={currentStakeholder?.emailPlaceholder}
+                        className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="pwd-input" className="text-xs font-semibold text-[#0F172A]">
-                    Password (Min. 8 characters) <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
-                    <Input
-                      id="pwd-input"
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
-                    />
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full h-11 text-xs font-bold transition mt-2 rounded-[12px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-sm"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="size-4 animate-spin" />
+                        Sending Reset Link...
+                      </span>
+                    ) : (
+                      "Send Password Reset Link"
+                    )}
+                  </Button>
+
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsForgotPassword(false)}
+                      className="text-xs font-semibold text-[#2563EB] hover:underline"
+                    >
+                      Back to Sign In
+                    </button>
                   </div>
-                </div>
+                </form>
+              ) : (
+                /* Regular Sign In / Sign Up Form */
+                <form onSubmit={handleAuthSubmit} className="space-y-3.5">
+                  <div className="space-y-1">
+                    <Label htmlFor="id-input" className="text-xs font-semibold text-[#0F172A]">
+                      {currentStakeholder?.idFieldLabel} <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <Input
+                        id="id-input"
+                        required
+                        value={stakeholderId}
+                        onChange={(e) => setStakeholderId(e.target.value)}
+                        placeholder={currentStakeholder?.idPlaceholder}
+                        className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
+                      />
+                    </div>
+                  </div>
 
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{ transition: "all 200ms ease" }}
-                  className={cn("w-full h-11 text-xs font-bold transition mt-2 rounded-[12px] px-5 py-3 shadow-[0_6px_16px_rgba(37,99,235,0.20)] hover:-translate-y-[1px]", currentStakeholder?.buttonClass)}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="size-4 animate-spin" />
-                      Processing Request...
-                    </span>
-                  ) : authMode === "signin" ? (
-                    `Sign In as ${currentStakeholder?.title}`
-                  ) : (
-                    `Create Account & Send Verification Email`
+                  {authMode === "signup" && (
+                    <div className="space-y-1 relative" ref={dropdownRef}>
+                      <Label htmlFor="org-input" className="text-xs font-semibold text-[#0F172A]">
+                        {currentStakeholder?.orgLabel} <span className="text-red-500">*</span>
+                      </Label>
+                      
+                      {selectedRole === "student" ? (
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                          <Input
+                            id="org-input"
+                            required
+                            value={collegeSearch}
+                            onChange={(e) => {
+                              setCollegeSearch(e.target.value);
+                              setShowCollegeDropdown(true);
+                            }}
+                            onFocus={() => setShowCollegeDropdown(true)}
+                            placeholder="Type 2+ letters to search (e.g. IIT, JNTU, CBIT)..."
+                            className="pl-9 pr-8 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
+                          />
+                          {isSearchingColleges && (
+                            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 size-3.5 animate-spin text-[#2563EB]" />
+                          )}
+
+                          {showCollegeDropdown && collegeSearch.trim().length >= 2 && (
+                            <div className="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded-2xl border border-[#E2E8F0] bg-white shadow-2xl">
+                              {isSearchingColleges ? (
+                                <div className="p-3 text-xs text-[#64748B] text-center flex items-center justify-center gap-2">
+                                  <Loader2 className="size-3.5 animate-spin" /> Searching colleges...
+                                </div>
+                              ) : collegeResults.length > 0 ? (
+                                collegeResults.map((c) => (
+                                  <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setCollegeSearch(c.name);
+                                      setOrgInput(c.name);
+                                      setShowCollegeDropdown(false);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs text-[#0F172A] hover:bg-blue-50 hover:text-blue-700 border-b border-[#E2E8F0] last:border-0 transition"
+                                  >
+                                    <div className="font-semibold">{c.name}</div>
+                                    <div className="text-[10px] text-[#64748B] flex items-center gap-2 mt-0.5">
+                                      {c.state && <span>{c.state}</span>}
+                                    </div>
+                                  </button>
+                                ))
+                              ) : (
+                                <div className="p-3 text-xs text-[#64748B]">
+                                  <span className="font-semibold text-[#0F172A]">College not found in pre-index.</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                          <Input
+                            id="org-input"
+                            required
+                            value={orgInput}
+                            onChange={(e) => setOrgInput(e.target.value)}
+                            placeholder={currentStakeholder?.orgPlaceholder}
+                            className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
+                          />
+                        </div>
+                      )}
+                    </div>
                   )}
-                  {!isSubmitting && <ArrowRight className="size-4 ml-1.5" />}
-                </Button>
 
-                <p className="text-center text-[10px] text-[#64748B] pt-1">
-                  Pan-India Institutional Directory Active • Secured by Supabase Engine
-                </p>
-              </form>
+                  <div className="space-y-1">
+                    <Label htmlFor="email-input" className="text-xs font-semibold text-[#0F172A]">
+                      {currentStakeholder?.emailLabel} <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <Input
+                        id="email-input"
+                        type="email"
+                        required
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        placeholder={currentStakeholder?.emailPlaceholder}
+                        className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="pwd-input" className="text-xs font-semibold text-[#0F172A]">
+                        Password (Min. 8 characters) <span className="text-red-500">*</span>
+                      </Label>
+                      {authMode === "signin" && (
+                        <button
+                          type="button"
+                          onClick={() => setIsForgotPassword(true)}
+                          className="text-[11px] font-medium text-[#2563EB] hover:underline"
+                        >
+                          Forgot Password?
+                        </button>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <Input
+                        id="pwd-input"
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="pl-9 h-10 text-xs border-[#E2E8F0] bg-white rounded-xl focus:border-[#2563EB]"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    style={{ transition: "all 200ms ease" }}
+                    className={cn("w-full h-11 text-xs font-bold transition mt-2 rounded-[12px] px-5 py-3 shadow-[0_6px_16px_rgba(37,99,235,0.20)] hover:-translate-y-[1px]", currentStakeholder?.buttonClass)}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="size-4 animate-spin" />
+                        Processing Request...
+                      </span>
+                    ) : authMode === "signin" ? (
+                      `Sign In as ${currentStakeholder?.title}`
+                    ) : (
+                      `Create Account & Send Verification Email`
+                    )}
+                    {!isSubmitting && <ArrowRight className="size-4 ml-1.5" />}
+                  </Button>
+
+                  <p className="text-center text-[10px] text-[#64748B] pt-1">
+                    Pan-India Institutional Directory Active • Secured by Supabase Engine
+                  </p>
+                </form>
+              )}
             </div>
           </div>
         )}
       </main>
 
-      {/* SaaS Footer */}
       <footer className="relative z-10 border-t border-[#E2E8F0] bg-white py-4 px-6 text-center text-xs text-[#64748B]">
         SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Infrastructure Frameworks.
       </footer>
