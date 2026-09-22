@@ -16,10 +16,8 @@ import {
   Check,
   Sparkles,
   Loader2,
-  Search,
   Menu,
-  X,
-  ChevronDown
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -217,14 +215,14 @@ function LanguageMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex size-9 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white text-[#64748B] hover:text-[#0F172A] hover:bg-slate-50 transition"
+        className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition"
         title="Language"
       >
         <MoreVertical className="size-4" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-2xl z-50">
+        <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50">
           <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1 sticky top-0 bg-white z-10">
             <Globe className="size-3.5" />
             Select Language
@@ -240,7 +238,7 @@ function LanguageMenu() {
                 <span className="font-semibold text-slate-900">{lang.native}</span>
                 <span className="text-[10px] text-slate-400">{lang.label}</span>
               </div>
-              {currentLang === lang.code && <Check className="size-3.5 text-[#2563EB] stroke-[2.5]" />}
+              {currentLang === lang.code && <Check className="size-3.5 text-blue-600 stroke-[2.5]" />}
             </button>
           ))}
         </div>
@@ -262,7 +260,6 @@ function Welcome() {
   const [password, setPassword] = useState("");
   const [orgInput, setOrgInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const rolesSectionRef = useRef<HTMLDivElement>(null);
@@ -378,21 +375,21 @@ function Welcome() {
   }
 
   return (
-    <div className="min-h-screen relative flex flex-col font-sans text-[#0F172A] bg-[#F8FAFC]">
+    <div className="min-h-screen relative flex flex-col font-sans text-slate-900 bg-slate-50 selection:bg-blue-600 selection:text-white">
       
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white/90 backdrop-blur-md px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs transition-all">
+      {/* Header Navigation */}
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 sm:px-10 py-4 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-[#2563EB] text-white font-bold text-sm shadow-sm">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-base shadow-md">
             SB
           </div>
-          <span className="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">SkillBridge</span>
+          <span className="text-lg font-black text-slate-900 tracking-tight">SkillBridge</span>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-[#64748B]">
-          <a href="#" className="hover:text-[#2563EB] transition">Home</a>
-          <a href="#about" className="hover:text-[#2563EB] transition">About</a>
-          <button onClick={scrollToRoles} className="hover:text-[#2563EB] transition cursor-pointer font-semibold">Sign In / Register</button>
+        <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
+          <a href="#" className="hover:text-blue-600 transition">Home</a>
+          <a href="#about" className="hover:text-blue-600 transition">About</a>
+          <button onClick={scrollToRoles} className="hover:text-blue-600 transition cursor-pointer">Sign In / Register</button>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -400,55 +397,50 @@ function Welcome() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex size-9 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white text-slate-700 hover:bg-slate-50 transition"
+            className="md:hidden flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition"
           >
             {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
         </div>
       </header>
 
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 z-40 bg-white border-b border-[#E2E8F0] p-4 shadow-xl flex flex-col gap-3">
+        <div className="md:hidden absolute top-16 left-0 right-0 z-40 bg-white border-b border-slate-200 p-4 shadow-xl flex flex-col gap-3">
           <a href="#" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">Home</a>
           <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">About</a>
           <button onClick={() => { scrollToRoles(); setMobileMenuOpen(false); }} className="text-xs font-semibold text-left text-blue-600 py-2">Sign In / Register</button>
         </div>
       )}
 
-      {/* Hero Section matching reference image style */}
-      <section className="relative w-full h-[520px] sm:h-[600px] flex items-center justify-center overflow-hidden bg-[#0F172A]">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-40 transform scale-105"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2000&q=85')`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/70 to-transparent" />
+      {/* Professional Light Theme Hero Section */}
+      <section className="relative w-full py-24 sm:py-32 px-6 bg-gradient-to-b from-white via-slate-50 to-slate-100 border-b border-slate-200 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-60" />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-xs font-semibold text-blue-300 backdrop-blur-md shadow-sm">
-            <Sparkles className="size-3.5 text-blue-400" />
-            Next-Gen Academic & Corporate Exchange
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-700 shadow-2xs">
+            <Sparkles className="size-3.5 text-blue-600" />
+            Unified Academia & Industry Exchange
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.15]">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 leading-[1.15]">
             Business Consultant & Talent Platform
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
-            Connect students, corporate recruiters, deans, and certified industry mentors on a single verified platform.
+          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            SkillBridge connects students, corporate recruiters, deans, and certified industry mentors on a single verified platform.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+          <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
             <Button
               onClick={scrollToRoles}
-              className="px-7.5 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/30 transition cursor-pointer"
+              className="px-8.5 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/25 transition cursor-pointer"
             >
               Sign In / Register
             </Button>
             <a
               href="#about"
-              className="px-7.5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs sm:text-sm backdrop-blur-md transition cursor-pointer"
+              className="px-8.5 py-4 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm shadow-2xs transition cursor-pointer"
             >
               Learn More
             </a>
@@ -458,55 +450,57 @@ function Welcome() {
 
       {/* About Section */}
       <section id="about" className="py-20 px-6 max-w-7xl mx-auto w-full">
-        <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
-          <h2 className="text-2xl sm:text-4xl font-black text-[#0F172A]">About SkillBridge</h2>
-          <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
-            Explore how our platform seamlessly links academia with top industry enterprises.
+        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">About SkillBridge</h2>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Our platform bridges the gap between academic institutions and top-tier global enterprise recruitment.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
-            <div className="size-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563EB] font-bold text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <div className="size-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold">
               01
             </div>
-            <h3 className="text-base font-bold text-[#0F172A]">Verified Competency</h3>
-            <p className="text-xs text-[#64748B] leading-relaxed">
-              Diagnostic tests and proctored evaluations ensure reliable talent scoring for all students.
+            <h3 className="text-lg font-bold text-slate-900">Verified Competency</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Diagnostic technical testing and proctored evaluations provide unbiased audit trails for every student.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
-            <div className="size-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-bold text-sm">
+          <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <div className="size-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-bold">
               02
             </div>
-            <h3 className="text-base font-bold text-[#0F172A]">Expert Mentorship</h3>
-            <p className="text-xs text-[#64748B] leading-relaxed">
-              Connect 1:1 with industry staff architects to close skill deficits and build career portfolios.
+            <h3 className="text-lg font-bold text-slate-900">Expert Mentorship</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Connect 1:1 with industry staff architects, close skill deficits, and complete structured guidance plans.
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
-            <div className="size-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 font-bold text-sm">
+          <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+            <div className="size-12 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 font-bold">
               03
             </div>
-            <h3 className="text-base font-bold text-[#0F172A]">Direct Placements</h3>
-            <p className="text-xs text-[#64748B] leading-relaxed">
-              Unlock high-stipend corporate internships and direct interview shortlists upon course completion.
+            <h3 className="text-lg font-bold text-slate-900">Direct Placements</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Unlock high-stipend corporate internships and direct interview shortlists once readiness thresholds are achieved.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Role Selection & Login/Register Section */}
-      <section ref={rolesSectionRef} className="py-16 px-6 max-w-7xl mx-auto w-full border-t border-[#E2E8F0] bg-slate-50">
+      {/* Role Selection & Auth Section */}
+      <section ref={rolesSectionRef} className="py-16 px-6 max-w-7xl mx-auto w-full border-t border-slate-200 bg-white">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-          <h2 className="text-xl sm:text-3xl font-black text-[#0F172A]">Select Your Professional Role</h2>
-          <p className="text-xs text-[#64748B]">Choose your role to sign in or register with SkillBridge.</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Select Your Professional Role</h2>
+          <p className="text-xs sm:text-sm text-slate-600">
+            Choose your role to sign in or register with SkillBridge.
+          </p>
         </div>
 
         {!selectedRole ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {STAKEHOLDERS.map((item) => {
               const IconComponent = item.icon;
               return (
@@ -514,21 +508,21 @@ function Welcome() {
                   key={item.id}
                   type="button"
                   onClick={() => setSelectedRole(item.id)}
-                  className="group flex flex-col justify-between rounded-[20px] border border-[#E2E8F0] bg-white overflow-hidden text-left shadow-sm hover:-translate-y-1 hover:border-blue-400 transition cursor-pointer"
+                  className="group flex flex-col justify-between rounded-3xl border border-slate-200 bg-slate-50/60 overflow-hidden text-left shadow-sm hover:-translate-y-1.5 hover:border-blue-600 hover:bg-white hover:shadow-xl transition duration-300 cursor-pointer"
                 >
-                  <div className="relative h-40 w-full overflow-hidden bg-slate-100">
-                    <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover group-hover:scale-105 transition" />
-                    <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border bg-white/95", item.pillBg)}>
+                  <div className="relative h-44 w-full overflow-hidden bg-slate-200">
+                    <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-500" />
+                    <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border shadow-xs bg-white", item.pillBg)}>
                       {item.badge}
                     </span>
                   </div>
-                  <div className="p-5 flex-1 flex flex-col justify-between bg-white">
+                  <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-base font-bold text-[#0F172A] group-hover:text-[#2563EB] transition flex items-center justify-between">
+                      <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition flex items-center justify-between">
                         <span>{item.title}</span>
-                        <ArrowRight className="size-4 text-[#64748B]" />
+                        <ArrowRight className="size-4 text-slate-400 group-hover:translate-x-1 transition" />
                       </h3>
-                      <p className="text-xs text-[#64748B] mt-2 line-clamp-2">{item.tagline}</p>
+                      <p className="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">{item.tagline}</p>
                     </div>
                   </div>
                 </button>
@@ -536,11 +530,10 @@ function Welcome() {
             })}
           </div>
         ) : (
-          <div className="w-full max-w-4xl mx-auto rounded-[20px] border-2 border-[#2563EB] bg-[#EFF6FF] shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-4">
-            
-            <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-[#0F172A] text-white p-6 sm:p-8 min-h-[360px]">
-              <img src={currentStakeholder?.imageUrl} alt={currentStakeholder?.title} className="absolute inset-0 h-full w-full object-cover opacity-30" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/80 to-[#0F172A]/40" />
+          <div className="w-full max-w-4xl mx-auto rounded-3xl border-2 border-blue-600 bg-blue-50/30 shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 animate-fade-in">
+            <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-slate-900 text-white p-6 sm:p-8 min-h-[380px]">
+              <img src={currentStakeholder?.imageUrl} alt={currentStakeholder?.title} className="absolute inset-0 h-full w-full object-cover opacity-35" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-slate-900/40" />
 
               <div className="relative z-10">
                 <button
@@ -549,41 +542,41 @@ function Welcome() {
                     setSelectedRole(null);
                     setIsForgotPassword(false);
                   }}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white mb-6 transition cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white mb-6 transition cursor-pointer"
                 >
                   <ArrowLeft className="size-3.5" />
-                  Back to Portals
+                  Back to Role Selection
                 </button>
 
                 <h2 className="text-2xl font-black text-white">{currentStakeholder?.title} Portal</h2>
-                <p className="mt-2 text-xs text-white/80">{currentStakeholder?.description}</p>
+                <p className="mt-2 text-xs text-slate-300 leading-relaxed">{currentStakeholder?.description}</p>
               </div>
             </div>
 
             <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-center bg-white">
               <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="text-base font-bold text-[#0F172A]">
+                  <h3 className="text-base font-bold text-slate-900">
                     {isForgotPassword ? "Reset Password" : authMode === "signin" ? "Authorized Login" : "New Registration"}
                   </h3>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-slate-500">
                     {isForgotPassword ? "Enter your email to receive a password reset link" : "Enter credentials"}
                   </p>
                 </div>
 
                 {!isForgotPassword && (
-                  <div className="flex rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] p-0.5 text-xs">
+                  <div className="flex rounded-xl bg-slate-100 border border-slate-200 p-0.5 text-xs">
                     <button
                       type="button"
                       onClick={() => setAuthMode("signin")}
-                      className={cn("px-3 py-1 rounded-lg font-semibold cursor-pointer", authMode === "signin" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]")}
+                      className={cn("px-3 py-1 rounded-lg font-semibold cursor-pointer", authMode === "signin" ? "bg-white shadow-xs text-slate-900" : "text-slate-500")}
                     >
                       Sign In
                     </button>
                     <button
                       type="button"
                       onClick={() => setAuthMode("signup")}
-                      className={cn("px-3 py-1 rounded-lg font-semibold cursor-pointer", authMode === "signup" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]")}
+                      className={cn("px-3 py-1 rounded-lg font-semibold cursor-pointer", authMode === "signup" ? "bg-white shadow-xs text-slate-900" : "text-slate-500")}
                     >
                       Register
                     </button>
@@ -594,26 +587,26 @@ function Welcome() {
               {isForgotPassword ? (
                 <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold text-[#0F172A]">Email Address <span className="text-red-500">*</span></Label>
+                    <Label className="text-xs font-semibold text-slate-900">Email Address <span className="text-red-500">*</span></Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
                         type="email"
                         required
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
                         placeholder="yourname@gmail.com"
-                        className="pl-9 h-10 text-xs border-[#E2E8F0] rounded-xl"
+                        className="pl-9 h-10 text-xs border-slate-200 rounded-xl"
                       />
                     </div>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className="w-full h-11 text-xs font-bold rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white cursor-pointer">
+                  <Button type="submit" disabled={isSubmitting} className="w-full h-11 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white cursor-pointer">
                     {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Send Password Reset Link"}
                   </Button>
 
                   <div className="text-center pt-2">
-                    <button type="button" onClick={() => setIsForgotPassword(false)} className="text-xs font-semibold text-[#2563EB] hover:underline cursor-pointer">
+                    <button type="button" onClick={() => setIsForgotPassword(false)} className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer">
                       Back to Sign In
                     </button>
                   </div>
@@ -621,68 +614,68 @@ function Welcome() {
               ) : (
                 <form onSubmit={handleAuthSubmit} className="space-y-3.5">
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold text-[#0F172A]">{currentStakeholder?.idFieldLabel} <span className="text-red-500">*</span></Label>
+                    <Label className="text-xs font-semibold text-slate-900">{currentStakeholder?.idFieldLabel} <span className="text-red-500">*</span></Label>
                     <div className="relative">
-                      <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
                         required
                         value={stakeholderId}
                         onChange={(e) => setStakeholderId(e.target.value)}
                         placeholder={currentStakeholder?.idPlaceholder}
-                        className="pl-9 h-10 text-xs border-[#E2E8F0] rounded-xl"
+                        className="pl-9 h-10 text-xs border-slate-200 rounded-xl"
                       />
                     </div>
                   </div>
 
                   {authMode === "signup" && (
                     <div className="space-y-1">
-                      <Label className="text-xs font-semibold text-[#0F172A]">{currentStakeholder?.orgLabel} <span className="text-red-500">*</span></Label>
+                      <Label className="text-xs font-semibold text-slate-900">{currentStakeholder?.orgLabel} <span className="text-red-500">*</span></Label>
                       <div className="relative">
-                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                         <Input
                           required
                           value={orgInput}
                           onChange={(e) => setOrgInput(e.target.value)}
                           placeholder={currentStakeholder?.orgPlaceholder}
-                          className="pl-9 h-10 text-xs border-[#E2E8F0] rounded-xl"
+                          className="pl-9 h-10 text-xs border-slate-200 rounded-xl"
                         />
                       </div>
                     </div>
                   )}
 
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold text-[#0F172A]">{currentStakeholder?.emailLabel} <span className="text-red-500">*</span></Label>
+                    <Label className="text-xs font-semibold text-slate-900">{currentStakeholder?.emailLabel} <span className="text-red-500">*</span></Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
                         type="email"
                         required
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
                         placeholder={currentStakeholder?.emailPlaceholder}
-                        className="pl-9 h-10 text-xs border-[#E2E8F0] rounded-xl"
+                        className="pl-9 h-10 text-xs border-slate-200 rounded-xl"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-semibold text-[#0F172A]">Password <span className="text-red-500">*</span></Label>
+                      <Label className="text-xs font-semibold text-slate-900">Password <span className="text-red-500">*</span></Label>
                       {authMode === "signin" && (
-                        <button type="button" onClick={() => setIsForgotPassword(true)} className="text-[11px] font-medium text-[#2563EB] hover:underline cursor-pointer">
+                        <button type="button" onClick={() => setIsForgotPassword(true)} className="text-[11px] font-medium text-blue-600 hover:underline cursor-pointer">
                           Forgot Password?
                         </button>
                       )}
                     </div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#64748B]" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
                         type="password"
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="pl-9 h-10 text-xs border-[#E2E8F0] rounded-xl"
+                        className="pl-9 h-10 text-xs border-slate-200 rounded-xl"
                       />
                     </div>
                   </div>
@@ -698,7 +691,7 @@ function Welcome() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#E2E8F0] bg-white py-6 px-6 text-center text-xs text-[#64748B]">
+      <footer className="border-t border-slate-200 bg-white py-6 px-6 text-center text-xs text-slate-500">
         SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Infrastructure Frameworks.
       </footer>
     </div>
