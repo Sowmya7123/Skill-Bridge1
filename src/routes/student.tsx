@@ -875,7 +875,7 @@ function StudentAssessmentEngine() {
       : DOMAIN_OPTIONS.find((d) => d.id === selectedDomain)?.title || selectedDomain;
 
   // -------------------------------------------------------------
-  // VIEW 1: DOMAIN SELECTION
+  // VIEW 1: DOMAIN SELECTION (Light Theme + Vertical Wrap Categories)
   // -------------------------------------------------------------
   if (assessmentStage === "domain-selection") {
     const filteredDomains = DOMAIN_OPTIONS.filter((d) => {
@@ -888,21 +888,21 @@ function StudentAssessmentEngine() {
     });
 
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
-        <div className="w-full max-w-6xl rounded-2xl border border-white/15 bg-slate-900/95 backdrop-blur-xl p-5 sm:p-8 shadow-2xl flex flex-col max-h-[92vh]">
+      <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col items-center justify-center p-3 sm:p-6 font-sans">
+        <div className="w-full max-w-6xl rounded-3xl border border-slate-200 bg-white p-5 sm:p-8 shadow-2xl flex flex-col max-h-[92vh]">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-slate-400">Language Preference:</span>
+            <span className="text-[11px] font-bold text-slate-500">Language Preference:</span>
             <LanguageSelector />
           </div>
 
           <div className="text-center max-w-2xl mx-auto mb-4 shrink-0">
-            <div className="size-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mx-auto mb-2">
+            <div className="size-10 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 mx-auto mb-2 shadow-sm">
               <Sparkles className="size-5" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
               Choose Your Engineering Specialization
             </h1>
-            <p className="text-xs text-blue-200/70 mt-1">
+            <p className="text-xs text-slate-600 mt-1">
               Assessment scoring strictly awards marks for correct answers. Unattempted questions award 0 marks.
             </p>
 
@@ -913,21 +913,22 @@ function StudentAssessmentEngine() {
                 value={domainSearch}
                 onChange={(e) => setDomainSearch(e.target.value)}
                 placeholder="Search domains (e.g. AI, Full Stack, DevOps, VLSI, EV, Robotics)..."
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition"
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 transition shadow-inner"
               />
             </div>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto py-2 mt-2.5 no-scrollbar">
+            {/* Vertical / Wrap Category Buttons (No Horizontal Scrolling) */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
                   className={cn(
-                    "px-2.5 py-1 rounded-full text-[10px] font-semibold whitespace-nowrap transition border",
+                    "px-3 py-1.5 rounded-xl text-xs font-semibold transition border shadow-2xs cursor-pointer",
                     selectedCategory === cat
-                      ? "bg-blue-600 text-white border-blue-500 shadow-sm"
-                      : "bg-white/5 text-slate-400 border-white/10 hover:text-white hover:bg-white/10"
+                      ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                      : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 hover:text-slate-900"
                   )}
                 >
                   {cat}
@@ -936,6 +937,7 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
+          {/* Clean Vertical Grid Layout with Light Background & Highlighted Selected Card */}
           <div className="flex-1 overflow-y-auto pr-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filteredDomains.map((item) => {
               const isSelected = selectedDomain === item.id;
@@ -948,25 +950,25 @@ function StudentAssessmentEngine() {
                     setCustomDomainText("");
                   }}
                   className={cn(
-                    "p-3.5 rounded-xl border text-left transition-all relative flex flex-col justify-between",
+                    "p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between shadow-xs cursor-pointer",
                     isSelected
-                      ? "border-blue-500 bg-blue-600/20 ring-2 ring-blue-500/50 shadow-md shadow-blue-500/10"
-                      : "border-white/10 bg-slate-900/50 hover:bg-slate-800/80 hover:border-white/20"
+                      ? "border-blue-600 bg-blue-50/80 ring-2 ring-blue-600/40 shadow-md"
+                      : "border-slate-200 bg-slate-50/60 hover:bg-white hover:border-blue-400 hover:shadow-md"
                   )}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-xs sm:text-sm text-white truncate">{item.title}</span>
-                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/10 text-slate-300 shrink-0">
+                      <span className="font-bold text-xs sm:text-sm text-slate-900">{item.title}</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200/80 text-slate-800 border border-slate-300 shrink-0">
                         {item.badge}
                       </span>
                     </div>
-                    <span className="text-[10px] text-blue-300 font-medium block mt-0.5">{item.category}</span>
-                    <p className="text-[11px] text-slate-400 mt-1 leading-relaxed line-clamp-2">{item.desc}</p>
+                    <span className="text-[10px] text-blue-600 font-bold block mt-1">{item.category}</span>
+                    <p className="text-[11px] text-slate-600 mt-1 leading-relaxed line-clamp-2">{item.desc}</p>
                   </div>
                   {isSelected && (
-                    <div className="absolute top-3 right-3 size-4 rounded-full bg-blue-500 text-white flex items-center justify-center">
-                      <Check className="size-2.5 stroke-[3]" />
+                    <div className="absolute top-3 right-3 size-5 rounded-full bg-blue-600 text-white flex items-center justify-center shadow">
+                      <Check className="size-3 stroke-[3]" />
                     </div>
                   )}
                 </button>
@@ -976,15 +978,15 @@ function StudentAssessmentEngine() {
             <div
               onClick={() => setSelectedDomain("custom-domain")}
               className={cn(
-                "p-3.5 rounded-xl border text-left transition-all relative flex flex-col justify-between cursor-pointer",
+                "p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between cursor-pointer",
                 selectedDomain === "custom-domain"
-                  ? "border-blue-500 bg-blue-600/20 ring-2 ring-blue-500/50"
-                  : "border-dashed border-white/20 bg-black/30 hover:border-white/40"
+                  ? "border-blue-600 bg-blue-50/80 ring-2 ring-blue-600/40 shadow-md"
+                  : "border-dashed border-slate-300 bg-slate-50/50 hover:border-blue-400 hover:bg-white"
               )}
             >
               <div>
-                <span className="font-bold text-xs sm:text-sm text-white">Other / Custom Specialization</span>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <span className="font-bold text-xs sm:text-sm text-slate-900">Other / Custom Specialization</span>
+                <p className="text-[11px] text-slate-600 mt-1">
                   Type your custom domain if not found in the curated list.
                 </p>
                 {selectedDomain === "custom-domain" && (
@@ -994,15 +996,15 @@ function StudentAssessmentEngine() {
                     value={customDomainText}
                     onChange={(e) => setCustomDomainText(e.target.value)}
                     placeholder="e.g. Mechatronics, Bio-Informatics, Aerospace..."
-                    className="mt-2 w-full px-3 py-1.5 rounded-lg bg-black/70 border border-blue-400 text-xs text-white placeholder:text-slate-500 focus:outline-none"
+                    className="mt-2 w-full px-3 py-1.5 rounded-lg bg-white border border-blue-600 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none shadow-inner"
                   />
                 )}
               </div>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between shrink-0">
-            <Link to="/" className="text-xs text-slate-400 hover:text-white">
+          <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between shrink-0">
+            <Link to="/" className="text-xs font-semibold text-slate-600 hover:text-slate-900">
               Back to Home
             </Link>
             <Button
@@ -1012,7 +1014,7 @@ function StudentAssessmentEngine() {
                 isLoadingQuestions
               }
               onClick={handleProceedToGuidelines}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs px-6"
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow cursor-pointer"
             >
               {isLoadingQuestions ? (
                 <span className="flex items-center gap-2">
