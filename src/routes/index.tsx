@@ -265,62 +265,20 @@ function Welcome() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
-  const roleDropdownRef = useRef<HTMLDivElement>(null);
+  const rolesSectionRef = useRef<HTMLDivElement>(null);
 
-  const [collegeSearch, setCollegeSearch] = useState("");
-  const [collegeResults, setCollegeResults] = useState<{ id: string; name: string; state?: string }[]>([]);
-  const [isSearchingColleges, setIsSearchingColleges] = useState(false);
-  const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const scrollToRoles = () => {
+    rolesSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const currentStakeholder = STAKEHOLDERS.find((s) => s.id === selectedRole);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowCollegeDropdown(false);
-      }
-      if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target as Node)) {
-        setRoleDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    if (selectedRole !== "student" && selectedRole !== "academician") return;
-    const term = collegeSearch.trim();
-    if (term.length < 2) {
-      setCollegeResults([]);
-      setIsSearchingColleges(false);
-      return;
-    }
-
-    setIsSearchingColleges(true);
-    const delayDebounce = setTimeout(async () => {
-      const { data, error } = await supabase
-        .from("colleges")
-        .select("id, name, state")
-        .ilike("name", `%${term}%`)
-        .limit(10);
-
-      if (!error && data) {
-        setCollegeResults(data);
-      }
-      setIsSearchingColleges(false);
-    }, 280);
-
-    return () => clearTimeout(delayDebounce);
-  }, [collegeSearch, selectedRole]);
 
   async function handleAuthSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedRole || !currentStakeholder) return;
 
     const emailValue = emailInput.trim();
-    const finalOrg = (selectedRole === "student" ? (collegeSearch.trim() || orgInput.trim()) : orgInput.trim()) || currentStakeholder.orgPlaceholder;
+    const finalOrg = orgInput.trim() || currentStakeholder.orgPlaceholder;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailValue)) {
@@ -421,7 +379,9 @@ function Welcome() {
 
   return (
     <div className="min-h-screen relative flex flex-col font-sans text-[#0F172A] bg-[#F8FAFC]">
-      <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white/80 backdrop-blur-md px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs transition-all">
+      
+      {/* Header */}
+      <header className="sticky top-0 z-50 border-b border-[#E2E8F0] bg-white/90 backdrop-blur-md px-6 sm:px-10 py-3.5 flex items-center justify-between shadow-xs transition-all">
         <div className="flex items-center gap-3">
           <div className="flex size-9 items-center justify-center rounded-xl bg-[#2563EB] text-white font-bold text-sm shadow-sm">
             SB
@@ -431,53 +391,12 @@ function Welcome() {
 
         <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-[#64748B]">
           <a href="#" className="hover:text-[#2563EB] transition">Home</a>
-          <a href="#features" className="hover:text-[#2563EB] transition">Features</a>
-          <a href="#roles" className="hover:text-[#2563EB] transition">Explore Roles</a>
           <a href="#about" className="hover:text-[#2563EB] transition">About</a>
+          <button onClick={scrollToRoles} className="hover:text-[#2563EB] transition cursor-pointer font-semibold">Sign In / Register</button>
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="relative" ref={roleDropdownRef}>
-            <button
-              type="button"
-              onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#E2E8F0] bg-white text-xs font-semibold text-[#0F172A] shadow-2xs hover:border-[#2563EB] transition"
-            >
-              <span>👤 {currentStakeholder ? currentStakeholder.title : "Select Role"}</span>
-              <ChevronDown className="size-3.5 text-[#64748B]" />
-            </button>
-
-            {roleDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-52 rounded-2xl border border-[#E2E8F0] bg-white p-1.5 shadow-2xl z-50">
-                <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
-                  Professional Roles
-                </div>
-                {STAKEHOLDERS.map((role) => {
-                  const isSelected = selectedRole === role.id;
-                  return (
-                    <button
-                      key={role.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedRole(role.id);
-                        setRoleDropdownOpen(false);
-                      }}
-                      className={cn(
-                        "flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition",
-                        isSelected ? "bg-[#EFF6FF] text-[#2563EB] font-semibold" : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <span>{role.title}</span>
-                      {isSelected && <Check className="size-3.5 text-[#2563EB] stroke-[2.5]" />}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
           <LanguageMenu />
-          
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -491,81 +410,133 @@ function Welcome() {
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 z-40 bg-white border-b border-[#E2E8F0] p-4 shadow-xl flex flex-col gap-3">
           <a href="#" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">Home</a>
-          <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">Features</a>
-          <a href="#roles" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">Explore Roles</a>
-          <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2">About</a>
+          <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">About</a>
+          <button onClick={() => { scrollToRoles(); setMobileMenuOpen(false); }} className="text-xs font-semibold text-left text-blue-600 py-2">Sign In / Register</button>
         </div>
       )}
 
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-start px-4 sm:px-8 py-10 max-w-7xl mx-auto w-full">
+      {/* Hero Section matching reference image style */}
+      <section className="relative w-full h-[520px] sm:h-[600px] flex items-center justify-center overflow-hidden bg-[#0F172A]">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-40 transform scale-105"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2000&q=85')`,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/70 to-transparent" />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center space-y-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-xs font-semibold text-blue-300 backdrop-blur-md shadow-sm">
+            <Sparkles className="size-3.5 text-blue-400" />
+            Next-Gen Academic & Corporate Exchange
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.15]">
+            Business Consultant & Talent Platform
+          </h1>
+
+          <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
+            Connect students, corporate recruiters, deans, and certified industry mentors on a single verified platform.
+          </p>
+
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+            <Button
+              onClick={scrollToRoles}
+              className="px-7.5 py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/30 transition cursor-pointer"
+            >
+              Sign In / Register
+            </Button>
+            <a
+              href="#about"
+              className="px-7.5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs sm:text-sm backdrop-blur-md transition cursor-pointer"
+            >
+              Learn More
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-20 px-6 max-w-7xl mx-auto w-full">
+        <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
+          <h2 className="text-2xl sm:text-4xl font-black text-[#0F172A]">About SkillBridge</h2>
+          <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+            Explore how our platform seamlessly links academia with top industry enterprises.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
+            <div className="size-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563EB] font-bold text-sm">
+              01
+            </div>
+            <h3 className="text-base font-bold text-[#0F172A]">Verified Competency</h3>
+            <p className="text-xs text-[#64748B] leading-relaxed">
+              Diagnostic tests and proctored evaluations ensure reliable talent scoring for all students.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
+            <div className="size-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-bold text-sm">
+              02
+            </div>
+            <h3 className="text-base font-bold text-[#0F172A]">Expert Mentorship</h3>
+            <p className="text-xs text-[#64748B] leading-relaxed">
+              Connect 1:1 with industry staff architects to close skill deficits and build career portfolios.
+            </p>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-2xs space-y-3">
+            <div className="size-10 rounded-xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 font-bold text-sm">
+              03
+            </div>
+            <h3 className="text-base font-bold text-[#0F172A]">Direct Placements</h3>
+            <p className="text-xs text-[#64748B] leading-relaxed">
+              Unlock high-stipend corporate internships and direct interview shortlists upon course completion.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Role Selection & Login/Register Section */}
+      <section ref={rolesSectionRef} className="py-16 px-6 max-w-7xl mx-auto w-full border-t border-[#E2E8F0] bg-slate-50">
+        <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
+          <h2 className="text-xl sm:text-3xl font-black text-[#0F172A]">Select Your Professional Role</h2>
+          <p className="text-xs text-[#64748B]">Choose your role to sign in or register with SkillBridge.</p>
+        </div>
+
         {!selectedRole ? (
-          <div className="w-full flex flex-col items-center">
-            <div className="text-center max-w-3xl mx-auto mb-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-[#2563EB] mb-4 shadow-2xs">
-                <Sparkles className="size-3.5 text-[#2563EB]" />
-                Next-Gen Academic & Corporate Exchange
-              </div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#0F172A] leading-tight">
-                SkillBridge
-              </h1>
-              <p className="mt-3 text-sm sm:text-base text-[#64748B] max-w-xl mx-auto leading-relaxed">
-                Connect students, corporate recruiters, deans, and certified industry mentors on a single verified platform.
-              </p>
-            </div>
-
-            <div className="w-full max-w-2xl mx-auto mb-14 px-4 text-center">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#64748B] mb-2 block">Search SkillBridge</span>
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-[#64748B]" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search jobs, skills, courses, mentors..."
-                  className="w-full h-14 pl-12 pr-4 text-sm bg-white border border-[#E2E8F0] rounded-2xl shadow-sm outline-none text-[#0F172A] placeholder:text-[#64748B] focus:border-[#2563EB]"
-                />
-              </div>
-            </div>
-
-            <div id="roles" className="w-full">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#0F172A] tracking-tight">Explore by Role</h2>
-                <span className="text-xs text-[#64748B]">Select your professional workspace</span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {STAKEHOLDERS.map((item) => {
-                  const IconComponent = item.icon;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setSelectedRole(item.id)}
-                      className="group flex flex-col justify-between rounded-[20px] border border-[#E2E8F0] bg-white overflow-hidden text-left shadow-sm hover:-translate-y-1 hover:border-blue-400 transition"
-                    >
-                      <div className="relative h-40 w-full overflow-hidden bg-slate-100">
-                        <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover group-hover:scale-105 transition" />
-                        <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border bg-white/95", item.pillBg)}>
-                          {item.badge}
-                        </span>
-                      </div>
-                      <div className="p-5 flex-1 flex flex-col justify-between bg-white">
-                        <div>
-                          <h3 className="text-base font-bold text-[#0F172A] group-hover:text-[#2563EB] transition flex items-center justify-between">
-                            <span>{item.title}</span>
-                            <ArrowRight className="size-4 text-[#64748B]" />
-                          </h3>
-                          <p className="text-xs text-[#64748B] mt-2 line-clamp-2">{item.tagline}</p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {STAKEHOLDERS.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedRole(item.id)}
+                  className="group flex flex-col justify-between rounded-[20px] border border-[#E2E8F0] bg-white overflow-hidden text-left shadow-sm hover:-translate-y-1 hover:border-blue-400 transition cursor-pointer"
+                >
+                  <div className="relative h-40 w-full overflow-hidden bg-slate-100">
+                    <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover group-hover:scale-105 transition" />
+                    <span className={cn("absolute top-3 right-3 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border bg-white/95", item.pillBg)}>
+                      {item.badge}
+                    </span>
+                  </div>
+                  <div className="p-5 flex-1 flex flex-col justify-between bg-white">
+                    <div>
+                      <h3 className="text-base font-bold text-[#0F172A] group-hover:text-[#2563EB] transition flex items-center justify-between">
+                        <span>{item.title}</span>
+                        <ArrowRight className="size-4 text-[#64748B]" />
+                      </h3>
+                      <p className="text-xs text-[#64748B] mt-2 line-clamp-2">{item.tagline}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         ) : (
-          <div className="w-full max-w-4xl rounded-[20px] border-2 border-[#2563EB] bg-[#EFF6FF] shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-4">
+          <div className="w-full max-w-4xl mx-auto rounded-[20px] border-2 border-[#2563EB] bg-[#EFF6FF] shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 my-4">
             
             <div className="lg:col-span-5 relative flex flex-col justify-between overflow-hidden bg-[#0F172A] text-white p-6 sm:p-8 min-h-[360px]">
               <img src={currentStakeholder?.imageUrl} alt={currentStakeholder?.title} className="absolute inset-0 h-full w-full object-cover opacity-30" />
@@ -578,7 +549,7 @@ function Welcome() {
                     setSelectedRole(null);
                     setIsForgotPassword(false);
                   }}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white mb-6 transition"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white mb-6 transition cursor-pointer"
                 >
                   <ArrowLeft className="size-3.5" />
                   Back to Portals
@@ -605,14 +576,14 @@ function Welcome() {
                     <button
                       type="button"
                       onClick={() => setAuthMode("signin")}
-                      className={cn("px-3 py-1 rounded-lg font-semibold", authMode === "signin" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]")}
+                      className={cn("px-3 py-1 rounded-lg font-semibold cursor-pointer", authMode === "signin" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]")}
                     >
                       Sign In
                     </button>
                     <button
                       type="button"
                       onClick={() => setAuthMode("signup")}
-                      className={cn("px-3 py-1 rounded-lg font-semibold", authMode === "signup" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]")}
+                      className={cn("px-3 py-1 rounded-lg font-semibold cursor-pointer", authMode === "signup" ? "bg-white shadow-2xs text-[#0F172A]" : "text-[#64748B]")}
                     >
                       Register
                     </button>
@@ -637,12 +608,12 @@ function Welcome() {
                     </div>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className="w-full h-11 text-xs font-bold rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white">
+                  <Button type="submit" disabled={isSubmitting} className="w-full h-11 text-xs font-bold rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white cursor-pointer">
                     {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Send Password Reset Link"}
                   </Button>
 
                   <div className="text-center pt-2">
-                    <button type="button" onClick={() => setIsForgotPassword(false)} className="text-xs font-semibold text-[#2563EB] hover:underline">
+                    <button type="button" onClick={() => setIsForgotPassword(false)} className="text-xs font-semibold text-[#2563EB] hover:underline cursor-pointer">
                       Back to Sign In
                     </button>
                   </div>
@@ -698,7 +669,7 @@ function Welcome() {
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-semibold text-[#0F172A]">Password <span className="text-red-500">*</span></Label>
                       {authMode === "signin" && (
-                        <button type="button" onClick={() => setIsForgotPassword(true)} className="text-[11px] font-medium text-[#2563EB] hover:underline">
+                        <button type="button" onClick={() => setIsForgotPassword(true)} className="text-[11px] font-medium text-[#2563EB] hover:underline cursor-pointer">
                           Forgot Password?
                         </button>
                       )}
@@ -716,7 +687,7 @@ function Welcome() {
                     </div>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting} className={cn("w-full h-11 text-xs font-bold rounded-xl text-white", currentStakeholder?.buttonClass)}>
+                  <Button type="submit" disabled={isSubmitting} className={cn("w-full h-11 text-xs font-bold rounded-xl text-white cursor-pointer", currentStakeholder?.buttonClass)}>
                     {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : authMode === "signin" ? `Sign In` : `Create Account`}
                   </Button>
                 </form>
@@ -724,9 +695,10 @@ function Welcome() {
             </div>
           </div>
         )}
-      </main>
+      </section>
 
-      <footer className="relative z-10 border-t border-[#E2E8F0] bg-white py-4 px-6 text-center text-xs text-[#64748B]">
+      {/* Footer */}
+      <footer className="border-t border-[#E2E8F0] bg-white py-6 px-6 text-center text-xs text-[#64748B]">
         SkillBridge Unified Portal &copy; 2026. Higher Education & Industry Infrastructure Frameworks.
       </footer>
     </div>
