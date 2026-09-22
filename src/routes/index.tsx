@@ -254,6 +254,7 @@ function Welcome() {
   const [selectedRole, setSelectedRole] = useState<RoleId | null>(null);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
 
   const [stakeholderId, setStakeholderId] = useState("");
   const [emailInput, setEmailInput] = useState("");
@@ -423,8 +424,8 @@ function Welcome() {
             Unified Academia & Industry Exchange
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 leading-[1.15]">
-            Business Consultant & Talent Platform
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.15]">
+            Bridging Academia & Industry Talent Platform
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -438,12 +439,13 @@ function Welcome() {
             >
               Sign In / Register
             </Button>
-            <a
-              href="#about"
+            <Button
+              onClick={() => setShowLearnMoreModal(true)}
+              variant="outline"
               className="px-8.5 py-4 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm shadow-2xs transition cursor-pointer"
             >
               Learn More
-            </a>
+            </Button>
           </div>
         </div>
       </section>
@@ -689,6 +691,61 @@ function Welcome() {
           </div>
         )}
       </section>
+
+      {/* Learn More Detailed Information Modal */}
+      {showLearnMoreModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-fade-in text-slate-900">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="size-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                  SB
+                </div>
+                <h3 className="text-lg font-black text-slate-900">About SkillBridge Infrastructure</h3>
+              </div>
+              <button 
+                onClick={() => setShowLearnMoreModal(false)}
+                className="size-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+              <p>
+                <strong className="text-slate-900">SkillBridge</strong> is a comprehensive institutional career readiness and talent verification ecosystem designed to bridge the gap between academic institutions and top-tier global enterprise recruitment.
+              </p>
+              
+              <div className="space-y-2 pt-2">
+                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">How SkillBridge Works:</h4>
+                <ul className="space-y-2 list-disc pl-4 text-xs sm:text-sm">
+                  <li><strong>For Students:</strong> Take proctored domain-specific skill diagnostics, undergo a mandatory 4-week structured mentor curriculum, practice with AI voice/camera mock interviews, and unlock verified high-stipend placement drives.</li>
+                  <li><strong>For Recruiters:</strong> Access pre-vetted, audited talent pools with verified competency scores, eliminating lengthy initial screening rounds and hiring 3.2x faster.</li>
+                  <li><strong>For Academicians:</strong> Monitor real-time department cohort readiness metrics, export accreditation reports (NIRF & NAAC), and align syllabi with modern industry standards.</li>
+                  <li><strong>For Mentors:</strong> Guide student final-year capstones, review code repositories, and endorse top-performing portfolios with official credentials.</li>
+                </ul>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 text-xs text-blue-900 space-y-1">
+                <span className="font-bold block">Secure & Transparent Ecosystem</span>
+                <span>Powered by advanced proctoring analytics, encrypted session management, and role-based access control.</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-slate-100">
+              <Button
+                onClick={() => {
+                  setShowLearnMoreModal(false);
+                  scrollToRoles();
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl cursor-pointer"
+              >
+                Get Started Now <ArrowRight className="size-4 ml-1.5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-6 px-6 text-center text-xs text-slate-500">
