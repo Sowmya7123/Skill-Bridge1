@@ -193,7 +193,7 @@ function LanguageMenu() {
   const handleLanguageSelect = (langCode: string) => {
     if (typeof window === "undefined") return;
     document.cookie = `googtrans=/en/${langCode}; path=/;`;
-    document.cookie = `googtrans=/en/${langCode}; domain=.${window.location.hostname}; path=/;`;
+    document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
     setCurrentLang(langCode);
     setIsOpen(false);
     window.location.reload();
@@ -215,7 +215,7 @@ function LanguageMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition"
+        className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer"
         title="Language"
       >
         <MoreVertical className="size-4" />
@@ -232,7 +232,7 @@ function LanguageMenu() {
               key={lang.code}
               type="button"
               onClick={() => handleLanguageSelect(lang.code)}
-              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer"
             >
               <div className="flex flex-col text-left">
                 <span className="font-semibold text-slate-900">{lang.native}</span>
@@ -397,7 +397,7 @@ function Welcome() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition"
+            className="md:hidden flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition cursor-pointer"
           >
             {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
           </button>
@@ -409,11 +409,11 @@ function Welcome() {
         <div className="md:hidden absolute top-16 left-0 right-0 z-40 bg-white border-b border-slate-200 p-4 shadow-xl flex flex-col gap-3">
           <a href="#" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">Home</a>
           <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">About</a>
-          <button onClick={() => { scrollToRoles(); setMobileMenuOpen(false); }} className="text-xs font-semibold text-left text-blue-600 py-2">Sign In / Register</button>
+          <button onClick={() => { scrollToRoles(); setMobileMenuOpen(false); }} className="text-xs font-semibold text-left text-blue-600 py-2 cursor-pointer">Sign In / Register</button>
         </div>
       )}
 
-      {/* Professional Light Theme Hero Section */}
+      {/* Hero Section */}
       <section className="relative w-full py-24 sm:py-32 px-6 bg-gradient-to-b from-white via-slate-50 to-slate-100 border-b border-slate-200 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-60" />
 
