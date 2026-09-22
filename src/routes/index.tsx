@@ -11,13 +11,11 @@ import {
   Lock,
   IdCard,
   Building2,
-  MoreVertical,
-  Globe,
-  Check,
   Sparkles,
   Loader2,
   Menu,
-  X
+  X,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -170,79 +168,28 @@ const STAKEHOLDERS: StakeholderTheme[] = [
   },
 ];
 
-function LanguageMenu() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState("en");
-  const menuRef = useRef<HTMLDivElement>(null);
-
+function GoogleTranslateWidget() {
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
-    if (match && match[1]) {
-      setCurrentLang(match[1]);
+    // Add Google Translate Script if not present
+    if (typeof window !== "undefined" && !document.getElementById("google-translate-script")) {
+      const addScript = document.createElement("script");
+      addScript.id = "google-translate-script";
+      addScript.type = "text/javascript";
+      addScript.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      document.body.appendChild(addScript);
+
+      (window as any).googleTranslateElementInit = () => {
+        new (window as any).google.translate.TranslateElement(
+          { pageLanguage: "en", includedLanguages: "en,te,hi,ta,kn,ml,mr,bn", layout: (window as any).google.translate.TranslateElement.InlineLayout.SIMPLE },
+          "google_translate_element"
+        );
+      };
     }
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLanguageSelect = (langCode: string) => {
-    if (typeof window === "undefined") return;
-    document.cookie = `googtrans=/en/${langCode}; path=/;`;
-    document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
-    setCurrentLang(langCode);
-    setIsOpen(false);
-    window.location.reload();
-  };
-
-  const languages = [
-    { code: "en", label: "English", native: "English" },
-    { code: "te", label: "Telugu", native: "తెలుగు" },
-    { code: "hi", label: "Hindi", native: "हिंदी" },
-    { code: "ta", label: "Tamil", native: "தமிழ்" },
-    { code: "kn", label: "Kannada", native: "ಕನ್ನಡ" },
-    { code: "ml", label: "Malayalam", native: "മലയാളം" },
-    { code: "mr", label: "Marathi", native: "मराठी" },
-    { code: "bn", label: "Bengali", native: "বাংলা" },
-  ];
-
   return (
-    <div className="relative inline-block text-left" ref={menuRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer"
-        title="Language"
-      >
-        <MoreVertical className="size-4" />
-      </button>
-
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1 sticky top-0 bg-white z-10">
-            <Globe className="size-3.5" />
-            Select Language
-          </div>
-          {languages.map((lang) => (
-            <button
-              key={lang.code}
-              type="button"
-              onClick={() => handleLanguageSelect(lang.code)}
-              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer"
-            >
-              <div className="flex flex-col text-left">
-                <span className="font-semibold text-slate-900">{lang.native}</span>
-                <span className="text-[10px] text-slate-400">{lang.label}</span>
-              </div>
-              {currentLang === lang.code && <Check className="size-3.5 text-blue-600 stroke-[2.5]" />}
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="flex items-center">
+      <div id="google_translate_element" className="scale-95 origin-right" />
     </div>
   );
 }
@@ -393,7 +340,7 @@ function Welcome() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <LanguageMenu />
+          <GoogleTranslateWidget />
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
