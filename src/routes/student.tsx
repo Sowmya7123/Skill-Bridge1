@@ -1728,53 +1728,71 @@ function StudentAssessmentEngine() {
             })}
           </div>
 
+          {/* Module Study & Video Material Verification Modal */}
           {selectedModule && (
-            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-white/20 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-white">
-                <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                  <h3 className="text-sm font-bold text-white">{selectedModule.title}</h3>
-                  <button onClick={() => { setSelectedModule(null); setIsTimerRunning(false); }} className="text-xs text-slate-400 hover:text-white cursor-pointer">Close</button>
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-blue-500/30 rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl text-white max-h-[90vh] overflow-y-auto">
+                
+                {/* Modal Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-8 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+                      <BookOpen className="size-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">{selectedModule.title}</h3>
+                      <span className="text-[10px] text-blue-400 uppercase tracking-wider font-semibold">Duration: {selectedModule.duration}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => setSelectedModule(null)} className="text-xs text-slate-400 hover:text-white cursor-pointer px-2 py-1 rounded bg-white/5">Close ✕</button>
                 </div>
 
+                {/* Video / Study Content View */}
                 <div className="space-y-4 text-xs text-slate-300">
-                  <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-2">
-                    <span className="font-bold text-blue-400 text-xs uppercase tracking-wider block">Curriculum Study Material</span>
-                    <p className="text-slate-200 leading-relaxed text-xs">
+                  <div className="p-4 rounded-xl bg-black/60 border border-white/10 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-blue-300 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                        <Video className="size-4 text-cyan-400" /> Module Video & Learning Resource
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">Required Watch Time: {selectedModule.duration}</span>
+                    </div>
+                    
+                    <p className="text-slate-200 leading-relaxed text-xs sm:text-sm font-normal bg-slate-950 p-4 rounded-lg border border-white/5">
                       {selectedModule.content}
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-950 border border-blue-500/30 text-center space-y-2">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Mandatory Study Timer</span>
-                    <div className="text-3xl font-black font-mono text-emerald-400">
-                      {Math.floor(moduleTimer / 60)}:{(moduleTimer % 60).toString().padStart(2, '0')}
-                    </div>
+                  <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs flex items-center gap-3">
+                    <AlertTriangle className="size-5 text-amber-400 shrink-0" />
+                    <span>Please watch the video / review the complete study matter for the specified duration before marking this module as verified.</span>
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
-                  <Button onClick={() => { setSelectedModule(null); setIsTimerRunning(false); }} variant="ghost" className="text-xs text-slate-300 cursor-pointer">Cancel</Button>
-                  <Button
-                    disabled={moduleTimer > 0}
-                    onClick={() => {
-                      setCurriculum(prev =>
-                        prev.map(week => ({
-                          ...week,
-                          modules: week.modules.map(m => m.id === selectedModule.id ? { ...m, completed: true } : m)
-                        }))
-                      );
-                      setSelectedModule(null);
-                      setIsTimerRunning(false);
-                      toast.success("Module studied and verified successfully!");
-                    }}
-                    className={cn(
-                      "px-6 py-2 rounded-xl text-xs font-bold shadow cursor-pointer",
-                      moduleTimer === 0 ? "bg-emerald-600 hover:bg-emerald-500 text-white" : "bg-slate-800 text-slate-500 cursor-not-allowed"
-                    )}
-                  >
-                    {moduleTimer === 0 ? "Mark as Studied & Complete ✅" : `Study Time Remaining (${Math.floor(moduleTimer / 60)}m)...`}
-                  </Button>
+                {/* Manual Verification & Mark as Completed Action */}
+                <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    Status: {selectedModule.completed ? "Verified & Completed ✅" : "Pending Verification ⏳"}
+                  </span>
+                  <div className="flex gap-2">
+                    <Button onClick={() => setSelectedModule(null)} variant="ghost" className="text-xs text-slate-300 cursor-pointer">Cancel</Button>
+                    <Button
+                      onClick={() => {
+                        setCurriculum(prev =>
+                          prev.map(week => ({
+                            ...week,
+                            modules: week.modules.map(m => m.id === selectedModule.id ? { ...m, completed: true } : m)
+                          }))
+                        );
+                        setSelectedModule(null);
+                        toast.success(`Module "${selectedModule.title}" marked as completed and verified! 🎉`);
+                      }}
+                      className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg cursor-pointer transition hover:scale-105"
+                    >
+                      Mark as Completed & Verify 🎯
+                    </Button>
+                  </div>
                 </div>
+
               </div>
             </div>
           )}
