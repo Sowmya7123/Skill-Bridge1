@@ -1032,7 +1032,7 @@ function StudentAssessmentEngine() {
   }
 
   // -------------------------------------------------------------
-  // VIEW 2: DISQUALIFIED SCREEN WITH FULL AUDIT TRAIL
+  // VIEW 2: DISQUALIFIED SCREEN WITH FULL AUDIT TRAIL (UPDATED)
   // -------------------------------------------------------------
   if (isDisqualified) {
     return (
@@ -1063,11 +1063,24 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          <Link to="/" className="inline-block mt-8">
-            <Button className="bg-white/10 hover:bg-white/20 text-white text-xs border border-white/20">
-              Return to Portal Home
+          <div className="mt-8 flex items-center justify-center gap-4">
+            <Button
+              onClick={() => {
+                setIsDisqualified(false);
+                setStrikes([]);
+                setAssessmentStage("domain-selection");
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-2.5 rounded-xl cursor-pointer shadow-lg"
+            >
+              Retake Test / Change Track
             </Button>
-          </Link>
+            
+            <Link to="/">
+              <Button className="bg-white/10 hover:bg-white/20 text-white text-xs border border-white/20 cursor-pointer">
+                Return to Portal Home
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
