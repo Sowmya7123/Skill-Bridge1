@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
 });
 
 // -------------------------------------------------------------
-// 8-LANGUAGE DICTIONARY FOR INSTANT TRANSLATION
+// INSTANT FULL-WEBSITE MULTILINGUAL DICTIONARY
 // -------------------------------------------------------------
 type LanguageCode = "en" | "te" | "hi" | "ta" | "kn" | "ml" | "mr" | "bn";
 
@@ -64,7 +64,15 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_title": "Direct Placements",
     "feat3_desc": "Unlock high-stipend corporate internships and direct interview shortlists once readiness thresholds are achieved.",
     "select_role_title": "Select Your Professional Role",
-    "select_role_desc": "Choose your role to sign in or register with SkillBridge."
+    "select_role_desc": "Choose your role to sign in or register with SkillBridge.",
+    "auth_signin": "Authorized Login",
+    "auth_signup": "New Registration",
+    "enter_creds": "Enter credentials",
+    "email_label": "Email Address",
+    "password_label": "Password",
+    "forgot_pass": "Forgot Password?",
+    "btn_login": "Sign In",
+    "btn_register": "Create Account"
   },
   te: {
     "home": "హోమ్",
@@ -80,11 +88,19 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat1_title": "ధృవీకరించబడిన సామర్థ్యం",
     "feat1_desc": "సాంకేతిక పరీక్షలు మరియు మూల్యాంకనాలు ప్రతి విద్యార్థికి నిష్పాక్షికమైన నివేదికలను అందిస్తాయి.",
     "feat2_title": "నిపుణుల మార్గదర్శకత్వం",
-    "feat2_desc": "ఇండస్ట్రీ నిపుణులతో 1:1 కనెక్ట్ అయి మీ నైపుణ్యాలను మెరుగుపరుచుకోండి.",
+    "feat2_desc": "ఇండస్ట్రీ నిపుణులతో కనెక్ట్ అయి మీ నైపుణ్యాలను మెరుగుపరుచుకోండి.",
     "feat3_title": "నేరుగా ప్లేస్‌మెంట్లు",
     "feat3_desc": "అర్హత సాధించిన తర్వాత కార్పొరేట్ ఇంటర్న్‌షిప్‌లు మరియు ఇంటర్వ్యూలను పొందండి.",
     "select_role_title": "మీ వృత్తిపరమైన పాత్రను ఎంచుకోండి",
-    "select_role_desc": "స్కిల్‌బ్రిడ్జ్‌లో సైన్ ఇన్ చేయడానికి లేదా రిజిస్టర్ చేయడానికి మీ పాత్రను ఎంచుకోండి."
+    "select_role_desc": "స్కిల్‌బ్రిడ్జ్‌లో సైన్ ఇన్ చేయడానికి లేదా రిజిస్టర్ చేయడానికి మీ పాత్రను ఎంచుకోండి.",
+    "auth_signin": "అధికారిక లాగిన్",
+    "auth_signup": "కొత్త రిజిస్ట్రేషన్",
+    "enter_creds": "మీ వివరాలను నమోదు చేయండి",
+    "email_label": "ఈమెయిల్ చిరునామా",
+    "password_label": "పాస్‌వర్డ్",
+    "forgot_pass": "పాస్‌వర్డ్ మర్చిపోయారా?",
+    "btn_login": "సైన్ ఇన్",
+    "btn_register": "ఖాతాను సృష్టించండి"
   },
   hi: {
     "home": "होम",
@@ -98,13 +114,21 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "about_title": "स्किलब्रिज के बारे में",
     "about_desc": "हमारा मंच शैक्षणिक संस्थानों और कॉर्पोरेट जगत के बीच की दूरी को कम करता है।",
     "feat1_title": "सत्यापित दक्षता",
-    "feat1_desc": "निदान तकनीकी परीक्षण और मूल्यांकन प्रत्येक छात्र के लिए निष्पक्ष ऑडिट ट्रेल प्रदान करते हैं।",
+    "feat1_desc": "तकनीकी परीक्षण और मूल्यांकन प्रत्येक छात्र के लिए निष्पक्ष ऑडिट ट्रेल प्रदान करते हैं।",
     "feat2_title": "विशेषज्ञ मार्गदर्शन",
     "feat2_desc": "उद्योग विशेषज्ञों से जुड़ें और अपने कौशल अंतराल को दूर करें।",
     "feat3_title": "प्रत्यक्ष प्लेसमेंट",
-    "feat3_desc": "योग्यता प्राप्त करने के बाद उच्च-वेतन वाली कॉर्पोरेट इंटर्नशिप और साक्षात्कार प्राप्त करें।",
+    "feat3_desc": "योग्यता प्राप्त करने के बाद उच्च-वेतन वाली कॉर्पोरेट इंटर्नशिप प्राप्त करें।",
     "select_role_title": "अपनी व्यावसायिक भूमिका चुनें",
-    "select_role_desc": "स्किलब्रिज के साथ साइन इन या रजिस्टर करने के लिए अपनी भूमिका चुनें।"
+    "select_role_desc": "स्किलब्रिज के साथ साइन इन या रजिस्टर करने के लिए अपनी भूमिका चुनें।",
+    "auth_signin": "अधिकृत लॉगिन",
+    "auth_signup": "नया पंजीकरण",
+    "enter_creds": "क्रेडेंशियल दर्ज करें",
+    "email_label": "ईमेल पता",
+    "password_label": "पासवर्ड",
+    "forgot_pass": "पासवर्ड भूल गए?",
+    "btn_login": "साइन इन",
+    "btn_register": "खाता बनाएं"
   },
   ta: {
     "home": "முகப்பு",
@@ -112,7 +136,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "signin_reg": "உள்நுழைக / பதிவு செய்க",
     "badge": "கல்வி மற்றும் தொழில்துறை பரிமாற்றம்",
     "hero_title": "கல்வி மற்றும் தொழில்துறை திறமை தளம்",
-    "hero.desc": "மாணவர்கள், நிறுவன recruiters மற்றும் mentor-களை இணைக்கும் தளம்.",
+    "hero_desc": "மாணவர்கள், நிறுவன recruiters மற்றும் mentor-களை இணைக்கும் தளம்.",
     "btn_signin": "உள்நுழைக / பதிவு செய்க",
     "btn_learn": "மேலும் அறிக",
     "about_title": "ஸ்கில்பிரிட்ஜ் பற்றி",
@@ -124,7 +148,15 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_title": "நேரடி வேலை வாய்ப்புகள்",
     "feat3_desc": "கார்ப்பரேட் இன்டர்ன்ஷிப்களைப் பெறுங்கள்.",
     "select_role_title": "உங்கள் தொழில்முறை பங்கைத் தேர்ந்தெடுக்கவும்",
-    "select_role_desc": "ஸ்கில்பிரிட்ஜில் உள்நுழைய அல்லது பதிவு செய்ய உங்கள் பங்கைத் தேர்ந்தெடுக்கவும்."
+    "select_role_desc": "ஸ்கில்பிரிட்ஜில் உள்நுழைய அல்லது பதிவு செய்ய உங்கள் பங்கைத் தேர்ந்தெடுக்கவும்.",
+    "auth_signin": "உள்நுழைவு",
+    "auth_signup": "புதிய பதிவு",
+    "enter_creds": "சான்றுகளை உள்ளிடவும்",
+    "email_label": "மின்னஞ்சல் முகவரி",
+    "password_label": "கடவுச்சொல்",
+    "forgot_pass": "கடவுச்சொல்லை மறந்துவிட்டீர்களா?",
+    "btn_login": "உள்நுழைக",
+    "btn_register": " கணக்கை உருவாக்கு"
   },
   kn: {
     "home": "ಮುಖಪುಟ",
@@ -144,7 +176,15 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_title": "ನೇರ ಉದ್ಯೋಗ ಅವಕಾಶಗಳು",
     "feat3_desc": "ಕಾರ್ಪೊರೇಟ್ ಇಂಟರ್ನ್‌ಶಿಪ್‌ಗಳನ್ನು ಪಡೆಯಿರಿ.",
     "select_role_title": "ನಿಮ್ಮ ವೃತ್ತಿಪರ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
-    "select_role_desc": "ಸ್ಕಿಲ್ ಬ್ರಿಡ್ಜ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಮಾಡಲು ಅಥವಾ ನೋಂದಾಯಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ."
+    "select_role_desc": "ಸ್ಕಿಲ್ ಬ್ರಿಡ್ಜ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಮಾಡಲು ಅಥವಾ ನೋಂದಾಯಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "auth_signin": "ಅಧಿಕೃತ ಲಾಗಿನ್",
+    "auth_signup": "ಹೊಸ ನೋಂದಣಿ",
+    "enter_creds": "ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ",
+    "email_label": "ಇಮೇಲ್ ವಿಳಾಸ",
+    "password_label": "ಪಾಸ್‌ವರ್ಡ್",
+    "forgot_pass": "ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರುವಿರಾ?",
+    "btn_login": "ಸೈನ್ ಇನ್",
+    "btn_register": "ಖಾತೆ ರಚಿಸಿ"
   },
   ml: {
     "home": "ഹോം",
@@ -164,7 +204,15 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_title": "നേരിട്ടുള്ള പ്ലേസ്‌മെന്റുകൾ",
     "feat3_desc": "കോർപ്പറേറ്റ് ഇന്റേൺഷിപ്പുകൾ നേടുക.",
     "select_role_title": "നിങ്ങളുടെ പ്രൊഫഷണൽ റോൾ തിരഞ്ഞെടുക്കുക",
-    "select_role_desc": "സ്കിൽബ്രിഡ്ജിൽ സൈൻ ഇൻ ചെയ്യാനോ രജിസ്റ്റർ ചെയ്യാനോ റോൾ തിരഞ്ഞെടുക്കുക."
+    "select_role_desc": "സ്കിൽബ്രിഡ്ജിൽ സൈൻ ഇൻ ചെയ്യാനോ രജിസ്റ്റർ ചെയ്യാനോ റോൾ തിരഞ്ഞെടുക്കുക.",
+    "auth_signin": "അംഗീകൃത ലോഗിൻ",
+    "auth_signup": "പുതിയ രജിസ്ട്രേഷൻ",
+    "enter_creds": "വിവരങ്ങൾ നൽകുക",
+    "email_label": "ഇമെയിൽ വിലാസം",
+    "password_label": "പാസ്‌വേർഡ്",
+    "forgot_pass": "പാസ്‌വേർഡ് മറന്നുപോയോ?",
+    "btn_login": "സൈൻ ഇൻ",
+    "btn_register": "അക്കൗണ്ട് സൃഷ്ടിക്കുക"
   },
   mr: {
     "home": "मुखपृष्ठ",
@@ -184,7 +232,15 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_title": "थेट प्लेसमेंट",
     "feat3_desc": "कॉर्पोरेट इंटर्नशिप मिळवा.",
     "select_role_title": "तुमची व्यावसायिक भूमिका निवडा",
-    "select_role_desc": "स्किलब्रिजमध्ये साइन इन किंवा नोंदणी करण्यासाठी तुमची भूमिका निवडा."
+    "select_role_desc": "स्किलब्रिजमध्ये साइन इन किंवा नोंदणी करण्यासाठी तुमची भूमिका निवडा.",
+    "auth_signin": "अधिकृत लॉगिन",
+    "auth_signup": "नवीन नोंदणी",
+    "enter_creds": "तपशील प्रविष्ट करा",
+    "email_label": "ईमेल पत्ता",
+    "password_label": "पासवर्ड",
+    "forgot_pass": "पासवर्ड विसरलात?",
+    "btn_login": "साइन इन",
+    "btn_register": "खाते तयार करा"
   },
   bn: {
     "home": "হোম",
@@ -204,7 +260,15 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_title": "সরাসরি প্লেসমেন্ট",
     "feat3_desc": "কর্পোরেট ইন্টার্নশিপ আনলক করুন।",
     "select_role_title": "আপনার পেশাদার ভূমিকা নির্বাচন করুন",
-    "select_role_desc": "সাইন ইন বা রেজিস্টার করতে আপনার ভূমিকা নির্বাচন করুন।"
+    "select_role_desc": "সাইন ইন বা রেজিস্টার করতে আপনার ভূমিকা নির্বাচন করুন।",
+    "auth_signin": "অনুমোদিত লগইন",
+    "auth_signup": "নতুন নিবন্ধন",
+    "enter_creds": "তথ্য দিন",
+    "email_label": "ইমেল ঠিকানা",
+    "password_label": "পাসওয়ার্ড",
+    "forgot_pass": "পাসওয়ার্ড ভুলে গেছেন?",
+    "btn_login": "সাইন ইন",
+    "btn_register": "অ্যাকাউন্ট তৈরি করুন"
   }
 };
 
@@ -787,10 +851,10 @@ function Welcome() {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="text-base font-bold text-slate-900">
-                    {isForgotPassword ? "Reset Password" : authMode === "signin" ? "Authorized Login" : "New Registration"}
+                    {isForgotPassword ? "Reset Password" : authMode === "signin" ? t("auth_signin") : t("auth_signup")}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    {isForgotPassword ? "Enter your email to receive a password reset link" : "Enter credentials"}
+                    {isForgotPassword ? "Enter your email to receive a password reset link" : t("enter_creds")}
                   </p>
                 </div>
 
@@ -806,7 +870,7 @@ function Welcome() {
                           : "text-slate-600 hover:text-blue-600 hover:bg-slate-200/60"
                       )}
                     >
-                      Sign In
+                      {t("btn_login")}
                     </button>
                     <button
                       type="button"
@@ -827,7 +891,7 @@ function Welcome() {
               {isForgotPassword ? (
                 <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold text-slate-900">Email Address <span className="text-red-500">*</span></Label>
+                    <Label className="text-xs font-semibold text-slate-900">{t("email_label")} <span className="text-red-500">*</span></Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
@@ -890,7 +954,6 @@ function Welcome() {
                         )}
                       </div>
 
-                      {/* College Auto-Complete Dropdown */}
                       {showCollegeDropdown && collegeResults.length > 0 && (selectedRole === "student" || selectedRole === "academician") && (
                         <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl z-50 p-1">
                           {collegeResults.map((col) => (
@@ -929,10 +992,10 @@ function Welcome() {
 
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-semibold text-slate-900">Password <span className="text-red-500">*</span></Label>
+                      <Label className="text-xs font-semibold text-slate-900">{t("password_label")} <span className="text-red-500">*</span></Label>
                       {authMode === "signin" && (
                         <button type="button" onClick={() => setIsForgotPassword(true)} className="text-[11px] font-medium text-blue-600 hover:underline cursor-pointer">
-                          Forgot Password?
+                          {t("forgot_pass")}
                         </button>
                       )}
                     </div>
@@ -950,7 +1013,7 @@ function Welcome() {
                   </div>
 
                   <Button type="submit" disabled={isSubmitting} className={cn("w-full h-11 text-xs font-bold rounded-xl text-white cursor-pointer", currentStakeholder?.buttonClass)}>
-                    {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : authMode === "signin" ? `Sign In` : `Create Account`}
+                    {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : authMode === "signin" ? t("btn_login") : t("btn_register")}
                   </Button>
                 </form>
               )}
@@ -982,21 +1045,6 @@ function Welcome() {
               <p>
                 <strong className="text-slate-900">SkillBridge</strong> is a comprehensive institutional career readiness and talent verification ecosystem designed to bridge the gap between academic institutions and top-tier global enterprise recruitment.
               </p>
-              
-              <div className="space-y-2 pt-2">
-                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">How SkillBridge Works:</h4>
-                <ul className="space-y-2 list-disc pl-4 text-xs sm:text-sm">
-                  <li><strong>For Students:</strong> Take proctored domain-specific skill diagnostics, undergo a mandatory 4-week structured mentor curriculum, practice with AI voice/camera mock interviews, and unlock verified high-stipend placement drives.</li>
-                  <li><strong>For Recruiters:</strong> Access pre-vetted, audited talent pools with verified competency scores, eliminating lengthy initial screening rounds and hiring 3.2x faster.</li>
-                  <li><strong>For Academicians:</strong> Monitor real-time department cohort readiness metrics, export accreditation reports (NIRF & NAAC), and align syllabi with modern industry standards.</li>
-                  <li><strong>For Mentors:</strong> Guide student final-year capstones, review code repositories, and endorse top-performing portfolios with official credentials.</li>
-                </ul>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 text-xs text-blue-900 space-y-1">
-                <span className="font-bold block">Secure & Transparent Ecosystem</span>
-                <span>Powered by advanced proctoring analytics, encrypted session management, and role-based access control.</span>
-              </div>
             </div>
 
             <div className="flex justify-end pt-4 border-t border-slate-100">
