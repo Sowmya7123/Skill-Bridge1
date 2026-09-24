@@ -40,9 +40,6 @@ export const Route = createFileRoute("/")({
   component: Welcome,
 });
 
-// -------------------------------------------------------------
-// FULL WEBSITE MULTILINGUAL DICTIONARY
-// -------------------------------------------------------------
 type LanguageCode = "en" | "te" | "hi" | "ta" | "kn" | "ml" | "mr" | "bn";
 
 const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
@@ -73,7 +70,31 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "Password",
     "forgot_pass": "Forgot Password?",
     "btn_login": "Sign In",
-    "btn_register": "Create Account"
+    "btn_register": "Create Account",
+
+    "role.student": "Student",
+    "role.student.badge": "Student Portal",
+    "role.student.tagline": "Build your skills and discover opportunities.",
+    "role.student.desc": "Industry-aligned skill tests, verified project portfolios, and direct hiring tracks.",
+    "role.student.idlabel": "University Roll Number / Hall Ticket ID",
+
+    "role.recruiter": "Recruiter",
+    "role.recruiter.badge": "Recruitment Suite",
+    "role.recruiter.tagline": "Hire pre-screened talent with audited skill scores.",
+    "role.recruiter.desc": "Discover candidates with verified competencies and campus academic audit trails.",
+    "role.recruiter.idlabel": "Corporate Employee ID / Work ID",
+
+    "role.academician": "Academician",
+    "role.academician.badge": "Faculty Portal",
+    "role.academician.tagline": "Track batch competencies and align syllabus to market trends.",
+    "role.academician.desc": "Monitor real-time cohort readiness metrics and export verified documentation.",
+    "role.academician.idlabel": "Faculty Institutional ID",
+
+    "role.mentor": "Mentor",
+    "role.mentor.badge": "Mentor Desk",
+    "role.mentor.tagline": "Review capstone projects and mentor future engineers.",
+    "role.mentor.desc": "Guide student final-year capstones and endorse high-potential portfolios.",
+    "role.mentor.idlabel": "Mentor Registration ID",
   },
   te: {
     "home": "హోమ్",
@@ -102,7 +123,31 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "పాస్‌వర్డ్",
     "forgot_pass": "పాస్‌వర్డ్ మర్చిపోయారా?",
     "btn_login": "సైన్ ఇన్",
-    "btn_register": "ఖాతాను సృష్టించండి"
+    "btn_register": "ఖాతాను సృష్టించండి",
+
+    "role.student": "విద్యార్థి",
+    "role.student.badge": "స్టూడెంట్ పోర్టల్",
+    "role.student.tagline": "మీ నైపుణ్యాలను పెంచుకోండి మరియు అవకాశాలను కనుగొనండి.",
+    "role.student.desc": "ఇండస్ట్రీ స్థాయి నైపుణ్య పరీక్షలు మరియు ప్రాజెక్ట్ పోర్ట్‌ఫోలియోలు.",
+    "role.student.idlabel": "యూనివర్సిటీ రోల్ నంబర్ / హాల్ టికెట్ ఐడి",
+
+    "role.recruiter": "రిక్రూటర్",
+    "role.recruiter.badge": "రిక్రిూట్‌మెంట్ సూట్",
+    "role.recruiter.tagline": "ఆడిట్ చేయబడిన నైపుణ్య స్కోర్‌లతో ప్రతిభను నియమించుకోండి.",
+    "role.recruiter.desc": "ధృవీకరించబడిన సామర్థ్యాలు ఉన్న అభ్యర్థులను కనుగొనండి.",
+    "role.recruiter.idlabel": "కార్పొరేట్ ఎంప్లాయ్ ఐడి / వర్క్ ఐడి",
+
+    "role.academician": "అకాడెమిషియన్",
+    "role.academician.badge": "ఫ్యాకల్టీ పోర్టల్",
+    "role.academician.tagline": "సమర్థతను ట్రాక్ చేయండి మరియు సిలబస్‌ను మార్కెట్ ట్రెండ్‌లకు అనుగుణంగా మార్చండి.",
+    "role.academician.desc": "నిజ-సమయ కోహोर्ट సిద్ధత మెట్రిక్‌లను పర్యవేక్షించండి.",
+    "role.academician.idlabel": "ఫ్యాకల్టీ ఇన్స్టిట్యూషనల్ ఐడి",
+
+    "role.mentor": "మెంటార్",
+    "role.mentor.badge": "మెంటార్ డెస్క్",
+    "role.mentor.tagline": "ప్రాజెక్ట్‌లను సమీక్షించండి మరియు భవిష్యత్ ఇంజనీర్‌లకు మార్గనిర్దేశం చేయండి.",
+    "role.mentor.desc": "విద్యార్థుల తుది సంవత్సరం ప్రాజెక్ట్‌లకు మార్గదర్శకత్వం వహించండి.",
+    "role.mentor.idlabel": "మెంటార్ రిజిస్ట్రేషన్ ఐడి",
   },
   hi: {
     "home": "होम",
@@ -131,7 +176,31 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "पासवर्ड",
     "forgot_pass": "पासवर्ड भूल गए?",
     "btn_login": "साइन इन",
-    "btn_register": "खाता बनाएं"
+    "btn_register": "खाता बनाएं",
+
+    "role.student": "छात्र",
+    "role.student.badge": "छात्र पोर्टल",
+    "role.student.tagline": "अपने कौशल का निर्माण करें और अवसर खोजें।",
+    "role.student.desc": "उद्योग-संरेखित कौशल परीक्षण और सत्यापित परियोजना पोर्टफोलियो।",
+    "role.student.idlabel": "विश्वविद्यालय रोल नंबर / हॉल टिकट आईडी",
+
+    "role.recruiter": "भर्तीकर्ता",
+    "role.recruiter.badge": "भर्ती सुइट",
+    "role.recruiter.tagline": "ऑडिट किए गए कौशल स्कोर के साथ पूर्व-स्क्रीन की गई प्रतिभा को काम पर रखें।",
+    "role.recruiter.desc": "सत्यापित दक्षताओं वाले उम्मीदवारों की खोज करें।",
+    "role.recruiter.idlabel": "कॉर्पोरेट कर्मचारी आईडी / कार्य आईडी",
+
+    "role.academician": "शिक्षाविद्",
+    "role.academician.badge": "संकाय पोर्टल",
+    "role.academician.tagline": "बैच दक्षताओं को ट्रैक करें और पाठ्यक्रम को बाजार के रुझानों के साथ संरेखित करें।",
+    "role.academician.desc": "वास्तविक समय कोहोर्ट तत्परता मेट्रिक्स की निगरानी करें।",
+    "role.academician.idlabel": "संकाय संस्थागत आईडी",
+
+    "role.mentor": "मेंटॉर",
+    "role.mentor.badge": "मेंटॉर डेस्क",
+    "role.mentor.tagline": "कैपस्टोन प्रोजेक्ट्स की समीक्षा करें और भविष्य के इंजीनियरों को मेंटॉर करें।",
+    "role.mentor.desc": "छात्र अंतिम वर्ष के कैपस्टोन का मार्गदर्शन करें।",
+    "role.mentor.idlabel": "मेंटॉर पंजीकरण आईडी",
   },
   ta: {
     "home": "முகப்பு",
@@ -160,7 +229,31 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "கடவுச்சொல்",
     "forgot_pass": "கடவுச்சொல்லை மறந்துவிட்டீர்களா?",
     "btn_login": "உள்நுழைக",
-    "btn_register": "கணக்கை உருவாக்கு"
+    "btn_register": "கணக்கை உருவாக்கு",
+
+    "role.student": "மாணவர்",
+    "role.student.badge": "மாணவர் போர்டல்",
+    "role.student.tagline": "உங்கள் திறமைகளை வளர்த்துக் கொள்ளுங்கள்.",
+    "role.student.desc": "தொழில்நுட்ப திறன் சோதனைகள் மற்றும் திட்டங்கள்.",
+    "role.student.idlabel": "பல்கலைக்கழக ரோல் எண் / ஹால் டிக்கெட் ஐடி",
+
+    "role.recruiter": "நிறுவன recruiters",
+    "role.recruiter.badge": "வேலைவாய்ப்பு தளம்",
+    "role.recruiter.tagline": "திறமையான மாணவர்களை பணியமர்த்துங்கள்.",
+    "role.recruiter.desc": "சரிபார்க்கப்பட்ட திறன்களைக் கண்டறியவும்.",
+    "role.recruiter.idlabel": "நிறுவன ஊழியர் ஐடி",
+
+    "role.academician": "ஆசிரியர்",
+    "role.academician.badge": "ஆசிரியர் போர்டல்",
+    "role.academician.tagline": "மாணவர்களின் திறன்களை கண்காணிக்கவும்.",
+    "role.academician.desc": "மதிப்பீட்டு அளவீடுகளைக் கண்காணிக்கவும்.",
+    "role.academician.idlabel": "ஆசிரியர் நிறுவன ஐடி",
+
+    "role.mentor": "வழிகாட்டி",
+    "role.mentor.badge": "வழிகாட்டி மேசை",
+    "role.mentor.tagline": "திட்டங்களை மதிப்பீடு செய்யவும்.",
+    "role.mentor.desc": "மாணவர்களுக்கு வழிகாட்டுங்கள்.",
+    "role.mentor.idlabel": "வழிகாட்டி பதிவு ஐடி",
   },
   kn: {
     "home": "ಮುಖಪುಟ",
@@ -189,7 +282,31 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "ಪಾಸ್‌ವರ್ಡ್",
     "forgot_pass": "ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರುವಿರಾ?",
     "btn_login": "ಸೈನ್ ಇನ್",
-    "btn_register": "ಖಾತೆ ರಚಿಸಿ"
+    "btn_register": "ಖಾತೆ ರಚಿಸಿ",
+
+    "role.student": "ವಿದ್ಯಾರ್ಥಿ",
+    "role.student.badge": "ವಿದ್ಯಾರ್ಥಿ ಪೋರ್ಟಲ್",
+    "role.student.tagline": "ನಿಮ್ಮ ಕೌಶಲ್ಯಗಳನ್ನು ನಿರ್ಮಿಸಿ.",
+    "role.student.desc": "ಉದ್ಯಮ-ಜೊತೆಗಿನ ಕೌಶಲ್ಯ ಪರೀಕ್ಷೆಗಳು.",
+    "role.student.idlabel": "ವಿಶ್ವವಿದ್ಯಾಲಯ ರೋಲ್ ಸಂಖ್ಯೆ / ಹಾಲ್ ಟಿಕೆಟ್ ಐಡಿ",
+
+    "role.recruiter": "ನೇಮಕಾತದಾರ",
+    "role.recruiter.badge": "ನೇಮಕಾತಿ ಸೂಟ್",
+    "role.recruiter.tagline": "ಪ್ರತಿಭೆಯನ್ನು ನೇಮಿಸಿಕೊಳ್ಳಿ.",
+    "role.recruiter.desc": "ಪರಿಶೀಲಿಸಿದ ಸಾಮರ್ಥ್ಯದ ಅಭ್ಯರ್ಥಿಗಳನ್ನು ಹುಡುಕಿ.",
+    "role.recruiter.idlabel": "ಕಾರ್ಪೊರೇಟ್ ಉದ್ಯೋಗಿ ಐಡಿ",
+
+    "role.academician": "ಅಧ್ಯಾಪಕ",
+    "role.academician.badge": "ಅಧ್ಯಾಪಕರ ಪೋರ್ಟಲ್",
+    "role.academician.tagline": "ಸಾಮರ್ಥ್ಯಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.",
+    "role.academician.desc": "ಕೋಹೋರ್ಟ್ ಸಿದ್ಧತೆಯನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ.",
+    "role.academician.idlabel": "ಅಧ್ಯಾಪಕ ಸಾಂಸ್ಥಿಕ ಐಡಿ",
+
+    "role.mentor": "ಮಾರ್ಗದರ್ಶಕ",
+    "role.mentor.badge": "ಮಾರ್ಗದರ್ಶಕ ಪೀಠ",
+    "role.mentor.tagline": "ಯೋಜನೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.",
+    "role.mentor.desc": "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡಿ.",
+    "role.mentor.idlabel": "ಮಾರ್ಗದರ್ಶಕ ನೋಂದಣಿ ಐಡಿ",
   },
   ml: {
     "home": "ഹോം",
@@ -218,7 +335,31 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "പാസ്‌വേർഡ്",
     "forgot_pass": "പാസ്‌വേർഡ് മറന്നുപോയോ?",
     "btn_login": "സൈൻ ഇൻ",
-    "btn_register": "അക്കൗണ്ട് സൃഷ്ടിക്കുക"
+    "btn_register": "അക്കൗണ്ട് സൃഷ്ടിക്കുക",
+
+    "role.student": "വിദ്യാർത്ഥി",
+    "role.student.badge": "സ്റ്റുഡന്റ് പോർട്ടൽ",
+    "role.student.tagline": "കഴിവുകൾ വളർത്തുക.",
+    "role.student.desc": "വ്യവസായ-അധിഷ്ഠിത കഴിവ് പരിശോധനകൾ.",
+    "role.student.idlabel": "യൂണിവേഴ്സിറ്റി റോൾ നമ്പർ / ഹാൾ ടിക്കറ്റ് ഐഡി",
+
+    "role.recruiter": "റിക്രൂട്ടർ",
+    "role.recruiter.badge": "റക്രൂട്ട്മെന്റ് സ്യൂട്ട്",
+    "role.recruiter.tagline": "പ്രതിഭകളെ നിയമിക്കുക.",
+    "role.recruiter.desc": "പരിശോധിച്ച കഴിവുകളുള്ള ഉദ്യോഗാർത്ഥികളെ കണ്ടെത്തുക.",
+    "role.recruiter.idlabel": "കോർപ്പറേറ്റ് എംപ്ലോയ് ഐഡി",
+
+    "role.academician": "അക്കാദമിഷ്യൻ",
+    "role.academician.badge": "ഫാക്കൽറ്റി പോർട്ടൽ",
+    "role.academician.tagline": "കഴിവുകൾ ട്രാക്ക് ചെയ്യുക.",
+    "role.academician.desc": "സന്നദ്ധത മെട്രിക്സ് നിരീക്ഷിക്കുക.",
+    "role.academician.idlabel": "ഫാക്കൽറ്റി ഐഡി",
+
+    "role.mentor": "മെന്റർ",
+    "role.mentor.badge": "മെന്റർ ഡെസ്ക്",
+    "role.mentor.tagline": "പ്രോജക്റ്റുകൾ അവലോകനം ചെയ്യുക.",
+    "role.mentor.desc": "വിദ്യാർത്ഥികൾക്ക് മാർഗ്ഗനിർദ്ദേശം നൽകുക.",
+    "role.mentor.idlabel": "മെന്റർ രജിസ്ട്രേഷൻ ഐഡി",
   },
   mr: {
     "home": "मुखपृष्ठ",
@@ -247,7 +388,31 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "पासवर्ड",
     "forgot_pass": "पासवर्ड विसरलात?",
     "btn_login": "साइन इन",
-    "btn_register": "खाते तयार करा"
+    "btn_register": "खाते तयार करा",
+
+    "role.student": "विद्यार्थी",
+    "role.student.badge": "विद्यार्थी पोर्टल",
+    "role.student.tagline": "तुमची कौशल्ये तयार करा.",
+    "role.student.desc": "उद्योग-संरेखित कौशल्य चाचण्या.",
+    "role.student.idlabel": "विद्यापीठ रोल नंबर / हॉल तिकीट आयडी",
+
+    "role.recruiter": "रिक्रूटर्स",
+    "role.recruiter.badge": "भर्ती संच",
+    "role.recruiter.tagline": "प्रतिभा नियुक्त करा.",
+    "role.recruiter.desc": "तपासलेल्या क्षमता असलेले उमेदवार शोधा.",
+    "role.recruiter.idlabel": "कॉर्पोरेट कर्मचारी आयडी",
+
+    "role.academician": "प्राध्यापक",
+    "role.academician.badge": "प्राध्यापक पोर्टल",
+    "role.academician.tagline": "सामर्थ्ये ट्रॅक करा.",
+    "role.academician.desc": "कोहोर्ट तयारी मेट्रिक्स मॉनिटर करा.",
+    "role.academician.idlabel": "प्राध्यापक संस्थागत आयडी",
+
+    "role.mentor": "मेंटॉर",
+    "role.mentor.badge": "मेंटॉर डेस्क",
+    "role.mentor.tagline": "प्रकल्प पुनरावलोकन करा.",
+    "role.mentor.desc": "विद्यार्थ्यांना मार्गदर्शन करा.",
+    "role.mentor.idlabel": "मेंटॉर नोंदणी आयডি",
   },
   bn: {
     "home": "হোম",
@@ -276,139 +441,33 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "পাসওয়ার্ড",
     "forgot_pass": "পাসওয়ার্ড ভুলে গেছেন?",
     "btn_login": "সাইন ইন",
-    "btn_register": "অ্যাকাউন্ট তৈরি করুন"
+    "btn_register": "অ্যাকাউন্ট তৈরি করুন",
+
+    "role.student": "ছাত্র",
+    "role.student.badge": "ছাত্র পোর্টাল",
+    "role.student.tagline": "আপনার দক্ষতা তৈরি করুন।",
+    "role.student.desc": "শিল্প-সম্মত দক্ষতা পরীক্ষা।",
+    "role.student.idlabel": "বিশ্ববিদ্যালয় রোল নম্বর / হল টিকিট আইডি",
+
+    "role.recruiter": "নিয়োগকর্তা",
+    "role.recruiter.badge": "নিয়োগ স্যুট",
+    "role.recruiter.tagline": "প্রত্যাশী নিয়োগ করুন।",
+    "role.recruiter.desc": "যাচাইকৃত দক্ষতার প্রার্থী খুঁজুন।",
+    "role.recruiter.idlabel": "কর্পোরেট কর্মচারী আইডি",
+
+    "role.academician": "শিক্ষাবিদ",
+    "role.academician.badge": "শিক্ষক পোর্টাল",
+    "role.academician.tagline": "দক্ষতা ট্র্যাক করুন।",
+    "role.academician.desc": "সচেতনতা মেট্রিক্স নিরীক্ষণ করুন।",
+    "role.academician.idlabel": "শিক্ষক প্রাতিষ্ঠানিক আইডি",
+
+    "role.mentor": "মেন্টর",
+    "role.mentor.badge": "মেন্টর ডেস্ক",
+    "role.mentor.tagline": "প্রকল্প পর্যালোচনা করুন।",
+    "role.mentor.desc": "শিক্ষার্থীদের গাইড করুন।",
+    "role.mentor.idlabel": "মেন্টর রেজিস্ট্রেশন আইডি",
   }
 };
-
-interface StakeholderTheme {
-  id: RoleId;
-  badge: string;
-  title: string;
-  tagline: string;
-  description: string;
-  icon: typeof GraduationCap;
-  imageUrl: string;
-  pillBg: string;
-  iconBg: string;
-  iconColor: string;
-  buttonClass: string;
-  statNumber: string;
-  statLabel: string;
-  features: string[];
-  idFieldLabel: string;
-  idPlaceholder: string;
-  emailLabel: string;
-  emailPlaceholder: string;
-  orgLabel: string;
-  orgPlaceholder: string;
-}
-
-const STAKEHOLDERS: StakeholderTheme[] = [
-  {
-    id: "student",
-    badge: "Student Portal",
-    title: "Student",
-    tagline: "Build your skills and discover opportunities.",
-    description: "Industry-aligned skill tests, verified project portfolios, and direct hiring tracks.",
-    icon: GraduationCap,
-    imageUrl: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80",
-    pillBg: "bg-blue-50 border-blue-200 text-blue-700",
-    iconBg: "bg-blue-100/80 border-blue-200",
-    iconColor: "text-blue-600",
-    buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
-    statNumber: "88.4%",
-    statLabel: "Skill-to-Role Fitment Score",
-    features: [
-      "Industry benchmarked skill diagnostic tests",
-      "Mentor-evaluated capstone portfolios",
-      "Direct verified interview shortlists",
-    ],
-    idFieldLabel: "University Roll Number / Hall Ticket ID",
-    idPlaceholder: "e.g. 21BCE1042",
-    emailLabel: "Student Email",
-    emailPlaceholder: "student@gmail.com",
-    orgLabel: "College / University Name",
-    orgPlaceholder: "Type your college name to search...",
-  },
-  {
-    id: "recruiter",
-    badge: "Recruitment Suite",
-    title: "Recruiter",
-    tagline: "Hire pre-screened talent with audited skill scores.",
-    description: "Discover candidates with verified competencies and campus academic audit trails.",
-    icon: Briefcase,
-    imageUrl: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
-    pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
-    iconBg: "bg-emerald-100/80 border-emerald-200",
-    iconColor: "text-emerald-700",
-    buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
-    statNumber: "3.2x",
-    statLabel: "Faster Candidate Filtering",
-    features: [
-      "Access pre-verified skill matrices",
-      "Granular filters by university and branch",
-      "Proctored assessment audit verification",
-    ],
-    idFieldLabel: "Corporate Employee ID / Work ID",
-    idPlaceholder: "e.g. CORP-REC-4821",
-    emailLabel: "Work Email Address",
-    emailPlaceholder: "talent@microsoft.com",
-    orgLabel: "Company Name",
-    orgPlaceholder: "Northwind Labs",
-  },
-  {
-    id: "academician",
-    badge: "Faculty Portal",
-    title: "Academician",
-    tagline: "Track batch competencies and align syllabus to market trends.",
-    description: "Monitor real-time cohort readiness metrics and export verified documentation.",
-    icon: School,
-    imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
-    pillBg: "bg-amber-50 border-amber-200 text-amber-800",
-    iconBg: "bg-amber-100/80 border-amber-200",
-    iconColor: "text-amber-700",
-    buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
-    statNumber: "94%",
-    statLabel: "Curriculum Alignment Index",
-    features: [
-      "Department skill gap visual heatmaps",
-      "Accreditation export tables (NIRF & NAAC)",
-      "Industry recommendation alerts for syllabus",
-    ],
-    idFieldLabel: "Faculty Institutional ID",
-    idPlaceholder: "e.g. FAC-CSE-2018",
-    emailLabel: "Institutional Faculty Email",
-    emailPlaceholder: "faculty@college.ac.in",
-    orgLabel: "College / University Name",
-    orgPlaceholder: "NIT Trichy",
-  },
-  {
-    id: "mentor",
-    badge: "Mentor Desk",
-    title: "Mentor",
-    tagline: "Review capstone projects and mentor future engineers.",
-    description: "Guide student final-year capstones and endorse high-potential portfolios.",
-    icon: Compass,
-    imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
-    pillBg: "bg-cyan-50 border-cyan-200 text-cyan-800",
-    iconBg: "bg-cyan-100/80 border-cyan-200",
-    iconColor: "text-cyan-700",
-    buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
-    statNumber: "4.9/5",
-    statLabel: "Average Mentor Engagement",
-    features: [
-      "Direct code repository and system reviews",
-      "Standard rubrics for skill validation badges",
-      "Letters of recommendation for talent",
-    ],
-    idFieldLabel: "Mentor Registration ID",
-    idPlaceholder: "e.g. MNT-ENG-7704",
-    emailLabel: "Professional Email Address",
-    emailPlaceholder: "mentor@domain.com",
-    orgLabel: "Domain Expertise",
-    orgPlaceholder: "Cloud & Platform Engineering",
-  },
-];
 
 function LanguageMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -504,6 +563,77 @@ function Welcome() {
     return TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS["en"]?.[key] || key;
   };
 
+  const STAKEHOLDERS = [
+    {
+      id: "student" as RoleId,
+      badge: t("role.student.badge"),
+      title: t("role.student"),
+      tagline: t("role.student.tagline"),
+      description: t("role.student.desc"),
+      icon: GraduationCap,
+      imageUrl: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80",
+      pillBg: "bg-blue-50 border-blue-200 text-blue-700",
+      buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
+      idFieldLabel: t("role.student.idlabel"),
+      idPlaceholder: "e.g. 21BCE1042",
+      emailLabel: t("email_label"),
+      emailPlaceholder: "student@gmail.com",
+      orgLabel: "College / University Name",
+      orgPlaceholder: "Type your college name to search...",
+    },
+    {
+      id: "recruiter" as RoleId,
+      badge: t("role.recruiter.badge"),
+      title: t("role.recruiter"),
+      tagline: t("role.recruiter.tagline"),
+      description: t("role.recruiter.desc"),
+      icon: Briefcase,
+      imageUrl: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
+      pillBg: "bg-emerald-50 border-emerald-200 text-emerald-700",
+      buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
+      idFieldLabel: t("role.recruiter.idlabel"),
+      idPlaceholder: "e.g. CORP-REC-4821",
+      emailLabel: t("email_label"),
+      emailPlaceholder: "talent@microsoft.com",
+      orgLabel: "Company Name",
+      orgPlaceholder: "Northwind Labs",
+    },
+    {
+      id: "academician" as RoleId,
+      badge: t("role.academician.badge"),
+      title: t("role.academician"),
+      tagline: t("role.academician.tagline"),
+      description: t("role.academician.desc"),
+      icon: School,
+      imageUrl: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80",
+      pillBg: "bg-amber-50 border-amber-200 text-amber-800",
+      buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
+      idFieldLabel: t("role.academician.idlabel"),
+      idPlaceholder: "e.g. FAC-CSE-2018",
+      emailLabel: t("email_label"),
+      emailPlaceholder: "faculty@college.ac.in",
+      orgLabel: "College / University Name",
+      orgPlaceholder: "NIT Trichy",
+    },
+    {
+      id: "mentor" as RoleId,
+      badge: t("role.mentor.badge"),
+      title: t("role.mentor"),
+      tagline: t("role.mentor.tagline"),
+      description: t("role.mentor.desc"),
+      icon: Compass,
+      imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+      pillBg: "bg-cyan-50 border-cyan-200 text-cyan-800",
+      buttonClass: "bg-[#2563EB] hover:bg-[#1D4ED8] text-white",
+      idFieldLabel: t("role.mentor.idlabel"),
+      idPlaceholder: "e.g. MNT-ENG-7704",
+      emailLabel: t("email_label"),
+      emailPlaceholder: "mentor@domain.com",
+      orgLabel: "Domain Expertise",
+      orgPlaceholder: "Cloud & Platform Engineering",
+    },
+  ];
+
   const [selectedRole, setSelectedRole] = useState<RoleId | null>(null);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -516,7 +646,6 @@ function Welcome() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // College Search Auto-complete States
   const [collegeSearch, setCollegeSearch] = useState("");
   const [collegeResults, setCollegeResults] = useState<{ id: string; name: string; state?: string }[]>([]);
   const [isSearchingColleges, setIsSearchingColleges] = useState(false);
