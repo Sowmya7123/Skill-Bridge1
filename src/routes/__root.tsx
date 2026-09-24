@@ -109,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-// Global Language Menu Component
+// Global Language Menu Component with Native Google Translate Hook
 export function GlobalLanguageMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState("en");
@@ -121,12 +121,32 @@ export function GlobalLanguageMenu() {
     if (match && match[1]) {
       setCurrentLang(match[1]);
     }
+
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
+
+    // Load Google Translate Script globally if not already loaded
+    if (!document.getElementById("google-translate-script")) {
+      const addScript = document.createElement("script");
+      addScript.id = "google-translate-script";
+      addScript.type = "text/javascript";
+      addScript.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      document.body.appendChild(addScript);
+
+      (window as any).googleTranslateElementInit = () => {
+        if ((window as any).google && (window as any).google.translate) {
+          new (window as any).google.translate.TranslateElement(
+            { pageLanguage: "en", includedLanguages: "en,te,hi,ta,kn,ml,mr,bn", autoDisplay: false },
+            "google_translate_element"
+          );
+        }
+      };
+    }
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -160,6 +180,9 @@ export function GlobalLanguageMenu() {
       >
         <MoreVertical className="size-4" />
       </button>
+
+      {/* Hidden google translate element container required for initialization */}
+      <div id="google_translate_element" style={{ display: "none" }} />
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50">
@@ -207,7 +230,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppStateProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-right" richColors />
       </AppStateProvider>
