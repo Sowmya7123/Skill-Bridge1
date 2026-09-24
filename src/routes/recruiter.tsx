@@ -43,18 +43,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { CANDIDATES, SKILL_TAGS, addCustomJob } from "@/lib/skillbridge-data";
+import { SKILL_TAGS, addCustomJob } from "@/lib/skillbridge-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/recruiter")({
   head: () => ({
     meta: [
-      { title: "Recruiter Dashboard — SkillBridge" },
+      { title: "Recruiter Command Center — SkillBridge" },
       {
         name: "description",
         content: "Track your hiring pipeline and shortlist verified student talent by AI match score.",
       },
-      { property: "og:title", content: "Recruiter Dashboard — SkillBridge" },
+      { property: "og:title", content: "Recruiter Command Center — SkillBridge" },
       { property: "og:description", content: "Verified candidate pool, AI match scores and role posting in one place." },
     ],
   }),
@@ -66,7 +66,7 @@ function RecruiterDashboard() {
   const [pathFilter, setPathFilter] = useState("all");
   const [dbCandidates, setDbCandidates] = useState<any[]>([]);
 
-  // Database nunchi real students data automatic ga fetch chesi CANDIDATES lo sync chese logic
+  // Database nunchi kevalam student side login/assess aina real students data matrame fetch cheyyadam
   useEffect(() => {
     async function fetchStudentCandidates() {
       const { data, error } = await supabase
@@ -74,25 +74,25 @@ function RecruiterDashboard() {
         .select("*");
 
       if (!error && data && data.length > 0) {
-        const formattedStudents = data.map((item, idx) => ({
+        const formatted = data.map((item, idx) => ({
           name: item.student_email ? item.student_email.split("@")[0] : `Student ${idx + 1}`,
           initials: item.student_email ? item.student_email.charAt(0).toUpperCase() : "S",
           college: "Verified Institution",
           path: item.role_id || "Full Stack Developer",
           score: item.total_score || 75,
           match: Math.min(99, (item.total_score || 70) + 10),
-          status: (item.total_score || 0) >= 75 ? "Shortlisted" : "Verified",
+          status: (item.total_score || 0) >= 80 ? "Shortlisted" : "Verified",
           email: item.student_email,
         }));
-        setDbCandidates(formattedStudents);
+        setDbCandidates(formatted);
       }
     }
     fetchStudentCandidates();
   }, []);
 
-  // Original static candidates + Database nunchi vachina real students ni combine cheyyadam
+  // Ikkada static CANDIDATES ni పూర్తిగా tholiginchaam. Only database lo unna real students matrame untaru!
   const allCandidates = useMemo(() => {
-    return [...dbCandidates, ...CANDIDATES];
+    return dbCandidates;
   }, [dbCandidates]);
 
   const rows = useMemo(
@@ -109,12 +109,12 @@ function RecruiterDashboard() {
 
   return (
     <PageShell
-      title="Recruiter Dashboard"
-      subtitle="Hire verified talent with skill scores backed by assessments and reviewed projects."
+      title="Recruiter Command Center"
+      subtitle="Discover verified student talent and build your hiring pipeline."
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Active Openings" value="12" hint="3 closing this week" icon={Briefcase} />
-        <KpiCard label="Verified Candidates" value={String(rows.length + 240)} hint="+34 this month" icon={BadgeCheck} tone="info" />
+        <KpiCard label="Verified Candidates" value={String(rows.length)} hint="Real-time student sync" icon={BadgeCheck} tone="info" />
         <KpiCard label="Shortlisted" value="36" hint="18 awaiting interview" icon={Bookmark} tone="warning" />
         <KpiCard label="Placed" value="9" hint="Offer acceptance 82%" icon={CheckCircle2} tone="success" />
       </div>
@@ -123,7 +123,7 @@ function RecruiterDashboard() {
         <div className="flex flex-wrap items-center gap-3 border-b border-border p-5">
           <div>
             <h2 className="text-lg font-semibold">Candidate Talent Pool</h2>
-            <p className="text-sm text-muted-foreground">{rows.length} candidates match your filters</p>
+            <p className="text-sm text-muted-foreground">{rows.length} registered students match your filters</p>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             <div className="relative">
@@ -163,47 +163,55 @@ function RecruiterDashboard() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((c, i) => (
-              <TableRow key={c.name + i}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="size-9">
-                      <AvatarFallback className="bg-primary-soft text-xs font-semibold text-accent-foreground">
-                        {c.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-medium">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">{c.college} {c.email ? `• ${c.email}` : ""}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{c.path}</TableCell>
-                <TableCell>
-                  <div className="flex w-36 items-center gap-2">
-                    <Progress value={c.score} className="h-1.5" />
-                    <span className="text-sm font-medium">{c.score}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="font-semibold text-success">{c.match}%</span>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      c.status === "Placed" && "border-success/40 text-success",
-                      c.status === "Shortlisted" && "border-primary/40 text-primary",
-                    )}
-                  >
-                    {c.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <PortfolioSheet candidate={c} />
+            {rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  No students have completed assessments yet. Register or log in from the student side to see them here!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              rows.map((c, i) => (
+                <TableRow key={c.name + i}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="size-9">
+                        <AvatarFallback className="bg-primary-soft text-xs font-semibold text-accent-foreground">
+                          {c.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium">{c.name}</p>
+                        <p className="text-xs text-muted-foreground">{c.college} {c.email ? `• ${c.email}` : ""}</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{c.path}</TableCell>
+                  <TableCell>
+                    <div className="flex w-36 items-center gap-2">
+                      <Progress value={c.score} className="h-1.5" />
+                      <span className="text-sm font-medium">{c.score}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-semibold text-success">{c.match}%</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        c.status === "Placed" && "border-success/40 text-success",
+                        c.status === "Shortlisted" && "border-primary/40 text-primary",
+                      )}
+                    >
+                      {c.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <PortfolioSheet candidate={c} />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </section>
@@ -211,100 +219,7 @@ function RecruiterDashboard() {
   );
 }
 
-// Recruiter part lo student profile & portfolio detail ga chupinche code update:
-
 function PortfolioSheet({ candidate }: { candidate: any }) {
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="cursor-pointer">
-          View Verified Profile
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg bg-slate-950 text-white border-l border-white/10">
-        <SheetHeader className="border-b border-white/10 pb-4">
-          <SheetTitle className="text-xl font-bold text-white">{candidate.name}</SheetTitle>
-          <SheetDescription className="text-xs text-blue-400">
-            Target Track: {candidate.path} · College: <span className="text-white font-semibold">{candidate.college || "Verified Institution"}</span>
-          </SheetDescription>
-        </SheetHeader>
-        
-        <div className="space-y-6 px-1 py-6">
-          {/* Score & AI Match Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-white/10 bg-slate-900/80 p-4">
-              <p className="text-xs text-slate-400 font-medium">Verified Skill Score</p>
-              <p className="mt-1 text-2xl font-black text-emerald-400">{candidate.score} / 100</p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-slate-900/90 p-4">
-              <p className="text-xs text-slate-400 font-medium">AI Competency Match</p>
-              <p className="mt-1 text-2xl font-black text-blue-400">{candidate.match}%</p>
-            </div>
-          </div>
-
-          {/* Student Contact & Academic Info */}
-          <div className="rounded-xl border border-white/10 bg-slate-900/60 p-4 space-y-2 text-xs">
-            <h4 className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">Academic & Contact Profile</h4>
-            <div className="flex justify-between text-slate-300">
-              <span className="text-slate-400">Email Address:</span>
-              <span className="font-medium text-white">{candidate.email || "student@skillbridge.ac.in"}</span>
-            </div>
-            <div className="flex justify-between text-slate-300">
-              <span className="text-slate-400">Institution / College:</span>
-              <span className="font-medium text-white">{candidate.college || "JNTU / Osmania Engineering College"}</span>
-            </div>
-            <div className="flex justify-between text-slate-300">
-              <span className="text-slate-400">Assessment Status:</span>
-              <span className="font-bold text-emerald-400">{candidate.status || "Active & Verified"}</span>
-            </div>
-          </div>
-
-          {/* Verified Skills Breakdown */}
-          <div>
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Verified Skill Analysis</h3>
-            <div className="space-y-3">
-              {[
-                { s: "Core Fundamentals & Theory", v: candidate.score },
-                { s: "Applied Problem Solving & Code", v: Math.max(45, candidate.score - 5) },
-                { s: "System Architecture & Design", v: Math.min(98, candidate.score + 4) },
-              ].map((r) => (
-                <div key={r.s} className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-slate-300">{r.s}</span>
-                    <span className="text-blue-400 font-mono font-bold">{r.v}%</span>
-                  </div>
-                  <Progress value={r.v} className="h-1.5 bg-slate-800" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mentor Reviewed Projects & Certifications */}
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Assessment & Project Milestones</h3>
-            <ul className="space-y-2 text-xs text-slate-300">
-              <li className="rounded-xl border border-white/10 bg-slate-900/60 p-3 flex items-center justify-between">
-                <span>Completed 4-Week Advanced Learning Curriculum</span>
-                <span className="text-emerald-400 font-bold">Verified ✅</span>
-              </li>
-              <li className="rounded-xl border border-white/10 bg-slate-900/60 p-3 flex items-center justify-between">
-                <span>Proctored AI Technical Mock Interview</span>
-                <span className="text-blue-400 font-bold">Passed (88/100)</span>
-              </li>
-            </ul>
-          </div>
-
-          <Button 
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs h-10 rounded-xl cursor-pointer shadow-lg" 
-            onClick={() => toast.success(`Candidate ${candidate.name} has been successfully shortlisted!`)}
-          >
-            Shortlist Candidate For Interview 🎯
-          </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-}
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -365,7 +280,7 @@ function PortfolioSheet({ candidate }: { candidate: any }) {
       </SheetContent>
     </Sheet>
   );
-
+}
 
 function PostOpeningDialog() {
   const [tags, setTags] = useState<string[]>(["React"]);
@@ -439,7 +354,7 @@ function PostOpeningDialog() {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel-out</Button>
+            <Button variant="outline">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button
