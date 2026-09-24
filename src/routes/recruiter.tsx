@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Briefcase, BadgeCheck, Bookmark, CheckCircle2, Plus, Search, Users } from "lucide-react";
 import { PageShell, KpiCard } from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/lib/supabase";
 import {
   Table,
   TableBody,
@@ -63,16 +64,47 @@ export const Route = createFileRoute("/recruiter")({
 function RecruiterDashboard() {
   const [query, setQuery] = useState("");
   const [pathFilter, setPathFilter] = useState("all");
+  const [dbCandidates, setDbCandidates] = useState<any[]>([]);
+
+  // Database nunchi real students data automatic ga fetch chesi CANDIDATES lo sync chese logic
+  useEffect(() => {
+    async function fetchStudentCandidates() {
+      const { data, error } = await supabase
+        .from("student_assessments")
+        .select("*");
+
+      if (!error && data && data.length > 0) {
+        const formattedStudents = data.map((item, idx) => ({
+          name: item.student_email ? item.student_email.split("@")[0] : `Student ${idx + 1}`,
+          initials: item.student_email ? item.student_email.charAt(0).toUpperCase() : "S",
+          college: "Verified Institution",
+          path: item.role_id || "Full Stack Developer",
+          score: item.total_score || 75,
+          match: Math.min(99, (item.total_score || 70) + 10),
+          status: (item.total_score || 0) >= 75 ? "Shortlisted" : "Verified",
+          email: item.student_email,
+        }));
+        setDbCandidates(formattedStudents);
+      }
+    }
+    fetchStudentCandidates();
+  }, []);
+
+  // Original static candidates + Database nunchi vachina real students ni combine cheyyadam
+  const allCandidates = useMemo(() => {
+    return [...dbCandidates, ...CANDIDATES];
+  }, [dbCandidates]);
 
   const rows = useMemo(
     () =>
-      CANDIDATES.filter(
+      allCandidates.filter(
         (c) =>
           (pathFilter === "all" || c.path === pathFilter) &&
           (c.name.toLowerCase().includes(query.toLowerCase()) ||
-            c.college.toLowerCase().includes(query.toLowerCase())),
+            c.college.toLowerCase().includes(query.toLowerCase()) ||
+            (c.email && c.email.toLowerCase().includes(query.toLowerCase()))),
       ),
-    [query, pathFilter],
+    [allCandidates, query, pathFilter],
   );
 
   return (
@@ -82,7 +114,7 @@ function RecruiterDashboard() {
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Active Openings" value="12" hint="3 closing this week" icon={Briefcase} />
-        <KpiCard label="Verified Candidates" value="248" hint="+34 this month" icon={BadgeCheck} tone="info" />
+        <KpiCard label="Verified Candidates" value={String(rows.length + 240)} hint="+34 this month" icon={BadgeCheck} tone="info" />
         <KpiCard label="Shortlisted" value="36" hint="18 awaiting interview" icon={Bookmark} tone="warning" />
         <KpiCard label="Placed" value="9" hint="Offer acceptance 82%" icon={CheckCircle2} tone="success" />
       </div>
@@ -99,7 +131,7 @@ function RecruiterDashboard() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search name or college"
+                placeholder="Search name, email or college"
                 className="w-56 pl-9"
               />
             </div>
@@ -131,8 +163,8 @@ function RecruiterDashboard() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((c) => (
-              <TableRow key={c.name}>
+            {rows.map((c, i) => (
+              <TableRow key={c.name + i}>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Avatar className="size-9">
@@ -142,7 +174,7 @@ function RecruiterDashboard() {
                     </Avatar>
                     <div>
                       <p className="text-sm font-medium">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">{c.college}</p>
+                      <p className="text-xs text-muted-foreground">{c.college} {c.email ? `• ${c.email}` : ""}</p>
                     </div>
                   </div>
                 </TableCell>
@@ -179,7 +211,7 @@ function RecruiterDashboard() {
   );
 }
 
-function PortfolioSheet({ candidate }: { candidate: (typeof CANDIDATES)[number] }) {
+function PortfolioSheet({ candidate }: { candidate: any }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -191,7 +223,7 @@ function PortfolioSheet({ candidate }: { candidate: (typeof CANDIDATES)[number] 
         <SheetHeader>
           <SheetTitle>{candidate.name}</SheetTitle>
           <SheetDescription>
-            {candidate.path} · {candidate.college}
+            {candidate.path} · {candidate.college} {candidate.email ? `(${candidate.email})` : ""}
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-6 px-4 pb-8">
@@ -314,7 +346,7 @@ function PostOpeningDialog() {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Cancel-out</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button
