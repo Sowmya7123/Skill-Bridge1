@@ -109,7 +109,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-// Global Language Menu Component with 8 Indian & Global Languages
 export function GlobalLanguageMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState("en");
@@ -117,9 +116,9 @@ export function GlobalLanguageMenu() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const saved = localStorage.getItem("skillbridge_lang");
-    if (saved) {
-      setCurrentLang(saved);
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
+    if (match && match[1]) {
+      setCurrentLang(match[1]);
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -128,15 +127,35 @@ export function GlobalLanguageMenu() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
+
+    // Google Translate Element Initialization Script
+    window.googleTranslateElementInit = () => {
+      if (window.google && window.google.translate) {
+        new window.google.translate.TranslateElement(
+          { pageLanguage: "en", includedLanguages: "en,te,hi,ta,kn,ml,mr,bn", autoDisplay: false },
+          "google_translate_element"
+        );
+      }
+    };
+
+    if (!document.getElementById("google-translate-script")) {
+      const script = document.createElement("script");
+      script.id = "google-translate-script";
+      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLanguageSelect = (langCode: string) => {
     if (typeof window === "undefined") return;
-    localStorage.setItem("skillbridge_lang", langCode);
+    document.cookie = `googtrans=/en/${langCode}; path=/;`;
+    document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
     setCurrentLang(langCode);
     setIsOpen(false);
-    window.location.reload(); // Instantly refresh the app to apply selected language
+    window.location.reload();
   };
 
   const languages = [
@@ -160,6 +179,9 @@ export function GlobalLanguageMenu() {
       >
         <MoreVertical className="size-4" />
       </button>
+
+      {/* Hidden google translate widget container */}
+      <div id="google_translate_element" style={{ display: "none" }} />
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50">
