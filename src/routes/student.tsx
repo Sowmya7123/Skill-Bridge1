@@ -1795,8 +1795,8 @@ function StudentAssessmentEngine() {
     );
   }
 
-  // -------------------------------------------------------------
-  // VIEW 8: MANDATORY 4-WEEK LEARNING PROGRAM & VERIFICATION
+// -------------------------------------------------------------
+  // VIEW 8: MANDATORY 4-WEEK LEARNING & MODULES PROGRAM (UPDATED)
   // -------------------------------------------------------------
   if (assessmentStage === "four-week-course") {
     return (
@@ -1805,22 +1805,22 @@ function StudentAssessmentEngine() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-white/10">
             <div>
               <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider">Mandatory Curriculum Gating</span>
-              <h1 className="text-2xl sm:text-3xl font-black text-white mt-0.5">4-Week Structured Learning & Verification</h1>
-              <p className="text-xs text-slate-400">Complete all modules with assessment proof before unlocking AI Mock Interviews & Placements.</p>
+              <h1 className="text-2xl sm:text-3xl font-black text-white mt-0.5">4-Week Structured Learning & Modules</h1>
+              <p className="text-xs text-slate-400">Open and study each module to complete your learning path before unlocking corporate placements.</p>
             </div>
             <div className="flex items-center gap-3">
-              <Button onClick={() => setAssessmentStage("mentor-hub")} className="bg-white/10 text-white text-xs">
+              <Button onClick={() => setAssessmentStage("mentor-hub")} className="bg-white/10 text-white text-xs cursor-pointer">
                 Back to Mentor Hub
               </Button>
               <Button
                 disabled={!isCourseComplete}
-                onClick={() => setAssessmentStage("ai-mock-interview")}
+                onClick={() => setAssessmentStage("placements")}
                 className={cn(
-                  "text-xs font-bold h-10 px-5",
-                  isCourseComplete ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
+                  "text-xs font-bold h-10 px-5 cursor-pointer",
+                  isCourseComplete ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg" : "bg-white/10 text-slate-500 cursor-not-allowed"
                 )}
               >
-                {isCourseComplete ? "Start AI Mock Interview" : <><Lock className="size-3.5 mr-1" /> Course Incomplete</>}
+                {isCourseComplete ? "Unlock Placements Board 🎉" : <><Lock className="size-3.5 mr-1" /> Complete All Modules to Unlock</>}
               </Button>
             </div>
           </div>
@@ -1830,7 +1830,7 @@ function StudentAssessmentEngine() {
             <div className="space-y-1 text-center sm:text-left">
               <h3 className="text-base font-bold text-white">Course Completion Status</h3>
               <p className="text-xs text-slate-300">
-                {completedModulesCount} of {totalModules} modules verified successfully ({Math.round((completedModulesCount / totalModules) * 100)}%)
+                {completedModulesCount} of {totalModules} modules viewed & completed ({Math.round((completedModulesCount / totalModules) * 100)}%)
               </p>
             </div>
             <div className="w-full sm:w-64 bg-slate-800 rounded-full h-3 overflow-hidden border border-white/10">
@@ -1841,7 +1841,7 @@ function StudentAssessmentEngine() {
             </div>
           </div>
 
-          {/* Curriculum Weeks */}
+          {/* Curriculum Weeks Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {curriculum.map((weekData) => {
               const weekProgress = weekData.modules.filter(m => m.completed).length;
@@ -1880,14 +1880,18 @@ function StudentAssessmentEngine() {
                           </div>
 
                           <Button
-                            onClick={() => setSelectedModule(mod)}
+                            onClick={() => {
+                              setSelectedModule(mod);
+                              setModuleTimer(20); // Demo kosam 20 seconds, real time lo 1200 seconds (20 mins) pettukovachu
+                              setIsTimerRunning(true);
+                            }}
                             size="sm"
                             className={cn(
-                              "text-xs font-bold h-8 rounded-lg",
-                              mod.completed ? "bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/30 border border-emerald-500/30" : "bg-blue-600 text-white hover:bg-blue-500"
+                              "text-xs font-bold h-8 rounded-lg cursor-pointer",
+                              mod.completed ? "bg-emerald-600/20 text-emerald-300 border border-emerald-500/30" : "bg-blue-600 text-white hover:bg-blue-500"
                             )}
                           >
-                            {mod.completed ? "Review" : "Learn & Verify"}
+                            {mod.completed ? "Review Module" : "Open & Study"}
                           </Button>
                         </div>
                       ))}
@@ -1898,62 +1902,72 @@ function StudentAssessmentEngine() {
             })}
           </div>
 
-          {/* Module Modal */}
+          {/* Module Study Modal with Timer */}
           {selectedModule && (
             <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-white/20 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-fade-in text-white">
+              <div className="bg-slate-900 border border-white/20 rounded-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-white">
                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <h3 className="text-sm font-bold text-white">{selectedModule.title}</h3>
-                  <button onClick={() => setSelectedModule(null)} className="text-xs text-slate-400 hover:text-white">Close</button>
+                  <button onClick={() => { setSelectedModule(null); setIsTimerRunning(false); }} className="text-xs text-slate-400 hover:text-white cursor-pointer">Close</button>
                 </div>
 
-                <div className="space-y-4 text-xs text-slate-300">
-                  <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
-                    <span className="font-bold text-blue-400">Mandatory Learning Material</span>
-                    <p className="leading-relaxed">
-                      Study the concepts, video lectures, and documentation. To complete this module, provide your assessment answer or solution summary below.
+                <div className="space-y-4 text-xs text-slate-300 text-center">
+                  <div className="p-4 rounded-xl bg-black/40 border border-white/10 space-y-3">
+                    <span className="font-bold text-blue-400 text-sm">Module Study Session (Video / Material)</span>
+                    <p className="text-slate-300 leading-relaxed">
+                      Please watch/read the module content carefully. Once you spend the required time, verification will unlock.
                     </p>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="font-semibold text-white">Assessment Proof / Solution:</label>
-                    <input
-                      type="text"
-                      value={assessmentAnswer}
-                      onChange={(e) => setAssessmentAnswer(e.target.value)}
-                      placeholder="Enter your solution code or summary..."
-                      className="w-full h-10 px-3 bg-black/60 border border-white/15 rounded-xl text-white outline-none focus:border-blue-500 text-xs"
-                    />
+                    <div className="text-3xl font-black font-mono text-emerald-400">
+                      {Math.floor(moduleTimer / 60)}:{(moduleTimer % 60).toString().padStart(2, '0')}
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
-                  <Button onClick={() => setSelectedModule(null)} variant="ghost" className="text-xs text-slate-300">Cancel</Button>
+                  <Button onClick={() => setSelectedModule(null)} variant="ghost" className="text-xs text-slate-300 cursor-pointer">Cancel</Button>
                   <Button
-                    disabled={isVerifying || !assessmentAnswer.trim()}
+                    disabled={moduleTimer > 0}
                     onClick={() => {
-                      setIsVerifying(true);
-                      setTimeout(() => {
-                        setCurriculum(prev =>
-                          prev.map(week => ({
-                            ...week,
-                            modules: week.modules.map(m => m.id === selectedModule.id ? { ...m, completed: true } : m)
-                          }))
-                        );
-                        setIsVerifying(false);
-                        setSelectedModule(null);
-                        setAssessmentAnswer("");
-                        toast.success("Module Verified & Completed!");
-                      }, 800);
+                      setCurriculum(prev =>
+                        prev.map(week => ({
+                          ...week,
+                          modules: week.modules.map(m => m.id === selectedModule.id ? { ...m, completed: true } : m)
+                        }))
+                      );
+                      setSelectedModule(null);
+                      setIsTimerRunning(false);
+                      toast.success("Module studied and verified successfully!");
                     }}
-                    className="px-6 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow"
+                    className={cn(
+                      "px-6 py-2 rounded-xl text-xs font-bold shadow cursor-pointer",
+                      moduleTimer === 0 ? "bg-emerald-600 hover:bg-emerald-500 text-white" : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                    )}
                   >
-                    {isVerifying ? <Loader2 className="size-4 animate-spin" /> : "Verify & Complete Module"}
+                    {moduleTimer === 0 ? "Mark as Studied & Complete ✅" : `Please Read (${moduleTimer}s left)...`}
                   </Button>
                 </div>
               </div>
             </div>
           )}
+
+          {/* AI Mock Interview Optional Asset Section */}
+          <div className="p-6 rounded-2xl border border-cyan-500/40 bg-slate-900/90 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
+            <div className="space-y-1 text-center sm:text-left">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-bold mb-1">
+                <Sparkles className="size-3.5" /> Optional Practice Asset
+              </div>
+              <h3 className="text-base font-bold text-white">AI Voice & Camera Mock Interview</h3>
+              <p className="text-xs text-slate-300 max-w-md">
+                Test your communication and technical knowledge with our unique AI interviewer anytime.
+              </p>
+            </div>
+            <Button
+              onClick={() => setAssessmentStage("ai-mock-interview")}
+              className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs h-11 px-6 shadow-lg shrink-0 cursor-pointer"
+            >
+              Start AI Practice Interview <Mic className="size-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </div>
     );
