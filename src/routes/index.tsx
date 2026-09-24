@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
 });
 
 // -------------------------------------------------------------
-// INSTANT FULL-WEBSITE MULTILINGUAL DICTIONARY
+// FULL WEBSITE MULTILINGUAL DICTIONARY
 // -------------------------------------------------------------
 type LanguageCode = "en" | "te" | "hi" | "ta" | "kn" | "ml" | "mr" | "bn";
 
@@ -65,6 +65,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "Unlock high-stipend corporate internships and direct interview shortlists once readiness thresholds are achieved.",
     "select_role_title": "Select Your Professional Role",
     "select_role_desc": "Choose your role to sign in or register with SkillBridge.",
+    "back_roles": "Back to Role Selection",
     "auth_signin": "Authorized Login",
     "auth_signup": "New Registration",
     "enter_creds": "Enter credentials",
@@ -93,6 +94,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "అర్హత సాధించిన తర్వాత కార్పొరేట్ ఇంటర్న్‌షిప్‌లు మరియు ఇంటర్వ్యూలను పొందండి.",
     "select_role_title": "మీ వృత్తిపరమైన పాత్రను ఎంచుకోండి",
     "select_role_desc": "స్కిల్‌బ్రిడ్జ్‌లో సైన్ ఇన్ చేయడానికి లేదా రిజిస్టర్ చేయడానికి మీ పాత్రను ఎంచుకోండి.",
+    "back_roles": "తిరిగి రోల్ ఎంపికకు వెళ్లండి",
     "auth_signin": "అధికారిక లాగిన్",
     "auth_signup": "కొత్త రిజిస్ట్రేషన్",
     "enter_creds": "మీ వివరాలను నమోదు చేయండి",
@@ -121,6 +123,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "योग्यता प्राप्त करने के बाद उच्च-वेतन वाली कॉर्पोरेट इंटर्नशिप प्राप्त करें।",
     "select_role_title": "अपनी व्यावसायिक भूमिका चुनें",
     "select_role_desc": "स्किलब्रिज के साथ साइन इन या रजिस्टर करने के लिए अपनी भूमिका चुनें।",
+    "back_roles": "भूमिका चयन पर वापस जाएं",
     "auth_signin": "अधिकृत लॉगिन",
     "auth_signup": "नया पंजीकरण",
     "enter_creds": "क्रेडेंशियल दर्ज करें",
@@ -149,6 +152,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "கார்ப்பரேட் இன்டர்ன்ஷிப்களைப் பெறுங்கள்.",
     "select_role_title": "உங்கள் தொழில்முறை பங்கைத் தேர்ந்தெடுக்கவும்",
     "select_role_desc": "ஸ்கில்பிரிட்ஜில் உள்நுழைய அல்லது பதிவு செய்ய உங்கள் பங்கைத் தேர்ந்தெடுக்கவும்.",
+    "back_roles": "பங்கு தேர்வுக்கு திரும்புக",
     "auth_signin": "உள்நுழைவு",
     "auth_signup": "புதிய பதிவு",
     "enter_creds": "சான்றுகளை உள்ளிடவும்",
@@ -156,7 +160,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "password_label": "கடவுச்சொல்",
     "forgot_pass": "கடவுச்சொல்லை மறந்துவிட்டீர்களா?",
     "btn_login": "உள்நுழைக",
-    "btn_register": " கணக்கை உருவாக்கு"
+    "btn_register": "கணக்கை உருவாக்கு"
   },
   kn: {
     "home": "ಮುಖಪುಟ",
@@ -177,6 +181,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "ಕಾರ್ಪೊರೇಟ್ ಇಂಟರ್ನ್‌ಶಿಪ್‌ಗಳನ್ನು ಪಡೆಯಿರಿ.",
     "select_role_title": "ನಿಮ್ಮ ವೃತ್ತಿಪರ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
     "select_role_desc": "ಸ್ಕಿಲ್ ಬ್ರಿಡ್ಜ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಮಾಡಲು ಅಥವಾ ನೋಂದಾಯಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "back_roles": "ಪಾತ್ರ ಆಯ್ಕೆಗೆ ಹಿಂತಿರುಗಿ",
     "auth_signin": "ಅಧಿಕೃತ ಲಾಗಿನ್",
     "auth_signup": "ಹೊಸ ನೋಂದಣಿ",
     "enter_creds": "ವಿವರಗಳನ್ನು ನಮೂದಿಸಿ",
@@ -205,6 +210,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "കോർപ്പറേറ്റ് ഇന്റേൺഷിപ്പുകൾ നേടുക.",
     "select_role_title": "നിങ്ങളുടെ പ്രൊഫഷണൽ റോൾ തിരഞ്ഞെടുക്കുക",
     "select_role_desc": "സ്കിൽബ്രിഡ്ജിൽ സൈൻ ഇൻ ചെയ്യാനോ രജിസ്റ്റർ ചെയ്യാനോ റോൾ തിരഞ്ഞെടുക്കുക.",
+    "back_roles": "റോൾ തിരഞ്ഞെടുപ്പിലേക്ക് മടങ്ങുക",
     "auth_signin": "അംഗീകൃത ലോഗിൻ",
     "auth_signup": "പുതിയ രജിസ്ട്രേഷൻ",
     "enter_creds": "വിവരങ്ങൾ നൽകുക",
@@ -233,6 +239,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "कॉर्पोरेट इंटर्नशिप मिळवा.",
     "select_role_title": "तुमची व्यावसायिक भूमिका निवडा",
     "select_role_desc": "स्किलब्रिजमध्ये साइन इन किंवा नोंदणी करण्यासाठी तुमची भूमिका निवडा.",
+    "back_roles": "भूमिका निवडीवर परत जा",
     "auth_signin": "अधिकृत लॉगिन",
     "auth_signup": "नवीन नोंदणी",
     "enter_creds": "तपशील प्रविष्ट करा",
@@ -261,6 +268,7 @@ const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
     "feat3_desc": "কর্পোরেট ইন্টার্নশিপ আনলক করুন।",
     "select_role_title": "আপনার পেশাদার ভূমিকা নির্বাচন করুন",
     "select_role_desc": "সাইন ইন বা রেজিস্টার করতে আপনার ভূমিকা নির্বাচন করুন।",
+    "back_roles": "ভূমিকা নির্বাচনে ফিরে যান",
     "auth_signin": "অনুমোদিত লগইন",
     "auth_signup": "নতুন নিবন্ধন",
     "enter_creds": "তথ্য দিন",
@@ -839,7 +847,7 @@ function Welcome() {
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white mb-6 transition cursor-pointer"
                 >
                   <ArrowLeft className="size-3.5" />
-                  Back to Role Selection
+                  {t("back_roles")}
                 </button>
 
                 <h2 className="text-2xl font-black text-white">{currentStakeholder?.title} Portal</h2>
@@ -851,7 +859,7 @@ function Welcome() {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="text-base font-bold text-slate-900">
-                    {isForgotPassword ? "Reset Password" : authMode === "signin" ? t("auth_signin") : t("auth_signup")}
+                    {isForgotPassword ? t("forgot_pass") : authMode === "signin" ? t("auth_signin") : t("auth_signup")}
                   </h3>
                   <p className="text-xs text-slate-500">
                     {isForgotPassword ? "Enter your email to receive a password reset link" : t("enter_creds")}
@@ -882,7 +890,7 @@ function Welcome() {
                           : "text-slate-600 hover:text-blue-600 hover:bg-slate-200/60"
                       )}
                     >
-                      Register
+                      {t("btn_register")}
                     </button>
                   </div>
                 )}
@@ -976,7 +984,7 @@ function Welcome() {
                   )}
 
                   <div className="space-y-1">
-                    <Label className="text-xs font-semibold text-slate-900">{currentStakeholder?.emailLabel} <span className="text-red-500">*</span></Label>
+                    <Label className="text-xs font-semibold text-slate-900">{t("email_label")} <span className="text-red-500">*</span></Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                       <Input
