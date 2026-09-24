@@ -1327,6 +1327,7 @@ function StudentAssessmentEngine() {
             <span className={cn("font-bold px-1.5 py-0.2 rounded text-[9px]", gazeStatus === "Center" ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300")}>
               {gazeStatus === "Center" ? "OK" : "Drifting"}
             </span>
+
           </div>
         </div>
 
