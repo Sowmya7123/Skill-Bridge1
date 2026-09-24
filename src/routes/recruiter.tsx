@@ -317,23 +317,23 @@ function PostOpeningDialog() {
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
-  <Button
-    disabled={tags.length === 0}
-    onClick={() => {
-      const roleTitle = title.trim() || "Full Stack Engineering Intern";
-      addCustomJob({
-        role: roleTitle,
-        company: "Acme Tech (Recruiter Post)",
-        location: "Bengaluru · Hybrid",
-        stipend: "₹35,000/mo",
-      });
-      toast.success(`Opening published & synced: ${roleTitle}`);
-      setTitle("");
-    }}
-  >
-    Publish opening
-  </Button>
-</DialogClose>
+            <Button
+              disabled={tags.length === 0}
+              onClick={() => {
+                const roleTitle = title.trim() || "Full Stack Engineering Intern";
+                addCustomJob({
+                  role: roleTitle,
+                  company: "Acme Tech (Recruiter Post)",
+                  location: "Bengaluru · Hybrid",
+                  stipend: "₹35,000/mo",
+                });
+                toast.success(`Opening published & synced: ${roleTitle}`);
+                setTitle("");
+              }}
+            >
+              Publish opening
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
