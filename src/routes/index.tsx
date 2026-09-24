@@ -40,6 +40,174 @@ export const Route = createFileRoute("/")({
   component: Welcome,
 });
 
+// -------------------------------------------------------------
+// 8-LANGUAGE DICTIONARY FOR INSTANT TRANSLATION
+// -------------------------------------------------------------
+type LanguageCode = "en" | "te" | "hi" | "ta" | "kn" | "ml" | "mr" | "bn";
+
+const TRANSLATIONS: Record<LanguageCode, Record<string, string>> = {
+  en: {
+    "home": "Home",
+    "about": "About",
+    "signin_reg": "Sign In / Register",
+    "badge": "Unified Academia & Industry Exchange",
+    "hero_title": "Bridging Academia & Industry Talent Platform",
+    "hero_desc": "SkillBridge connects students, corporate recruiters, deans, and certified industry mentors on a single verified platform.",
+    "btn_signin": "Sign In / Register",
+    "btn_learn": "Learn More",
+    "about_title": "About SkillBridge",
+    "about_desc": "Our platform bridges the gap between academic institutions and top-tier global enterprise recruitment.",
+    "feat1_title": "Verified Competency",
+    "feat1_desc": "Diagnostic technical testing and proctored evaluations provide unbiased audit trails for every student.",
+    "feat2_title": "Expert Mentorship",
+    "feat2_desc": "Connect 1:1 with industry staff architects, close skill deficits, and complete structured guidance plans.",
+    "feat3_title": "Direct Placements",
+    "feat3_desc": "Unlock high-stipend corporate internships and direct interview shortlists once readiness thresholds are achieved.",
+    "select_role_title": "Select Your Professional Role",
+    "select_role_desc": "Choose your role to sign in or register with SkillBridge."
+  },
+  te: {
+    "home": "హోమ్",
+    "about": "మా గురించి",
+    "signin_reg": "సైన్ ఇన్ / రిజిస్టర్",
+    "badge": "విద్యా మరియు పరిశ్రమల సమాఖ్య",
+    "hero_title": "విద్యా మరియు పరిశ్రమల ప్రతిభ వేదిక",
+    "hero_desc": "స్కిల్‌బ్రిడ్జ్ విద్యార్థులు, రిక్రూటర్లు మరియు మెంటార్లను ఒకే వేదికపైకి అనుసంధానిస్తుంది.",
+    "btn_signin": "సైన్ ఇన్ / రిజిస్టర్",
+    "btn_learn": "మరింత తెలుసుకోండి",
+    "about_title": "స్కిల్‌బ్రిడ్జ్ గురించి",
+    "about_desc": "విద్యా సంస్థలకు మరియు కార్పొరేట్ కంపెనీలకు మధ్య ఉన్న అంతరాన్ని మా వేదిక పూడుస్తుంది.",
+    "feat1_title": "ధృవీకరించబడిన సామర్థ్యం",
+    "feat1_desc": "సాంకేతిక పరీక్షలు మరియు మూల్యాంకనాలు ప్రతి విద్యార్థికి నిష్పాక్షికమైన నివేదికలను అందిస్తాయి.",
+    "feat2_title": "నిపుణుల మార్గదర్శకత్వం",
+    "feat2_desc": "ఇండస్ట్రీ నిపుణులతో 1:1 కనెక్ట్ అయి మీ నైపుణ్యాలను మెరుగుపరుచుకోండి.",
+    "feat3_title": "నేరుగా ప్లేస్‌మెంట్లు",
+    "feat3_desc": "అర్హత సాధించిన తర్వాత కార్పొరేట్ ఇంటర్న్‌షిప్‌లు మరియు ఇంటర్వ్యూలను పొందండి.",
+    "select_role_title": "మీ వృత్తిపరమైన పాత్రను ఎంచుకోండి",
+    "select_role_desc": "స్కిల్‌బ్రిడ్జ్‌లో సైన్ ఇన్ చేయడానికి లేదా రిజిస్టర్ చేయడానికి మీ పాత్రను ఎంచుకోండి."
+  },
+  hi: {
+    "home": "होम",
+    "about": "हमारे बारे में",
+    "signin_reg": "साइन इन / रजिस्टर",
+    "badge": "एकीकृत अकादमी और उद्योग एक्सचेंज",
+    "hero_title": "अकादमिक और उद्योग प्रतिभा मंच",
+    "hero_desc": "स्किलब्रिज छात्रों, कॉर्पोरेट भर्तीकर्ताओं और सलाहकारों को एक ही मंच पर जोड़ता है।",
+    "btn_signin": "साइन इन / रजिस्टर",
+    "btn_learn": "और जानें",
+    "about_title": "स्किलब्रिज के बारे में",
+    "about_desc": "हमारा मंच शैक्षणिक संस्थानों और कॉर्पोरेट जगत के बीच की दूरी को कम करता है।",
+    "feat1_title": "सत्यापित दक्षता",
+    "feat1_desc": "निदान तकनीकी परीक्षण और मूल्यांकन प्रत्येक छात्र के लिए निष्पक्ष ऑडिट ट्रेल प्रदान करते हैं।",
+    "feat2_title": "विशेषज्ञ मार्गदर्शन",
+    "feat2_desc": "उद्योग विशेषज्ञों से जुड़ें और अपने कौशल अंतराल को दूर करें।",
+    "feat3_title": "प्रत्यक्ष प्लेसमेंट",
+    "feat3_desc": "योग्यता प्राप्त करने के बाद उच्च-वेतन वाली कॉर्पोरेट इंटर्नशिप और साक्षात्कार प्राप्त करें।",
+    "select_role_title": "अपनी व्यावसायिक भूमिका चुनें",
+    "select_role_desc": "स्किलब्रिज के साथ साइन इन या रजिस्टर करने के लिए अपनी भूमिका चुनें।"
+  },
+  ta: {
+    "home": "முகப்பு",
+    "about": "பற்றி",
+    "signin_reg": "உள்நுழைக / பதிவு செய்க",
+    "badge": "கல்வி மற்றும் தொழில்துறை பரிமாற்றம்",
+    "hero_title": "கல்வி மற்றும் தொழில்துறை திறமை தளம்",
+    "hero.desc": "மாணவர்கள், நிறுவன recruiters மற்றும் mentor-களை இணைக்கும் தளம்.",
+    "btn_signin": "உள்நுழைக / பதிவு செய்க",
+    "btn_learn": "மேலும் அறிக",
+    "about_title": "ஸ்கில்பிரிட்ஜ் பற்றி",
+    "about_desc": "கல்வி நிறுவனங்களுக்கும் பெரு நிறுவனங்களுக்கும் இடையேயான இடைவெளியைக் குறைக்கிறது.",
+    "feat1_title": "சரிபார்க்கப்பட்ட திறன்",
+    "feat1_desc": "தொழில்நுட்ப சோதனைகள் ஒவ்வொரு மாணவருக்கும் பக்கச்சார்பற்ற முடிவுகளை வழங்குகின்றன.",
+    "feat2_title": "நிபுணர் வழிகாட்டுதல்",
+    "feat2_desc": "தொழில் துறை நிபுணர்களுடன் இணைந்திருங்கள்.",
+    "feat3_title": "நேரடி வேலை வாய்ப்புகள்",
+    "feat3_desc": "கார்ப்பரேட் இன்டர்ன்ஷிப்களைப் பெறுங்கள்.",
+    "select_role_title": "உங்கள் தொழில்முறை பங்கைத் தேர்ந்தெடுக்கவும்",
+    "select_role_desc": "ஸ்கில்பிரிட்ஜில் உள்நுழைய அல்லது பதிவு செய்ய உங்கள் பங்கைத் தேர்ந்தெடுக்கவும்."
+  },
+  kn: {
+    "home": "ಮುಖಪುಟ",
+    "about": "ನಮ್ಮ ಬಗ್ಗೆ",
+    "signin_reg": "ಸೈನ್ ಇನ್ / ನೋಂದಣಿ",
+    "badge": "ಶೈಕ್ಷಣಿಕ ಮತ್ತು ಕೈಗಾರಿಕಾ ವಿನಿಮಯ",
+    "hero_title": "ಶೈಕ್ಷಣಿಕ ಮತ್ತು ಕೈಗಾರಿಕಾ ಪ್ರತಿಭಾ ವೇದಿಕೆ",
+    "hero_desc": "ವಿದ್ಯಾರ್ಥಿಗಳು, ನೇಮಕಾತದಾರರು ಮತ್ತು ಮಾರ್ಗದರ್ಶಕರನ್ನು ಒಂದೇ ವೇದಿಕೆಯಲ್ಲಿ ಸಂಪರ್ಕಿಸುತ್ತದೆ.",
+    "btn_signin": "ಸೈನ್ ಇನ್ / ನೋಂದಣಿ",
+    "btn_learn": "ಹೆಚ್ಚು ತಿಳಿಯಿರಿ",
+    "about_title": "ಸ್ಕಿಲ್ ಬ್ರಿಡ್ಜ್ ಬಗ್ಗೆ",
+    "about_desc": "ಶಿಕ್ಷಣ ಸಂಸ್ಥೆಗಳು ಮತ್ತು ಕಾರ್ಪೊರೇಟ್ ಕಂಪನಿಗಳ ನಡುವಿನ ಅಂತರವನ್ನು ಕಡಿಮೆ ಮಾಡುತ್ತದೆ.",
+    "feat1_title": "ಪರಿಶೀಲಿಸಿದ ಸಾಮರ್ಥ್ಯ",
+    "feat1_desc": "ತಾಂತ್ರಿಕ ಪರೀಕ್ಷೆಗಳು ಮತ್ತು ಮೌಲ್ಯಮಾಪನಗಳು ಪ್ರತಿ ವಿದ್ಯಾರ್ಥಿಗೆ ಸಹಾಯ ಮಾಡುತ್ತವೆ.",
+    "feat2_title": "ತಜ್ಞರ ಮಾರ್ಗದರ್ಶನ",
+    "feat2_desc": "ಉದ್ಯಮ ತಜ್ಞರೊಂದಿಗೆ ಸಂಪರ್ಕ ಸಾಧಿಸಿ.",
+    "feat3_title": "ನೇರ ಉದ್ಯೋಗ ಅವಕಾಶಗಳು",
+    "feat3_desc": "ಕಾರ್ಪೊರೇಟ್ ಇಂಟರ್ನ್‌ಶಿಪ್‌ಗಳನ್ನು ಪಡೆಯಿರಿ.",
+    "select_role_title": "ನಿಮ್ಮ ವೃತ್ತಿಪರ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "select_role_desc": "ಸ್ಕಿಲ್ ಬ್ರಿಡ್ಜ್‌ನಲ್ಲಿ ಸೈನ್ ಇನ್ ಮಾಡಲು ಅಥವಾ ನೋಂದಾಯಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ."
+  },
+  ml: {
+    "home": "ഹോം",
+    "about": "ഞങ്ങളെക്കുറിച്ച്",
+    "signin_reg": "സൈൻ ഇൻ / രജിസ്റ്റർ",
+    "badge": "അക്കാദമി & ഇൻഡസ്ട്രി എക്സ്ചേഞ്ച്",
+    "hero_title": "അക്കാദമിയെയും വ്യവസായ പ്രതിഭകളെയും ബന്ധിപ്പിക്കുന്ന പ്ലാറ്റ്‌ഫോം",
+    "hero_desc": "വിദ്യാർത്ഥികളെയും റിക്രൂട്ടർമാരെയും മെന്റർമാരെയും ഒരൊറ്റ പ്ലാറ്റ്‌ഫോമിൽ ബന്ധിപ്പിക്കുന്നു.",
+    "btn_signin": "സൈൻ ഇൻ / രജിസ്റ്റർ",
+    "btn_learn": "കൂടുതൽ അറിയുക",
+    "about_title": "സ്കിൽബ്രിഡ്ജിനെക്കുറിച്ച്",
+    "about_desc": "വിദ്യാഭ്യാസ സ്ഥാപനങ്ങളും കോർപ്പറേറ്റ് സ്ഥാപനങ്ങളും തമ്മിലുള്ള അന്തരം കുറയ്ക്കുന്നു.",
+    "feat1_title": "പരിശോധിച്ച കഴിവ്",
+    "feat1_desc": "സാങ്കേതിക പരിശോധനകളും വിലയിരുത്തലുകളും സുതാര്യമായ വിവരങ്ങൾ നൽകുന്നു.",
+    "feat2_title": "വിദഗ്ദ്ധ മാർഗ്ഗനിർദ്ദേശം",
+    "feat2_desc": "വ്യവസായ വിദഗ്ദ്ധരുമായി ബന്ധപ്പെടുക.",
+    "feat3_title": "നേരിട്ടുള്ള പ്ലേസ്‌മെന്റുകൾ",
+    "feat3_desc": "കോർപ്പറേറ്റ് ഇന്റേൺഷിപ്പുകൾ നേടുക.",
+    "select_role_title": "നിങ്ങളുടെ പ്രൊഫഷണൽ റോൾ തിരഞ്ഞെടുക്കുക",
+    "select_role_desc": "സ്കിൽബ്രിഡ്ജിൽ സൈൻ ഇൻ ചെയ്യാനോ രജിസ്റ്റർ ചെയ്യാനോ റോൾ തിരഞ്ഞെടുക്കുക."
+  },
+  mr: {
+    "home": "मुखपृष्ठ",
+    "about": "आमच्याबद्दल",
+    "signin_reg": "साइन इन / नोंदणी",
+    "badge": "शैक्षणिक आणि उद्योग एक्सचेंज",
+    "hero_title": "शैक्षणिक आणि उद्योग प्रतिभा मंच",
+    "hero_desc": "स्किलब्रिज विद्यार्थी, कॉर्पोरेट रिक्रूटर्स आणि मेंटर्सना एकाच व्यासपीठावर जोडते.",
+    "btn_signin": "साइन इन / नोंदणी",
+    "btn_learn": "अधिक जाणून घ्या",
+    "about_title": "स्किलब्रिजबद्दल",
+    "about_desc": "आमचे व्यासपीठ शैक्षणिक संस्था आणि कॉर्पोरेट कंपन्यांमधील अंतर भरून काढते.",
+    "feat1_title": "तपासलेली क्षमता",
+    "feat1_desc": "तांत्रिक चाचण्या आणि मूल्यमापन प्रत्येक विद्यार्थ्यासाठी पारदर्शक अहवाल देतात.",
+    "feat2_title": "तज्ज्ञ मार्गदर्शन",
+    "feat2_desc": "उद्योग तज्ज्ञांशी कनेक्ट व्हा.",
+    "feat3_title": "थेट प्लेसमेंट",
+    "feat3_desc": "कॉर्पोरेट इंटर्नशिप मिळवा.",
+    "select_role_title": "तुमची व्यावसायिक भूमिका निवडा",
+    "select_role_desc": "स्किलब्रिजमध्ये साइन इन किंवा नोंदणी करण्यासाठी तुमची भूमिका निवडा."
+  },
+  bn: {
+    "home": "হোম",
+    "about": "সম্পর্কে",
+    "signin_reg": "সাইন ইন / রেজিস্টার",
+    "badge": "একাডেমি ও ইন্ডাস্ট্রি এক্সচেঞ্জ",
+    "hero_title": "একাডেমি ও ইন্ডাস্ট্রি ট্যালেন্ট প্ল্যাটফর্ম",
+    "hero_desc": "স্কিলব্রিজ শিক্ষার্থী, নিয়োগকর্তা এবং মেন্টরদের একটি একক প্ল্যাটফর্মে সংযুক্ত করে।",
+    "btn_signin": "সাইন ইন / রেজিস্টার",
+    "btn_learn": "আরও জানুন",
+    "about_title": "স্কিলব্রিজ সম্পর্কে",
+    "about_desc": "আমাদের প্ল্যাটফর্ম শিক্ষা প্রতিষ্ঠান এবং কর্পোরেট নিয়োগের মধ্যকার দূরত্ব কমায়।",
+    "feat1_title": "যাচাইকৃত যোগ্যতা",
+    "feat1_desc": "প্রযুক্তিগত পরীক্ষা এবং মূল্যায়ন প্রতিটি শিক্ষার্থীর জন্য নিরপেক্ষ অডিট ট্রেইল প্রদান করে।",
+    "feat2_title": "বিশেষজ্ঞ মেন্টরশিপ",
+    "feat2_desc": "শিল্প বিশেষজ্ঞদের সাথে সংযুক্ত হন।",
+    "feat3_title": "সরাসরি প্লেসমেন্ট",
+    "feat3_desc": "কর্পোরেট ইন্টার্নশিপ আনলক করুন।",
+    "select_role_title": "আপনার পেশাদার ভূমিকা নির্বাচন করুন",
+    "select_role_desc": "সাইন ইন বা রেজিস্টার করতে আপনার ভূমিকা নির্বাচন করুন।"
+  }
+};
+
 interface StakeholderTheme {
   id: RoleId;
   badge: string;
@@ -172,14 +340,14 @@ const STAKEHOLDERS: StakeholderTheme[] = [
 
 function LanguageMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState("en");
+  const [currentLang, setCurrentLang] = useState<LanguageCode>("en");
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
-    if (match && match[1]) {
-      setCurrentLang(match[1]);
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("skillbridge_lang") as LanguageCode;
+    if (saved && TRANSLATIONS[saved]) {
+      setCurrentLang(saved);
     }
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -190,16 +358,15 @@ function LanguageMenu() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLanguageSelect = (langCode: string) => {
+  const handleLanguageSelect = (langCode: LanguageCode) => {
     if (typeof window === "undefined") return;
-    document.cookie = `googtrans=/en/${langCode}; path=/;`;
-    document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
+    localStorage.setItem("skillbridge_lang", langCode);
     setCurrentLang(langCode);
     setIsOpen(false);
     window.location.reload();
   };
 
-  const languages = [
+  const languages: { code: LanguageCode; label: string; native: string }[] = [
     { code: "en", label: "English", native: "English" },
     { code: "te", label: "Telugu", native: "తెలుగు" },
     { code: "hi", label: "Hindi", native: "हिंदी" },
@@ -250,6 +417,20 @@ function LanguageMenu() {
 function Welcome() {
   const navigate = useNavigate();
   const { signIn, completeRegistration } = useAppState();
+
+  const [currentLang, setCurrentLang] = useState<LanguageCode>("en");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("skillbridge_lang") as LanguageCode;
+    if (saved && TRANSLATIONS[saved]) {
+      setCurrentLang(saved);
+    }
+  }, []);
+
+  const t = (key: string) => {
+    return TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS["en"]?.[key] || key;
+  };
 
   const [selectedRole, setSelectedRole] = useState<RoleId | null>(null);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
@@ -435,9 +616,9 @@ function Welcome() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8 text-xs font-semibold text-slate-600">
-          <a href="#" className="hover:text-blue-600 transition">Home</a>
-          <a href="#about" className="hover:text-blue-600 transition">About</a>
-          <button onClick={scrollToRoles} className="hover:text-blue-600 transition cursor-pointer">Sign In / Register</button>
+          <a href="#" className="hover:text-blue-600 transition">{t("home")}</a>
+          <a href="#about" className="hover:text-blue-600 transition">{t("about")}</a>
+          <button onClick={scrollToRoles} className="hover:text-blue-600 transition cursor-pointer">{t("signin_reg")}</button>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -455,9 +636,9 @@ function Welcome() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 z-40 bg-white border-b border-slate-200 p-4 shadow-xl flex flex-col gap-3">
-          <a href="#" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">Home</a>
-          <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">About</a>
-          <button onClick={() => { scrollToRoles(); setMobileMenuOpen(false); }} className="text-xs font-semibold text-left text-blue-600 py-2 cursor-pointer">Sign In / Register</button>
+          <a href="#" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">{t("home")}</a>
+          <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-xs font-medium text-slate-700 py-2 border-b border-slate-100">{t("about")}</a>
+          <button onClick={() => { scrollToRoles(); setMobileMenuOpen(false); }} className="text-xs font-semibold text-left text-blue-600 py-2 cursor-pointer">{t("signin_reg")}</button>
         </div>
       )}
 
@@ -468,15 +649,15 @@ function Welcome() {
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-700 shadow-2xs">
             <Sparkles className="size-3.5 text-blue-600" />
-            Unified Academia & Industry Exchange
+            {t("badge")}
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.15]">
-            Bridging Academia & Industry Talent Platform
+            {t("hero_title")}
           </h1>
 
           <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            SkillBridge connects students, corporate recruiters, deans, and certified industry mentors on a single verified platform.
+            {t("hero_desc")}
           </p>
 
           <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
@@ -484,14 +665,14 @@ function Welcome() {
               onClick={scrollToRoles}
               className="px-8.5 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-lg shadow-blue-600/25 transition cursor-pointer"
             >
-              Sign In / Register
+              {t("btn_signin")}
             </Button>
             <Button
               onClick={() => setShowLearnMoreModal(true)}
               variant="outline"
               className="px-8.5 py-4 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm shadow-2xs transition cursor-pointer"
             >
-              Learn More
+              {t("btn_learn")}
             </Button>
           </div>
         </div>
@@ -500,9 +681,9 @@ function Welcome() {
       {/* About Section */}
       <section id="about" className="py-20 px-6 max-w-7xl mx-auto w-full">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">About SkillBridge</h2>
+          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">{t("about_title")}</h2>
           <p className="text-sm text-slate-600 leading-relaxed">
-            Our platform bridges the gap between academic institutions and top-tier global enterprise recruitment.
+            {t("about_desc")}
           </p>
         </div>
 
@@ -511,9 +692,9 @@ function Welcome() {
             <div className="size-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold">
               01
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Verified Competency</h3>
+            <h3 className="text-lg font-bold text-slate-900">{t("feat1_title")}</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Diagnostic technical testing and proctored evaluations provide unbiased audit trails for every student.
+              {t("feat1_desc")}
             </p>
           </div>
 
@@ -521,9 +702,9 @@ function Welcome() {
             <div className="size-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-bold">
               02
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Expert Mentorship</h3>
+            <h3 className="text-lg font-bold text-slate-900">{t("feat2_title")}</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Connect 1:1 with industry staff architects, close skill deficits, and complete structured guidance plans.
+              {t("feat2_desc")}
             </p>
           </div>
 
@@ -531,9 +712,9 @@ function Welcome() {
             <div className="size-12 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-600 font-bold">
               03
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Direct Placements</h3>
+            <h3 className="text-lg font-bold text-slate-900">{t("feat3_title")}</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Unlock high-stipend corporate internships and direct interview shortlists once readiness thresholds are achieved.
+              {t("feat3_desc")}
             </p>
           </div>
         </div>
@@ -542,9 +723,9 @@ function Welcome() {
       {/* Role Selection & Auth Section */}
       <section ref={rolesSectionRef} className="py-16 px-6 max-w-7xl mx-auto w-full border-t border-slate-200 bg-white">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Select Your Professional Role</h2>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">{t("select_role_title")}</h2>
           <p className="text-xs sm:text-sm text-slate-600">
-            Choose your role to sign in or register with SkillBridge.
+            {t("select_role_desc")}
           </p>
         </div>
 
