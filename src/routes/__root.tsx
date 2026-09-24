@@ -7,7 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, useRef, type ReactNode } from "react";
+import { Globe, MoreVertical, Check } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
@@ -107,6 +108,84 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
+
+// Global Language Menu Component
+export function GlobalLanguageMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState("en");
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
+    if (match && match[1]) {
+      setCurrentLang(match[1]);
+    }
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLanguageSelect = (langCode: string) => {
+    if (typeof window === "undefined") return;
+    document.cookie = `googtrans=/en/${langCode}; path=/;`;
+    document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
+    setCurrentLang(langCode);
+    setIsOpen(false);
+    window.location.reload();
+  };
+
+  const languages = [
+    { code: "en", label: "English", native: "English" },
+    { code: "te", label: "Telugu", native: "తెలుగు" },
+    { code: "hi", label: "Hindi", native: "हिंदी" },
+    { code: "ta", label: "Tamil", native: "தமிழ்" },
+    { code: "kn", label: "Kannada", native: "ಕನ್ನಡ" },
+    { code: "ml", label: "Malayalam", native: "മലയാളം" },
+    { code: "mr", label: "Marathi", native: "मराठी" },
+    { code: "bn", label: "Bengali", native: "বাংলা" },
+  ];
+
+  return (
+    <div className="relative inline-block text-left" ref={menuRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer shadow-2xs"
+        title="Language"
+      >
+        <MoreVertical className="size-4" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1 sticky top-0 bg-white z-10">
+            <Globe className="size-3.5" />
+            Select Language
+          </div>
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              type="button"
+              onClick={() => handleLanguageSelect(lang.code)}
+              className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+            >
+              <div className="flex flex-col text-left">
+                <span className="font-semibold text-slate-900">{lang.native}</span>
+                <span className="text-[10px] text-slate-400">{lang.label}</span>
+              </div>
+              {currentLang === lang.code && <Check className="size-3.5 text-blue-600 stroke-[2.5]" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
