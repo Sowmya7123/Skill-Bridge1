@@ -109,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-// Global Language Menu Component with Native Google Translate Hook
+// Global Language Menu Component with 8 Indian & Global Languages
 export function GlobalLanguageMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState("en");
@@ -117,9 +117,9 @@ export function GlobalLanguageMenu() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2,3})/);
-    if (match && match[1]) {
-      setCurrentLang(match[1]);
+    const saved = localStorage.getItem("skillbridge_lang");
+    if (saved) {
+      setCurrentLang(saved);
     }
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -128,35 +128,15 @@ export function GlobalLanguageMenu() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-
-    // Load Google Translate Script globally if not already loaded
-    if (!document.getElementById("google-translate-script")) {
-      const addScript = document.createElement("script");
-      addScript.id = "google-translate-script";
-      addScript.type = "text/javascript";
-      addScript.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      document.body.appendChild(addScript);
-
-      (window as any).googleTranslateElementInit = () => {
-        if ((window as any).google && (window as any).google.translate) {
-          new (window as any).google.translate.TranslateElement(
-            { pageLanguage: "en", includedLanguages: "en,te,hi,ta,kn,ml,mr,bn", autoDisplay: false },
-            "google_translate_element"
-          );
-        }
-      };
-    }
-
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLanguageSelect = (langCode: string) => {
     if (typeof window === "undefined") return;
-    document.cookie = `googtrans=/en/${langCode}; path=/;`;
-    document.cookie = `googtrans=/en/${langCode}; domain=${window.location.hostname}; path=/;`;
+    localStorage.setItem("skillbridge_lang", langCode);
     setCurrentLang(langCode);
     setIsOpen(false);
-    window.location.reload();
+    window.location.reload(); // Instantly refresh the app to apply selected language
   };
 
   const languages = [
@@ -180,9 +160,6 @@ export function GlobalLanguageMenu() {
       >
         <MoreVertical className="size-4" />
       </button>
-
-      {/* Hidden google translate element container required for initialization */}
-      <div id="google_translate_element" style={{ display: "none" }} />
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-56 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl z-50">
