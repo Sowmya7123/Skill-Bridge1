@@ -49,12 +49,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/recruiter")({
   head: () => ({
     meta: [
-      { title: "Recruiter Command Center — SkillBridge" },
+      { title: "Recruiter Dashboard — SkillBridge" },
       {
         name: "description",
         content: "Track your hiring pipeline and shortlist verified student talent by AI match score.",
       },
-      { property: "og:title", content: "Recruiter Command Center — SkillBridge" },
+      { property: "og:title", content: "Recruiter Dashboard — SkillBridge" },
       { property: "og:description", content: "Verified candidate pool, AI match scores and role posting in one place." },
     ],
   }),
@@ -66,7 +66,7 @@ function RecruiterDashboard() {
   const [pathFilter, setPathFilter] = useState("all");
   const [dbCandidates, setDbCandidates] = useState<any[]>([]);
 
-  // Database nunchi kevalam student side login/assess aina real students data matrame fetch cheyyadam
+  // Database nunchi real students data fetch chese logic
   useEffect(() => {
     async function fetchStudentCandidates() {
       const { data, error } = await supabase
@@ -90,7 +90,6 @@ function RecruiterDashboard() {
     fetchStudentCandidates();
   }, []);
 
-  // Ikkada static CANDIDATES ni పూర్తిగా tholiginchaam. Only database lo unna real students matrame untaru!
   const allCandidates = useMemo(() => {
     return dbCandidates;
   }, [dbCandidates]);
@@ -109,8 +108,8 @@ function RecruiterDashboard() {
 
   return (
     <PageShell
-      title="Recruiter Command Center"
-      subtitle="Discover verified student talent and build your hiring pipeline."
+      title="Recruiter Dashboard"
+      subtitle="Hire verified talent with skill scores backed by assessments and reviewed projects."
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Active Openings" value="12" hint="3 closing this week" icon={Briefcase} />
